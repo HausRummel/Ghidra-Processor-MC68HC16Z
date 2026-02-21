@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/processor_spec.rxg -->
+
+<processor_spec>
+  <programcounter register="PC"/>
+  <volatile outputop="write_volatile" inputop="read_volatile">
+    <range space="ram" first="0x0FF000" last="0x0FFFFF"/>
+  </volatile>
+  <default_symbols>
+    <!-- Reset vector locations in bank 0 -->
+    <symbol name="VEC_RESET_ZK_SK_PK" address="ram:0x0000" entry="true"/>
+    <symbol name="VEC_RESET_PC"       address="ram:0x0002" entry="true"/>
+    <symbol name="VEC_RESET_SP"       address="ram:0x0004"/>
+    <symbol name="VEC_RESET_IZ"       address="ram:0x0006"/>
+    <symbol name="VEC_BKPT"           address="ram:0x0008"/>
+    <symbol name="VEC_BERR"           address="ram:0x000A"/>
+    <symbol name="VEC_SWI"            address="ram:0x000C"/>
+    <symbol name="VEC_ILLEGAL"        address="ram:0x000E"/>
+    <symbol name="VEC_DIV_ZERO"       address="ram:0x0010"/>
+    <symbol name="VEC_UNINITIALIZED"  address="ram:0x001E"/>
+    <symbol name="VEC_LVL1_AUTO"      address="ram:0x0022"/>
+    <symbol name="VEC_LVL2_AUTO"      address="ram:0x0024"/>
+    <symbol name="VEC_LVL3_AUTO"      address="ram:0x0026"/>
+    <symbol name="VEC_LVL4_AUTO"      address="ram:0x0028"/>
+    <symbol name="VEC_LVL5_AUTO"      address="ram:0x002A"/>
+    <symbol name="VEC_LVL6_AUTO"      address="ram:0x002C"/>
+    <symbol name="VEC_LVL7_AUTO"      address="ram:0x002E"/>
+    <symbol name="VEC_SPURIOUS"       address="ram:0x0030"/>
+
+    <!-- MC68HC16Z3 I/O register blocks (with Y=0xF for MM=1) -->
+    <symbol name="REG_ADC_BASE"       address="ram:0x0FF700"/>
+    <symbol name="REG_MRM_BASE"       address="ram:0x0FF820"/>
+    <symbol name="REG_GPT_BASE"       address="ram:0x0FF900"/>
+    <symbol name="REG_SIM_BASE"       address="ram:0x0FFA00"/>
+    <symbol name="REG_SRAM_BASE"      address="ram:0x0FFB00"/>
+    <symbol name="REG_QSM_BASE"       address="ram:0x0FFC00"/>
+  </default_symbols>
+  <default_memory_blocks>
+    <memory_block name="IO_REGS" start_address="ram:0x0FF700" length="0x900" initialized="false" mode="rwv"/>
+  </default_memory_blocks>
+  <register_data>
+    <register name="A"    group="GP"/>
+    <register name="B"    group="GP"/>
+    <register name="D"    group="GP"/>
+    <register name="E"    group="GP"/>
+    <register name="IX"   group="Index"/>
+    <register name="IY"   group="Index"/>
+    <register name="IZ"   group="Index"/>
+    <register name="SP"   group="Stack"/>
+    <register name="PC"   group="PC"/>
+    <register name="CCR"  group="Flags"/>
+    <register name="EK"   group="Extension"/>
+    <register name="XK"   group="Extension"/>
+    <register name="YK"   group="Extension"/>
+    <register name="ZK"   group="Extension"/>
+    <register name="SK"   group="Extension"/>
+    <register name="PK"   group="Extension"/>
+    <register name="HR"   group="MAC"/>
+    <register name="IR"   group="MAC"/>
+    <register name="AM"   group="MAC"/>
+    <register name="AM_EXT" group="MAC"/>
+    <register name="XMSK" group="MAC"/>
+    <register name="YMSK" group="MAC"/>
+  </register_data>
+</processor_spec>
+

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/language_definitions.rxg -->
+
+<language_definitions>
+  <language processor="68HC16"
+           endian="big"
+           size="24"
+           variant="default"
+           version="1.0"
+           slafile="68HC16.sla"
+           processorspec="68HC16.pspec"
+           id="68HC16:BE:24:default">
+    <description>Motorola MC68HC16 (CPU16)</description>
+    <compiler name="MC68HC16Zx" spec="68HC16.cspec" id="default"/>
+  </language>
+</language_definitions>

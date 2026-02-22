@@ -986,7 +986,7 @@ RmPC:  ""      is rm_pc=0  { }
 # --- SXT: Sign Extend B into A ---
 :SXT   is op8=0x27; op8b=0xF8  { A = (B s>> 7); setNZ8(A); }
 
-# --- Extension register transfers (B ↔ xK) ---
+# --- Extension register transfers (B <-> xK) ---
 :TBEK  is op8=0x27; op8b=0xFA  { EK = B & 0x0F; }
 :TBXK  is op8=0x37; op8b=0x9C  { XK = B & 0x0F; }
 :TBYK  is op8=0x37; op8b=0x9D  { YK = B & 0x0F; }
@@ -1718,7 +1718,7 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 # SECTION: BCLR - Clear Bit(s) in memory byte
 # (M) & ~(Mask) => M
-# Flags: N=∆ Z=∆ V=0 C=—
+# Flags: N=delta Z=delta V=0 C=--
 # IND8 modes use prefix 0x17; IND16/EXT modes are unprefixed
 # Encoding: [prefix] opcode mask8 offset/addr
 # ============================================================================
@@ -1804,7 +1804,7 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 # SECTION: BSET - Set Bit(s) in memory byte
 # (M) | (Mask) => M
-# Flags: N=∆ Z=∆ V=0 C=—
+# Flags: N=delta Z=delta V=0 C=--
 # ============================================================================
 
 # BSET IND8,X: 17 09 mm ff
@@ -1888,7 +1888,7 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 # SECTION: BCLRW - Clear Bit(s) in memory word
 # (M:M+1) & ~(Mask16) => M:M+1
-# Flags: N=∆ Z=∆ V=0 C=—
+# Flags: N=delta Z=delta V=0 C=--
 # All modes use page 3 prefix (0x27)
 # Encoding: 27 opcode offset16 mask16
 # ============================================================================
@@ -1933,7 +1933,7 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 # SECTION: BSETW - Set Bit(s) in memory word
 # (M:M+1) | (Mask16) => M:M+1
-# Flags: N=∆ Z=∆ V=0 C=—
+# Flags: N=delta Z=delta V=0 C=--
 # ============================================================================
 
 # BSETW IND16,X: 27 09 gggg mmmm
@@ -2118,7 +2118,7 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 # SECTION: SBCE - Subtract with Carry from E
 # (E) - (M:M+1) - C => E
-# Flags: N=∆ Z=∆ V=∆ C=∆
+# Flags: N=delta Z=delta V=delta C=delta
 # ============================================================================
 
 :SBCE "#"^imm16   is op8=0x37; op8b=0x32; imm16 {
@@ -2160,7 +2160,7 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 # SECTION: ADCE - Add with Carry to E
 # (E) + (M:M+1) + C => E
-# Flags: N=∆ Z=∆ V=∆ C=∆
+# Flags: N=delta Z=delta V=delta C=delta
 # ============================================================================
 
 :ADCE "#"^imm16   is op8=0x37; op8b=0x33; imm16 {
@@ -2205,7 +2205,7 @@ RmPC:  ""      is rm_pc=0  { }
 # Qualified IX/IY update, load HR/IR from memory
 # Opcode: 7B xoyo
 # The xo:yo byte encodes 4-bit signed offsets for IX and IY modification
-# Flags: MV=∆ EV=∆ V=∆
+# Flags: MV=delta EV=delta V=delta
 # ============================================================================
 
 :MAC macoffs  is op8=0x7B; macoffs & mac_xo & mac_yo {
@@ -2320,7 +2320,7 @@ RmPC:  ""      is rm_pc=0  { }
 
 # TMER: Transfer Rounded AM to E  (INH, opcode 27B4)
 # Rounds AM[31:16] by adding AM[15], with saturation support
-# Flags: MV=∆ EV=∆ N=∆ Z=∆
+# Flags: MV=delta EV=delta N=delta Z=delta
 :TMER   is op8=0x27; op8b=0xB4  {
     local upper:2 = AM[16,16];
     local roundbit:2 = zext(AM[15,1]);
@@ -2346,7 +2346,7 @@ RmPC:  ""      is rm_pc=0  { }
 
 # TMET: Transfer Truncated AM to E  (INH, opcode 27B5)
 # AM[31:16] => E (no rounding), with saturation support
-# Flags: N=∆ Z=∆
+# Flags: N=delta Z=delta
 :TMET   is op8=0x27; op8b=0xB5  {
     local saturate:1 = SM_flag & (EV_flag | MV_flag);
     if (saturate == 0) goto <tmet_nosaturate>;

@@ -27,35 +27,35 @@ define space register type=register_space size=1;
 # Register Definitions
 # =============================================================================
 
-# --- Accumulators ---
+# = Accumulators =
 # D = A:B (big-endian: A is high byte at lower offset, B is low byte)
 define register offset=0x00 size=2 [ D ];
 define register offset=0x00 size=1 [ A B ];
 define register offset=0x02 size=2 [ E ];
 
-# --- Index Registers and Stack Pointer (16-bit) ---
+# = Index Registers and Stack Pointer (16-bit) =
 define register offset=0x10 size=2 [ IX IY IZ SP ];
 
-# --- Program Counter (full 24-bit for Ghidra's address space) ---
+# = Program Counter (full 24-bit for Ghidra's address space) =
 define register offset=0x20 size=3 [ PC ];
 
-# --- Condition Code Register (16-bit) ---
+# = Condition Code Register (16-bit) =
 # Bit layout: [S:MV:H:EV:N:Z:V:C : IP2:IP1:IP0:SM:PK3:PK2:PK1:PK0]
 define register offset=0x30 size=2 [ CCR ];
 
-# --- Address Extension Fields (4-bit each, stored as 1-byte) ---
+# = Address Extension Fields (4-bit each, stored as 1-byte) =
 define register offset=0x40 size=1 [ PK EK XK YK ZK SK ];
 
-# --- Individual CCR flags (as 1-byte pseudo-registers) ---
+# = Individual CCR flags (as 1-byte pseudo-registers) =
 define register offset=0x50 size=1 [ S_flag MV_flag H_flag EV_flag N_flag Z_flag V_flag C_flag ];
 
-# --- MAC Registers ---
+# = MAC Registers =
 define register offset=0x60 size=2 [ HR IR ];
 define register offset=0x64 size=4 [ AM ];       # using 32-bit for AM[31:0]
 define register offset=0x68 size=1 [ AM_EXT ];   # AM[35:32] extension bits
 define register offset=0x6A size=1 [ XMSK YMSK ];
 
-# --- Temporary/internal registers ---
+# = Temporary/internal registers =
 define register offset=0x80 size=3 [ EADDR ];    # effective address scratchpad
 define register offset=0x84 size=1 [ SM_flag ];  # saturation mode
 define register offset=0x85 size=1 [ IP_bits ];  # interrupt priority [2:0]
@@ -236,49 +236,49 @@ macro pull16(val) {
 # Addressing Mode Sub-Constructors
 # =============================================================================
 
-# --- 8-bit Indexed (IND8,X / IND8,Y / IND8,Z) ---
+# = 8-bit Indexed (IND8,X / IND8,Y / IND8,Z) =
 # Unsigned 8-bit offset added to index register + extension
 
 IND8X: imm8^",X"  is imm8  { local ea:3 = (zext(XK:1) << 16) | zext(IX + zext(imm8:2)); export ea; }
 IND8Y: imm8^",Y"  is imm8  { local ea:3 = (zext(YK:1) << 16) | zext(IY + zext(imm8:2)); export ea; }
 IND8Z: imm8^",Z"  is imm8  { local ea:3 = (zext(ZK:1) << 16) | zext(IZ + zext(imm8:2)); export ea; }
 
-# --- 16-bit Indexed (IND16,X / IND16,Y / IND16,Z) ---
+# = 16-bit Indexed (IND16,X / IND16,Y / IND16,Z) =
 # Signed 16-bit offset added to index register + extension
 
 IND16X: simm16^",X"  is simm16  { local ea:3 = (zext(XK:1) << 16) | zext(IX + simm16); export ea; }
 IND16Y: simm16^",Y"  is simm16  { local ea:3 = (zext(YK:1) << 16) | zext(IY + simm16); export ea; }
 IND16Z: simm16^",Z"  is simm16  { local ea:3 = (zext(ZK:1) << 16) | zext(IZ + simm16); export ea; }
 
-# --- Extended (EXT) ---
+# = Extended (EXT) =
 # EK concatenated with 16-bit address
 
 EXT16: addr16  is addr16  { local hi:3 = zext(EK:1) << 16; local lo:3 = zext(addr16:2); local ea:3 = hi | lo; export ea; }
 
-# --- Accumulator E Offset (E,X / E,Y / E,Z) ---
+# = Accumulator E Offset (E,X / E,Y / E,Z) =
 # Sign-extended E added to index register
 
 EOFFX: E,IX  is E & IX  { local ea:3 = (zext(XK:1) << 16) | zext(IX + sext(E:2)); export ea; }
 EOFFY: E,IY  is E & IY  { local ea:3 = (zext(YK:1) << 16) | zext(IY + sext(E:2)); export ea; }
 EOFFZ: E,IZ  is E & IZ  { local ea:3 = (zext(ZK:1) << 16) | zext(IZ + sext(E:2)); export ea; }
 
-# --- Relative Addressing ---
+# = Relative Addressing =
 # CPU16 pipeline: branch offsets are ALWAYS relative to inst_start + 6 (3-word prefetch)
 REL8ADDR: reloc  is rel8   [ reloc = inst_start + 6 + rel8; ]   { export *:1 reloc; }
 REL16ADDR: reloc is rel16  [ reloc = inst_start + 6 + rel16; ]  { export *:1 reloc; }
 
-# --- Branch targets for BRCLR/BRSET (use different token slots) ---
+# = Branch targets for BRCLR/BRSET (use different token slots) =
 BRREL8: reloc  is rel8_3  [ reloc = inst_start + 6 + rel8_3; ]  { export *:1 reloc; }
 BRREL16: reloc is rel16_2 [ reloc = inst_start + 6 + rel16_2; ] { export *:1 reloc; }
 
-# --- Extended 20-bit (EXT20) - for JMP/JSR ---
+# = Extended 20-bit (EXT20) - for JMP/JSR =
 # ext20_pad must be 0 to disambiguate from BRSET/BRCLR sharing same opcodes
 EXT20ADDR: ext20_bank^":"^ext20_addr  is ext20_pad=0 & ext20_bank & ext20_addr {
     local ea:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
     export ea;
 }
 
-# --- 20-bit Indexed (IND20) - for JMP/JSR ---
+# = 20-bit Indexed (IND20) - for JMP/JSR =
 # ext20_pad must be 0 to disambiguate from BRSET/BRCLR
 IND20X: ext20_addr^",X"  is ext20_pad=0 & ext20_bank & ext20_addr {
     local offset:3 = sext(ext20_addr:2);
@@ -299,7 +299,7 @@ IND20Z: ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr {
     export ea;
 }
 
-# --- PSHM/PULM register mask display sub-constructors ---
+# = PSHM/PULM register mask display sub-constructors =
 # Each bit in the mask selects a register. We display set bits as register names.
 # A trailing comma on the last register is accepted for simplicity.
 RmD:   "D,"    is rm_d=1   { }
@@ -341,7 +341,7 @@ RmPC:  ""      is rm_pc=0  { }
 #   8=CMPA 9=BITA A=STAA B=UNUSED C=UNUSED D=UNUSED E=UNUSED F=UNUSED
 # ============================================================================
 
-# --- SUBA: (A) - (M) => A ---
+# = SUBA: (A) - (M) => A =
 :SUBA IND8X     is op8=0x40; IND8X     { local val:1 = *:1 IND8X; subFlags(A, val); A = A - val; setNZ8(A); }
 :SUBA IND8Y     is op8=0x50; IND8Y     { local val:1 = *:1 IND8Y; subFlags(A, val); A = A - val; setNZ8(A); }
 :SUBA IND8Z     is op8=0x60; IND8Z     { local val:1 = *:1 IND8Z; subFlags(A, val); A = A - val; setNZ8(A); }
@@ -354,7 +354,7 @@ RmPC:  ""      is rm_pc=0  { }
 :SUBA EOFFY     is op8=0x27; op8b=0x50; EOFFY   { local val:1 = *:1 EOFFY;  subFlags(A, val); A = A - val; setNZ8(A); }
 :SUBA EOFFZ     is op8=0x27; op8b=0x60; EOFFZ   { local val:1 = *:1 EOFFZ;  subFlags(A, val); A = A - val; setNZ8(A); }
 
-# --- ADDA: (A) + (M) => A ---
+# = ADDA: (A) + (M) => A =
 :ADDA IND8X     is op8=0x41; IND8X     { local val:1 = *:1 IND8X; addFlags(A, val); A = A + val; setNZ8(A); }
 :ADDA IND8Y     is op8=0x51; IND8Y     { local val:1 = *:1 IND8Y; addFlags(A, val); A = A + val; setNZ8(A); }
 :ADDA IND8Z     is op8=0x61; IND8Z     { local val:1 = *:1 IND8Z; addFlags(A, val); A = A + val; setNZ8(A); }
@@ -367,7 +367,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ADDA EOFFY     is op8=0x27; op8b=0x51; EOFFY   { local val:1 = *:1 EOFFY;  addFlags(A, val); A = A + val; setNZ8(A); }
 :ADDA EOFFZ     is op8=0x27; op8b=0x61; EOFFZ   { local val:1 = *:1 EOFFZ;  addFlags(A, val); A = A + val; setNZ8(A); }
 
-# --- SBCA: (A) - (M) - C => A ---
+# = SBCA: (A) - (M) - C => A =
 :SBCA IND8X     is op8=0x42; IND8X     { local val:1 = *:1 IND8X; local c:1 = C_flag; subFlags(A, val+c); A = A - val - c; setNZ8(A); }
 :SBCA IND8Y     is op8=0x52; IND8Y     { local val:1 = *:1 IND8Y; local c:1 = C_flag; subFlags(A, val+c); A = A - val - c; setNZ8(A); }
 :SBCA IND8Z     is op8=0x62; IND8Z     { local val:1 = *:1 IND8Z; local c:1 = C_flag; subFlags(A, val+c); A = A - val - c; setNZ8(A); }
@@ -380,7 +380,7 @@ RmPC:  ""      is rm_pc=0  { }
 :SBCA EOFFY     is op8=0x27; op8b=0x52; EOFFY   { local val:1 = *:1 EOFFY;  local c:1 = C_flag; subFlags(A, val+c); A = A - val - c; setNZ8(A); }
 :SBCA EOFFZ     is op8=0x27; op8b=0x62; EOFFZ   { local val:1 = *:1 EOFFZ;  local c:1 = C_flag; subFlags(A, val+c); A = A - val - c; setNZ8(A); }
 
-# --- ADCA: (A) + (M) + C => A ---
+# = ADCA: (A) + (M) + C => A =
 :ADCA IND8X     is op8=0x43; IND8X     { local val:1 = *:1 IND8X; local c:1 = C_flag; addFlags(A, val+c); A = A + val + c; setNZ8(A); }
 :ADCA IND8Y     is op8=0x53; IND8Y     { local val:1 = *:1 IND8Y; local c:1 = C_flag; addFlags(A, val+c); A = A + val + c; setNZ8(A); }
 :ADCA IND8Z     is op8=0x63; IND8Z     { local val:1 = *:1 IND8Z; local c:1 = C_flag; addFlags(A, val+c); A = A + val + c; setNZ8(A); }
@@ -393,7 +393,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ADCA EOFFY     is op8=0x27; op8b=0x53; EOFFY   { local val:1 = *:1 EOFFY;  local c:1 = C_flag; addFlags(A, val+c); A = A + val + c; setNZ8(A); }
 :ADCA EOFFZ     is op8=0x27; op8b=0x63; EOFFZ   { local val:1 = *:1 EOFFZ;  local c:1 = C_flag; addFlags(A, val+c); A = A + val + c; setNZ8(A); }
 
-# --- LDAA: (M) => A ---
+# = LDAA: (M) => A =
 :LDAA IND8X     is op8=0x45; IND8X     { A = *:1 IND8X; setNZ8(A); V_flag = 0; }
 :LDAA IND8Y     is op8=0x55; IND8Y     { A = *:1 IND8Y; setNZ8(A); V_flag = 0; }
 :LDAA IND8Z     is op8=0x65; IND8Z     { A = *:1 IND8Z; setNZ8(A); V_flag = 0; }
@@ -406,7 +406,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LDAA EOFFY     is op8=0x27; op8b=0x55; EOFFY   { A = *:1 EOFFY;  setNZ8(A); V_flag = 0; }
 :LDAA EOFFZ     is op8=0x27; op8b=0x65; EOFFZ   { A = *:1 EOFFZ;  setNZ8(A); V_flag = 0; }
 
-# --- ANDA: (A) & (M) => A ---
+# = ANDA: (A) & (M) => A =
 :ANDA IND8X     is op8=0x46; IND8X     { A = A & (*:1 IND8X); setNZ8(A); V_flag = 0; }
 :ANDA IND8Y     is op8=0x56; IND8Y     { A = A & (*:1 IND8Y); setNZ8(A); V_flag = 0; }
 :ANDA IND8Z     is op8=0x66; IND8Z     { A = A & (*:1 IND8Z); setNZ8(A); V_flag = 0; }
@@ -419,7 +419,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ANDA EOFFY     is op8=0x27; op8b=0x56; EOFFY   { A = A & (*:1 EOFFY);  setNZ8(A); V_flag = 0; }
 :ANDA EOFFZ     is op8=0x27; op8b=0x66; EOFFZ   { A = A & (*:1 EOFFZ);  setNZ8(A); V_flag = 0; }
 
-# --- ORAA: (A) | (M) => A ---
+# = ORAA: (A) | (M) => A =
 :ORAA IND8X     is op8=0x47; IND8X     { A = A | (*:1 IND8X); setNZ8(A); V_flag = 0; }
 :ORAA IND8Y     is op8=0x57; IND8Y     { A = A | (*:1 IND8Y); setNZ8(A); V_flag = 0; }
 :ORAA IND8Z     is op8=0x67; IND8Z     { A = A | (*:1 IND8Z); setNZ8(A); V_flag = 0; }
@@ -432,7 +432,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ORAA EOFFY     is op8=0x27; op8b=0x57; EOFFY   { A = A | (*:1 EOFFY);  setNZ8(A); V_flag = 0; }
 :ORAA EOFFZ     is op8=0x27; op8b=0x67; EOFFZ   { A = A | (*:1 EOFFZ);  setNZ8(A); V_flag = 0; }
 
-# --- CMPA: (A) - (M) [compare, no store] ---
+# = CMPA: (A) - (M) [compare, no store] =
 :CMPA IND8X     is op8=0x48; IND8X     { local val:1 = *:1 IND8X; local tmp:1 = A - val; subFlags(A, val); setNZ8(tmp); }
 :CMPA IND8Y     is op8=0x58; IND8Y     { local val:1 = *:1 IND8Y; local tmp:1 = A - val; subFlags(A, val); setNZ8(tmp); }
 :CMPA IND8Z     is op8=0x68; IND8Z     { local val:1 = *:1 IND8Z; local tmp:1 = A - val; subFlags(A, val); setNZ8(tmp); }
@@ -445,7 +445,7 @@ RmPC:  ""      is rm_pc=0  { }
 :CMPA EOFFY     is op8=0x27; op8b=0x58; EOFFY   { local val:1 = *:1 EOFFY;  local tmp:1 = A - val; subFlags(A, val); setNZ8(tmp); }
 :CMPA EOFFZ     is op8=0x27; op8b=0x68; EOFFZ   { local val:1 = *:1 EOFFZ;  local tmp:1 = A - val; subFlags(A, val); setNZ8(tmp); }
 
-# --- BITA: (A) & (M) [test, no store] ---
+# = BITA: (A) & (M) [test, no store] =
 :BITA IND8X     is op8=0x49; IND8X     { local tmp:1 = A & (*:1 IND8X); setNZ8(tmp); V_flag = 0; }
 :BITA IND8Y     is op8=0x59; IND8Y     { local tmp:1 = A & (*:1 IND8Y); setNZ8(tmp); V_flag = 0; }
 :BITA IND8Z     is op8=0x69; IND8Z     { local tmp:1 = A & (*:1 IND8Z); setNZ8(tmp); V_flag = 0; }
@@ -458,7 +458,7 @@ RmPC:  ""      is rm_pc=0  { }
 :BITA EOFFY     is op8=0x27; op8b=0x59; EOFFY   { local tmp:1 = A & (*:1 EOFFY);  setNZ8(tmp); V_flag = 0; }
 :BITA EOFFZ     is op8=0x27; op8b=0x69; EOFFZ   { local tmp:1 = A & (*:1 EOFFZ);  setNZ8(tmp); V_flag = 0; }
 
-# --- EORA: (A) ^ (M) => A ---
+# = EORA: (A) ^ (M) => A =
 :EORA IND8X     is op8=0x44; IND8X     { A = A ^ (*:1 IND8X); setNZ8(A); V_flag = 0; }
 :EORA IND8Y     is op8=0x54; IND8Y     { A = A ^ (*:1 IND8Y); setNZ8(A); V_flag = 0; }
 :EORA IND8Z     is op8=0x64; IND8Z     { A = A ^ (*:1 IND8Z); setNZ8(A); V_flag = 0; }
@@ -471,7 +471,7 @@ RmPC:  ""      is rm_pc=0  { }
 :EORA EOFFY     is op8=0x27; op8b=0x54; EOFFY   { A = A ^ (*:1 EOFFY);  setNZ8(A); V_flag = 0; }
 :EORA EOFFZ     is op8=0x27; op8b=0x64; EOFFZ   { A = A ^ (*:1 EOFFZ);  setNZ8(A); V_flag = 0; }
 
-# --- STAA: (A) => M ---
+# = STAA: (A) => M =
 :STAA IND8X     is op8=0x4A; IND8X     { *:1 IND8X = A; setNZ8(A); V_flag = 0; }
 :STAA IND8Y     is op8=0x5A; IND8Y     { *:1 IND8Y = A; setNZ8(A); V_flag = 0; }
 :STAA IND8Z     is op8=0x6A; IND8Z     { *:1 IND8Z = A; setNZ8(A); V_flag = 0; }
@@ -488,7 +488,7 @@ RmPC:  ""      is rm_pc=0  { }
 # SECTION: 8-BIT ACCUMULATOR B INSTRUCTIONS (Page 1: Cx-Fx, Page 2: 17Cx-17Fx, Page 3: 27Cx-27Fx)
 # ============================================================================
 
-# --- SUBB ---
+# = SUBB =
 :SUBB IND8X     is op8=0xC0; IND8X     { local val:1 = *:1 IND8X; subFlags(B, val); B = B - val; setNZ8(B); }
 :SUBB IND8Y     is op8=0xD0; IND8Y     { local val:1 = *:1 IND8Y; subFlags(B, val); B = B - val; setNZ8(B); }
 :SUBB IND8Z     is op8=0xE0; IND8Z     { local val:1 = *:1 IND8Z; subFlags(B, val); B = B - val; setNZ8(B); }
@@ -501,7 +501,7 @@ RmPC:  ""      is rm_pc=0  { }
 :SUBB EOFFY     is op8=0x27; op8b=0xD0; EOFFY   { local val:1 = *:1 EOFFY;  subFlags(B, val); B = B - val; setNZ8(B); }
 :SUBB EOFFZ     is op8=0x27; op8b=0xE0; EOFFZ   { local val:1 = *:1 EOFFZ;  subFlags(B, val); B = B - val; setNZ8(B); }
 
-# --- ADDB ---
+# = ADDB =
 :ADDB IND8X     is op8=0xC1; IND8X     { local val:1 = *:1 IND8X; addFlags(B, val); B = B + val; setNZ8(B); }
 :ADDB IND8Y     is op8=0xD1; IND8Y     { local val:1 = *:1 IND8Y; addFlags(B, val); B = B + val; setNZ8(B); }
 :ADDB IND8Z     is op8=0xE1; IND8Z     { local val:1 = *:1 IND8Z; addFlags(B, val); B = B + val; setNZ8(B); }
@@ -514,7 +514,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ADDB EOFFY     is op8=0x27; op8b=0xD1; EOFFY   { local val:1 = *:1 EOFFY;  addFlags(B, val); B = B + val; setNZ8(B); }
 :ADDB EOFFZ     is op8=0x27; op8b=0xE1; EOFFZ   { local val:1 = *:1 EOFFZ;  addFlags(B, val); B = B + val; setNZ8(B); }
 
-# --- SBCB ---
+# = SBCB =
 :SBCB IND8X     is op8=0xC2; IND8X     { local val:1 = *:1 IND8X; local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
 :SBCB IND8Y     is op8=0xD2; IND8Y     { local val:1 = *:1 IND8Y; local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
 :SBCB IND8Z     is op8=0xE2; IND8Z     { local val:1 = *:1 IND8Z; local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
@@ -524,7 +524,7 @@ RmPC:  ""      is rm_pc=0  { }
 :SBCB IND16Z    is op8=0x17; op8b=0xE2; IND16Z  { local val:1 = *:1 IND16Z; local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
 :SBCB EXT16     is op8=0x17; op8b=0xF2; EXT16   { local val:1 = *:1 EXT16;  local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
 
-# --- ADCB ---
+# = ADCB =
 :ADCB IND8X     is op8=0xC3; IND8X     { local val:1 = *:1 IND8X; local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
 :ADCB IND8Y     is op8=0xD3; IND8Y     { local val:1 = *:1 IND8Y; local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
 :ADCB IND8Z     is op8=0xE3; IND8Z     { local val:1 = *:1 IND8Z; local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
@@ -534,7 +534,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ADCB IND16Z    is op8=0x17; op8b=0xE3; IND16Z  { local val:1 = *:1 IND16Z; local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
 :ADCB EXT16     is op8=0x17; op8b=0xF3; EXT16   { local val:1 = *:1 EXT16;  local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
 
-# --- LDAB ---
+# = LDAB =
 :LDAB IND8X     is op8=0xC5; IND8X     { B = *:1 IND8X; setNZ8(B); V_flag = 0; }
 :LDAB IND8Y     is op8=0xD5; IND8Y     { B = *:1 IND8Y; setNZ8(B); V_flag = 0; }
 :LDAB IND8Z     is op8=0xE5; IND8Z     { B = *:1 IND8Z; setNZ8(B); V_flag = 0; }
@@ -547,7 +547,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LDAB EOFFY     is op8=0x27; op8b=0xD5; EOFFY   { B = *:1 EOFFY;  setNZ8(B); V_flag = 0; }
 :LDAB EOFFZ     is op8=0x27; op8b=0xE5; EOFFZ   { B = *:1 EOFFZ;  setNZ8(B); V_flag = 0; }
 
-# --- ANDB ---
+# = ANDB =
 :ANDB IND8X     is op8=0xC6; IND8X     { B = B & (*:1 IND8X); setNZ8(B); V_flag = 0; }
 :ANDB IND8Y     is op8=0xD6; IND8Y     { B = B & (*:1 IND8Y); setNZ8(B); V_flag = 0; }
 :ANDB IND8Z     is op8=0xE6; IND8Z     { B = B & (*:1 IND8Z); setNZ8(B); V_flag = 0; }
@@ -557,7 +557,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ANDB IND16Z    is op8=0x17; op8b=0xE6; IND16Z  { B = B & (*:1 IND16Z); setNZ8(B); V_flag = 0; }
 :ANDB EXT16     is op8=0x17; op8b=0xF6; EXT16   { B = B & (*:1 EXT16);  setNZ8(B); V_flag = 0; }
 
-# --- ORAB ---
+# = ORAB =
 :ORAB IND8X     is op8=0xC7; IND8X     { B = B | (*:1 IND8X); setNZ8(B); V_flag = 0; }
 :ORAB IND8Y     is op8=0xD7; IND8Y     { B = B | (*:1 IND8Y); setNZ8(B); V_flag = 0; }
 :ORAB IND8Z     is op8=0xE7; IND8Z     { B = B | (*:1 IND8Z); setNZ8(B); V_flag = 0; }
@@ -567,7 +567,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ORAB IND16Z    is op8=0x17; op8b=0xE7; IND16Z  { B = B | (*:1 IND16Z); setNZ8(B); V_flag = 0; }
 :ORAB EXT16     is op8=0x17; op8b=0xF7; EXT16   { B = B | (*:1 EXT16);  setNZ8(B); V_flag = 0; }
 
-# --- CMPB ---
+# = CMPB =
 :CMPB IND8X     is op8=0xC8; IND8X     { local val:1 = *:1 IND8X; local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
 :CMPB IND8Y     is op8=0xD8; IND8Y     { local val:1 = *:1 IND8Y; local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
 :CMPB IND8Z     is op8=0xE8; IND8Z     { local val:1 = *:1 IND8Z; local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
@@ -577,7 +577,7 @@ RmPC:  ""      is rm_pc=0  { }
 :CMPB IND16Z    is op8=0x17; op8b=0xE8; IND16Z  { local val:1 = *:1 IND16Z; local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
 :CMPB EXT16     is op8=0x17; op8b=0xF8; EXT16   { local val:1 = *:1 EXT16;  local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
 
-# --- BITB ---
+# = BITB =
 :BITB IND8X     is op8=0xC9; IND8X     { local tmp:1 = B & (*:1 IND8X); setNZ8(tmp); V_flag = 0; }
 :BITB IND8Y     is op8=0xD9; IND8Y     { local tmp:1 = B & (*:1 IND8Y); setNZ8(tmp); V_flag = 0; }
 :BITB IND8Z     is op8=0xE9; IND8Z     { local tmp:1 = B & (*:1 IND8Z); setNZ8(tmp); V_flag = 0; }
@@ -587,7 +587,7 @@ RmPC:  ""      is rm_pc=0  { }
 :BITB IND16Z    is op8=0x17; op8b=0xE9; IND16Z  { local tmp:1 = B & (*:1 IND16Z); setNZ8(tmp); V_flag = 0; }
 :BITB EXT16     is op8=0x17; op8b=0xF9; EXT16   { local tmp:1 = B & (*:1 EXT16);  setNZ8(tmp); V_flag = 0; }
 
-# --- EORB ---
+# = EORB =
 :EORB IND8X     is op8=0xC4; IND8X     { B = B ^ (*:1 IND8X); setNZ8(B); V_flag = 0; }
 :EORB IND8Y     is op8=0xD4; IND8Y     { B = B ^ (*:1 IND8Y); setNZ8(B); V_flag = 0; }
 :EORB IND8Z     is op8=0xE4; IND8Z     { B = B ^ (*:1 IND8Z); setNZ8(B); V_flag = 0; }
@@ -597,7 +597,7 @@ RmPC:  ""      is rm_pc=0  { }
 :EORB IND16Z    is op8=0x17; op8b=0xE4; IND16Z  { B = B ^ (*:1 IND16Z); setNZ8(B); V_flag = 0; }
 :EORB EXT16     is op8=0x17; op8b=0xF4; EXT16   { B = B ^ (*:1 EXT16);  setNZ8(B); V_flag = 0; }
 
-# --- STAB ---
+# = STAB =
 :STAB IND8X     is op8=0xCA; IND8X     { *:1 IND8X = B; setNZ8(B); V_flag = 0; }
 :STAB IND8Y     is op8=0xDA; IND8Y     { *:1 IND8Y = B; setNZ8(B); V_flag = 0; }
 :STAB IND8Z     is op8=0xEA; IND8Z     { *:1 IND8Z = B; setNZ8(B); V_flag = 0; }
@@ -617,7 +617,7 @@ RmPC:  ""      is rm_pc=0  { }
 #          278x=E,X  279x=E,Y  27Ax=E,Z
 # ============================================================================
 
-# --- SUBD: (D) - (M:M+1) => D ---
+# = SUBD: (D) - (M:M+1) => D =
 :SUBD IND8X     is op8=0x80; IND8X     { local val:2 = *:2 IND8X; subFlags16(D, val); D = D - val; setNZ16(D); }
 :SUBD IND8Y     is op8=0x90; IND8Y     { local val:2 = *:2 IND8Y; subFlags16(D, val); D = D - val; setNZ16(D); }
 :SUBD IND8Z     is op8=0xA0; IND8Z     { local val:2 = *:2 IND8Z; subFlags16(D, val); D = D - val; setNZ16(D); }
@@ -630,7 +630,7 @@ RmPC:  ""      is rm_pc=0  { }
 :SUBD EOFFY     is op8=0x27; op8b=0x90; EOFFY   { local val:2 = *:2 EOFFY;  subFlags16(D, val); D = D - val; setNZ16(D); }
 :SUBD EOFFZ     is op8=0x27; op8b=0xA0; EOFFZ   { local val:2 = *:2 EOFFZ;  subFlags16(D, val); D = D - val; setNZ16(D); }
 
-# --- ADDD: (D) + (M:M+1) => D ---
+# = ADDD: (D) + (M:M+1) => D =
 # Note: ADDD has both IMM8 (sign-extended) and IMM16 forms
 :ADDD IND8X     is op8=0x81; IND8X     { local val:2 = *:2 IND8X; addFlags16(D, val); D = D + val; setNZ16(D); }
 :ADDD IND8Y     is op8=0x91; IND8Y     { local val:2 = *:2 IND8Y; addFlags16(D, val); D = D + val; setNZ16(D); }
@@ -645,7 +645,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ADDD EOFFY     is op8=0x27; op8b=0x91; EOFFY   { local val:2 = *:2 EOFFY;  addFlags16(D, val); D = D + val; setNZ16(D); }
 :ADDD EOFFZ     is op8=0x27; op8b=0xA1; EOFFZ   { local val:2 = *:2 EOFFZ;  addFlags16(D, val); D = D + val; setNZ16(D); }
 
-# --- SBCD: (D) - (M:M+1) - C => D ---
+# = SBCD: (D) - (M:M+1) - C => D =
 :SBCD IND8X     is op8=0x82; IND8X     { local val:2 = *:2 IND8X; local c:2 = zext(C_flag:1); subFlags16(D, val+c); D = D - val - c; setNZ16(D); }
 :SBCD IND8Y     is op8=0x92; IND8Y     { local val:2 = *:2 IND8Y; local c:2 = zext(C_flag:1); subFlags16(D, val+c); D = D - val - c; setNZ16(D); }
 :SBCD IND8Z     is op8=0xA2; IND8Z     { local val:2 = *:2 IND8Z; local c:2 = zext(C_flag:1); subFlags16(D, val+c); D = D - val - c; setNZ16(D); }
@@ -658,7 +658,7 @@ RmPC:  ""      is rm_pc=0  { }
 :SBCD EOFFY     is op8=0x27; op8b=0x92; EOFFY   { local val:2 = *:2 EOFFY;  local c:2 = zext(C_flag:1); subFlags16(D, val+c); D = D - val - c; setNZ16(D); }
 :SBCD EOFFZ     is op8=0x27; op8b=0xA2; EOFFZ   { local val:2 = *:2 EOFFZ;  local c:2 = zext(C_flag:1); subFlags16(D, val+c); D = D - val - c; setNZ16(D); }
 
-# --- ADCD: (D) + (M:M+1) + C => D ---
+# = ADCD: (D) + (M:M+1) + C => D =
 :ADCD IND8X     is op8=0x83; IND8X     { local val:2 = *:2 IND8X; local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
 :ADCD IND8Y     is op8=0x93; IND8Y     { local val:2 = *:2 IND8Y; local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
 :ADCD IND8Z     is op8=0xA3; IND8Z     { local val:2 = *:2 IND8Z; local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
@@ -668,7 +668,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ADCD IND16Z    is op8=0x37; op8b=0xE3; IND16Z  { local val:2 = *:2 IND16Z; local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
 :ADCD EXT16     is op8=0x37; op8b=0xF3; EXT16   { local val:2 = *:2 EXT16;  local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
 
-# --- LDD: (M:M+1) => D ---
+# = LDD: (M:M+1) => D =
 :LDD IND8X     is op8=0x85; IND8X     { D = *:2 IND8X; setNZ16(D); V_flag = 0; }
 :LDD IND8Y     is op8=0x95; IND8Y     { D = *:2 IND8Y; setNZ16(D); V_flag = 0; }
 :LDD IND8Z     is op8=0xA5; IND8Z     { D = *:2 IND8Z; setNZ16(D); V_flag = 0; }
@@ -681,7 +681,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LDD EOFFY     is op8=0x27; op8b=0x95; EOFFY   { D = *:2 EOFFY;  setNZ16(D); V_flag = 0; }
 :LDD EOFFZ     is op8=0x27; op8b=0xA5; EOFFZ   { D = *:2 EOFFZ;  setNZ16(D); V_flag = 0; }
 
-# --- ANDD ---
+# = ANDD =
 :ANDD IND8X     is op8=0x86; IND8X     { D = D & (*:2 IND8X); setNZ16(D); V_flag = 0; }
 :ANDD IND8Y     is op8=0x96; IND8Y     { D = D & (*:2 IND8Y); setNZ16(D); V_flag = 0; }
 :ANDD IND8Z     is op8=0xA6; IND8Z     { D = D & (*:2 IND8Z); setNZ16(D); V_flag = 0; }
@@ -691,7 +691,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ANDD IND16Z    is op8=0x37; op8b=0xE6; IND16Z  { D = D & (*:2 IND16Z); setNZ16(D); V_flag = 0; }
 :ANDD EXT16     is op8=0x37; op8b=0xF6; EXT16   { D = D & (*:2 EXT16);  setNZ16(D); V_flag = 0; }
 
-# --- ORD ---
+# = ORD =
 :ORD IND8X     is op8=0x87; IND8X     { D = D | (*:2 IND8X); setNZ16(D); V_flag = 0; }
 :ORD IND8Y     is op8=0x97; IND8Y     { D = D | (*:2 IND8Y); setNZ16(D); V_flag = 0; }
 :ORD IND8Z     is op8=0xA7; IND8Z     { D = D | (*:2 IND8Z); setNZ16(D); V_flag = 0; }
@@ -701,7 +701,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ORD IND16Z    is op8=0x37; op8b=0xE7; IND16Z  { D = D | (*:2 IND16Z); setNZ16(D); V_flag = 0; }
 :ORD EXT16     is op8=0x37; op8b=0xF7; EXT16   { D = D | (*:2 EXT16);  setNZ16(D); V_flag = 0; }
 
-# --- CPD: (D) - (M:M+1) compare ---
+# = CPD: (D) - (M:M+1) compare =
 :CPD IND8X     is op8=0x88; IND8X     { local val:2 = *:2 IND8X; local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
 :CPD IND8Y     is op8=0x98; IND8Y     { local val:2 = *:2 IND8Y; local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
 :CPD IND8Z     is op8=0xA8; IND8Z     { local val:2 = *:2 IND8Z; local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
@@ -711,7 +711,7 @@ RmPC:  ""      is rm_pc=0  { }
 :CPD IND16Z    is op8=0x37; op8b=0xE8; IND16Z  { local val:2 = *:2 IND16Z; local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
 :CPD EXT16     is op8=0x37; op8b=0xF8; EXT16   { local val:2 = *:2 EXT16;  local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
 
-# --- EORD ---
+# = EORD =
 :EORD IND8X     is op8=0x84; IND8X     { D = D ^ (*:2 IND8X); setNZ16(D); V_flag = 0; }
 :EORD IND8Y     is op8=0x94; IND8Y     { D = D ^ (*:2 IND8Y); setNZ16(D); V_flag = 0; }
 :EORD IND8Z     is op8=0xA4; IND8Z     { D = D ^ (*:2 IND8Z); setNZ16(D); V_flag = 0; }
@@ -721,7 +721,7 @@ RmPC:  ""      is rm_pc=0  { }
 :EORD IND16Z    is op8=0x37; op8b=0xE4; IND16Z  { D = D ^ (*:2 IND16Z); setNZ16(D); V_flag = 0; }
 :EORD EXT16     is op8=0x37; op8b=0xF4; EXT16   { D = D ^ (*:2 EXT16);  setNZ16(D); V_flag = 0; }
 
-# --- STD ---
+# = STD =
 :STD IND8X     is op8=0x8A; IND8X     { *:2 IND8X = D; setNZ16(D); V_flag = 0; }
 :STD IND8Y     is op8=0x9A; IND8Y     { *:2 IND8Y = D; setNZ16(D); V_flag = 0; }
 :STD IND8Z     is op8=0xAA; IND8Z     { *:2 IND8Z = D; setNZ16(D); V_flag = 0; }
@@ -738,7 +738,7 @@ RmPC:  ""      is rm_pc=0  { }
 # SECTION: INDEX REGISTER / SP LOAD, STORE, COMPARE
 # ============================================================================
 
-# --- LDX --- (IND8X=CC, IND8Y=DC, IND8Z=EC, IMM16=37BC, IND16X=17CC, IND16Y=17DC, IND16Z=17EC, EXT=17FC)
+# = LDX = (IND8X=CC, IND8Y=DC, IND8Z=EC, IMM16=37BC, IND16X=17CC, IND16Y=17DC, IND16Z=17EC, EXT=17FC)
 :LDX IND8X     is op8=0xCC; IND8X     { IX = *:2 IND8X; setNZ16(IX); V_flag = 0; }
 :LDX IND8Y     is op8=0xDC; IND8Y     { IX = *:2 IND8Y; setNZ16(IX); V_flag = 0; }
 :LDX IND8Z     is op8=0xEC; IND8Z     { IX = *:2 IND8Z; setNZ16(IX); V_flag = 0; }
@@ -748,7 +748,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LDX IND16Z    is op8=0x17; op8b=0xEC; IND16Z  { IX = *:2 IND16Z; setNZ16(IX); V_flag = 0; }
 :LDX EXT16     is op8=0x17; op8b=0xFC; EXT16   { IX = *:2 EXT16;  setNZ16(IX); V_flag = 0; }
 
-# --- LDY --- (IND8X=CD, IND8Y=DD, IND8Z=ED, IMM16=37BD, IND16X=17CD, IND16Y=17DD, IND16Z=17ED, EXT=17FD)
+# = LDY = (IND8X=CD, IND8Y=DD, IND8Z=ED, IMM16=37BD, IND16X=17CD, IND16Y=17DD, IND16Z=17ED, EXT=17FD)
 :LDY IND8X     is op8=0xCD; IND8X     { IY = *:2 IND8X; setNZ16(IY); V_flag = 0; }
 :LDY IND8Y     is op8=0xDD; IND8Y     { IY = *:2 IND8Y; setNZ16(IY); V_flag = 0; }
 :LDY IND8Z     is op8=0xED; IND8Z     { IY = *:2 IND8Z; setNZ16(IY); V_flag = 0; }
@@ -758,7 +758,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LDY IND16Z    is op8=0x17; op8b=0xED; IND16Z  { IY = *:2 IND16Z; setNZ16(IY); V_flag = 0; }
 :LDY EXT16     is op8=0x17; op8b=0xFD; EXT16   { IY = *:2 EXT16;  setNZ16(IY); V_flag = 0; }
 
-# --- LDZ --- (IND8X=CE, IND8Y=DE, IND8Z=EE, IMM16=37BE, IND16X=17CE, IND16Y=17DE, IND16Z=17EE, EXT=17FE)
+# = LDZ = (IND8X=CE, IND8Y=DE, IND8Z=EE, IMM16=37BE, IND16X=17CE, IND16Y=17DE, IND16Z=17EE, EXT=17FE)
 :LDZ IND8X     is op8=0xCE; IND8X     { IZ = *:2 IND8X; setNZ16(IZ); V_flag = 0; }
 :LDZ IND8Y     is op8=0xDE; IND8Y     { IZ = *:2 IND8Y; setNZ16(IZ); V_flag = 0; }
 :LDZ IND8Z     is op8=0xEE; IND8Z     { IZ = *:2 IND8Z; setNZ16(IZ); V_flag = 0; }
@@ -768,7 +768,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LDZ IND16Z    is op8=0x17; op8b=0xEE; IND16Z  { IZ = *:2 IND16Z; setNZ16(IZ); V_flag = 0; }
 :LDZ EXT16     is op8=0x17; op8b=0xFE; EXT16   { IZ = *:2 EXT16;  setNZ16(IZ); V_flag = 0; }
 
-# --- LDS --- (IND8X=CF, IND8Y=DF, IND8Z=EF, IMM16=37BF, IND16X=17CF, IND16Y=17DF, IND16Z=17EF, EXT=17FF)
+# = LDS = (IND8X=CF, IND8Y=DF, IND8Z=EF, IMM16=37BF, IND16X=17CF, IND16Y=17DF, IND16Z=17EF, EXT=17FF)
 :LDS IND8X     is op8=0xCF; IND8X     { SP = *:2 IND8X; setNZ16(SP); V_flag = 0; }
 :LDS IND8Y     is op8=0xDF; IND8Y     { SP = *:2 IND8Y; setNZ16(SP); V_flag = 0; }
 :LDS IND8Z     is op8=0xEF; IND8Z     { SP = *:2 IND8Z; setNZ16(SP); V_flag = 0; }
@@ -778,7 +778,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LDS IND16Z    is op8=0x17; op8b=0xEF; IND16Z  { SP = *:2 IND16Z; setNZ16(SP); V_flag = 0; }
 :LDS EXT16     is op8=0x17; op8b=0xFF; EXT16   { SP = *:2 EXT16;  setNZ16(SP); V_flag = 0; }
 
-# --- STX ---
+# = STX =
 :STX IND8X     is op8=0x8C; IND8X     { *:2 IND8X = IX; setNZ16(IX); V_flag = 0; }
 :STX IND8Y     is op8=0x9C; IND8Y     { *:2 IND8Y = IX; setNZ16(IX); V_flag = 0; }
 :STX IND8Z     is op8=0xAC; IND8Z     { *:2 IND8Z = IX; setNZ16(IX); V_flag = 0; }
@@ -787,7 +787,7 @@ RmPC:  ""      is rm_pc=0  { }
 :STX IND16Z    is op8=0x17; op8b=0xAC; IND16Z  { *:2 IND16Z = IX; setNZ16(IX); V_flag = 0; }
 :STX EXT16     is op8=0x17; op8b=0xBC; EXT16   { *:2 EXT16 = IX;  setNZ16(IX); V_flag = 0; }
 
-# --- STY ---
+# = STY =
 :STY IND8X     is op8=0x8D; IND8X     { *:2 IND8X = IY; setNZ16(IY); V_flag = 0; }
 :STY IND8Y     is op8=0x9D; IND8Y     { *:2 IND8Y = IY; setNZ16(IY); V_flag = 0; }
 :STY IND8Z     is op8=0xAD; IND8Z     { *:2 IND8Z = IY; setNZ16(IY); V_flag = 0; }
@@ -796,7 +796,7 @@ RmPC:  ""      is rm_pc=0  { }
 :STY IND16Z    is op8=0x17; op8b=0xAD; IND16Z  { *:2 IND16Z = IY; setNZ16(IY); V_flag = 0; }
 :STY EXT16     is op8=0x17; op8b=0xBD; EXT16   { *:2 EXT16 = IY;  setNZ16(IY); V_flag = 0; }
 
-# --- STZ ---
+# = STZ =
 :STZ IND8X     is op8=0x8E; IND8X     { *:2 IND8X = IZ; setNZ16(IZ); V_flag = 0; }
 :STZ IND8Y     is op8=0x9E; IND8Y     { *:2 IND8Y = IZ; setNZ16(IZ); V_flag = 0; }
 :STZ IND8Z     is op8=0xAE; IND8Z     { *:2 IND8Z = IZ; setNZ16(IZ); V_flag = 0; }
@@ -805,7 +805,7 @@ RmPC:  ""      is rm_pc=0  { }
 :STZ IND16Z    is op8=0x17; op8b=0xAE; IND16Z  { *:2 IND16Z = IZ; setNZ16(IZ); V_flag = 0; }
 :STZ EXT16     is op8=0x17; op8b=0xBE; EXT16   { *:2 EXT16 = IZ;  setNZ16(IZ); V_flag = 0; }
 
-# --- STS ---
+# = STS =
 :STS IND8X     is op8=0x8F; IND8X     { *:2 IND8X = SP; setNZ16(SP); V_flag = 0; }
 :STS IND8Y     is op8=0x9F; IND8Y     { *:2 IND8Y = SP; setNZ16(SP); V_flag = 0; }
 :STS IND8Z     is op8=0xAF; IND8Z     { *:2 IND8Z = SP; setNZ16(SP); V_flag = 0; }
@@ -819,7 +819,7 @@ RmPC:  ""      is rm_pc=0  { }
 # SECTION: BRANCH INSTRUCTIONS
 # ============================================================================
 
-# --- Short Branches (REL8) ---
+# = Short Branches (REL8) =
 # Use REL8ADDR sub-constructor which computes target at disassembly time.
 :BRA  REL8ADDR   is op8=0xB0; REL8ADDR  { goto REL8ADDR; }
 :BRN  REL8ADDR   is op8=0xB1; REL8ADDR  { }
@@ -838,7 +838,7 @@ RmPC:  ""      is rm_pc=0  { }
 :BGT  REL8ADDR   is op8=0xBE; REL8ADDR  { if ((Z_flag | (N_flag ^ V_flag)) == 0) goto REL8ADDR; }
 :BLE  REL8ADDR   is op8=0xBF; REL8ADDR  { if ((Z_flag | (N_flag ^ V_flag)) != 0) goto REL8ADDR; }
 
-# --- BSR (Branch to Subroutine) ---
+# = BSR (Branch to Subroutine) =
 :BSR  REL8ADDR   is op8=0x36; REL8ADDR {
     push16(PC:2);
     packCCR();
@@ -846,7 +846,7 @@ RmPC:  ""      is rm_pc=0  { }
     call REL8ADDR;
 }
 
-# --- Long Branches (REL16) - Page 4 prefix 0x37 ---
+# = Long Branches (REL16) - Page 4 prefix 0x37 =
 :LBRA  REL16ADDR   is op8=0x37; op8b=0x80; REL16ADDR  { goto REL16ADDR; }
 :LBRN  REL16ADDR   is op8=0x37; op8b=0x81; REL16ADDR  { }
 :LBHI  REL16ADDR   is op8=0x37; op8b=0x82; REL16ADDR  { if ((C_flag | Z_flag) == 0) goto REL16ADDR; }
@@ -864,11 +864,11 @@ RmPC:  ""      is rm_pc=0  { }
 :LBGT  REL16ADDR   is op8=0x37; op8b=0x8E; REL16ADDR  { if ((Z_flag | (N_flag ^ V_flag)) == 0) goto REL16ADDR; }
 :LBLE  REL16ADDR   is op8=0x37; op8b=0x8F; REL16ADDR  { if ((Z_flag | (N_flag ^ V_flag)) != 0) goto REL16ADDR; }
 
-# --- LBEV / LBMV (DSP long branches) ---
+# = LBEV / LBMV (DSP long branches) =
 :LBMV  REL16ADDR   is op8=0x37; op8b=0x90; REL16ADDR  { if (MV_flag != 0) goto REL16ADDR; }
 :LBEV  REL16ADDR   is op8=0x37; op8b=0x91; REL16ADDR  { if (EV_flag != 0) goto REL16ADDR; }
 
-# --- LBSR (Long Branch to Subroutine) ---
+# = LBSR (Long Branch to Subroutine) =
 :LBSR  REL16ADDR   is op8=0x27; op8b=0xF9; REL16ADDR {
     push16(PC:2);
     packCCR();
@@ -881,13 +881,13 @@ RmPC:  ""      is rm_pc=0  { }
 # SECTION: JUMP, SUBROUTINE CALL, RETURN
 # ============================================================================
 
-# --- JMP (Extended 20-bit and Indexed 20-bit) ---
+# = JMP (Extended 20-bit and Indexed 20-bit) =
 :JMP EXT20ADDR       is op8=0x7A; EXT20ADDR           { goto [EXT20ADDR]; }
 :JMP IND20X          is op8=0x4B; IND20X               { goto [IND20X]; }
 :JMP IND20Y          is op8=0x5B; IND20Y               { goto [IND20Y]; }
 :JMP IND20Z          is op8=0x6B; IND20Z               { goto [IND20Z]; }
 
-# --- JSR (Jump to Subroutine - Extended 20 and Indexed 20) ---
+# = JSR (Jump to Subroutine - Extended 20 and Indexed 20) =
 :JSR EXT20ADDR       is op8=0xFA; EXT20ADDR {
     push16(PC:2);
     packCCR();
@@ -913,7 +913,7 @@ RmPC:  ""      is rm_pc=0  { }
     call [IND20Z];
 }
 
-# --- RTS (Return from Subroutine) ---
+# = RTS (Return from Subroutine) =
 :RTS   is op8=0x27; op8b=0xF7 {
     pull16(CCR);
     unpackCCR();
@@ -923,7 +923,7 @@ RmPC:  ""      is rm_pc=0  { }
     return [fulladdr];
 }
 
-# --- RTI (Return from Interrupt) ---
+# = RTI (Return from Interrupt) =
 :RTI   is op8=0x27; op8b=0x77 {
     pull16(CCR);
     unpackCCR();
@@ -933,7 +933,7 @@ RmPC:  ""      is rm_pc=0  { }
     return [fulladdr];
 }
 
-# --- SWI (Software Interrupt) ---
+# = SWI (Software Interrupt) =
 :SWI   is op8=0x37; op8b=0x20 {
     push16(PC:2);
     packCCR();
@@ -948,12 +948,12 @@ RmPC:  ""      is rm_pc=0  { }
 # SECTION: INHERENT (REGISTER) INSTRUCTIONS - Page 4 (37xx)
 # ============================================================================
 
-# --- Inter-accumulator operations ---
+# = Inter-accumulator operations =
 :ABA   is op8=0x37; op8b=0x0B  { addFlags(A, B); A = A + B; setNZ8(A); }
 :SBA   is op8=0x37; op8b=0x0A  { subFlags(A, B); A = A - B; setNZ8(A); }
 :CBA   is op8=0x37; op8b=0x1B  { local tmp:1 = A - B; subFlags(A, B); setNZ8(tmp); }
 
-# --- Transfer and Exchange ---
+# = Transfer and Exchange =
 :TAB   is op8=0x37; op8b=0x17  { B = A; setNZ8(B); V_flag = 0; }
 :TBA   is op8=0x37; op8b=0x07  { A = B; setNZ8(A); V_flag = 0; }
 :XGAB  is op8=0x37; op8b=0x1A  { local tmp:1 = A; A = B; B = tmp; }
@@ -965,7 +965,7 @@ RmPC:  ""      is rm_pc=0  { }
 :XGEY  is op8=0x37; op8b=0x5C  { local tmp:2 = E; E = IY; IY = tmp; }
 :XGEZ  is op8=0x37; op8b=0x6C  { local tmp:2 = E; E = IZ; IZ = tmp; }
 
-# --- TDE/TED/TDP/TPD etc. ---
+# = TDE/TED/TDP/TPD etc. =
 :TDE   is op8=0x27; op8b=0x7B  { E = D; }
 :TED   is op8=0x27; op8b=0xFB  { D = E; }
 :TXS   is op8=0x37; op8b=0x4E  { SP = IX; }
@@ -975,7 +975,7 @@ RmPC:  ""      is rm_pc=0  { }
 :TSY   is op8=0x27; op8b=0x5F  { IY = SP; }
 :TSZ   is op8=0x27; op8b=0x6F  { IZ = SP; }
 
-# --- Inter-index-register transfers ---
+# = Inter-index-register transfers =
 :TXY   is op8=0x27; op8b=0x5C  { YK = XK; IY = IX; }
 :TXZ   is op8=0x27; op8b=0x6C  { ZK = XK; IZ = IX; }
 :TYX   is op8=0x27; op8b=0x4D  { XK = YK; IX = IY; }
@@ -983,10 +983,10 @@ RmPC:  ""      is rm_pc=0  { }
 :TZX   is op8=0x27; op8b=0x4E  { XK = ZK; IX = IZ; }
 :TZY   is op8=0x27; op8b=0x5E  { YK = ZK; IY = IZ; }
 
-# --- SXT: Sign Extend B into A ---
+# = SXT: Sign Extend B into A =
 :SXT   is op8=0x27; op8b=0xF8  { A = (B s>> 7); setNZ8(A); }
 
-# --- Extension register transfers (B <-> xK) ---
+# = Extension register transfers (B <-> xK) =
 :TBEK  is op8=0x27; op8b=0xFA  { EK = B & 0x0F; }
 :TBXK  is op8=0x37; op8b=0x9C  { XK = B & 0x0F; }
 :TBYK  is op8=0x37; op8b=0x9D  { YK = B & 0x0F; }
@@ -998,22 +998,22 @@ RmPC:  ""      is rm_pc=0  { }
 :TZKB  is op8=0x37; op8b=0xAE  { B = ZK & 0x0F; }
 :TSKB  is op8=0x37; op8b=0xAF  { B = SK & 0x0F; }
 
-# --- CCR register transfers ---
+# = CCR register transfers =
 :TPA   is op8=0x37; op8b=0xFC  { packCCR(); A = CCR[8,8]; }
 :TAP   is op8=0x37; op8b=0xFD  { packCCR(); CCR = (CCR & 0x00FF) | (zext(A:1) << 8); unpackCCR(); }
 :TPD   is op8=0x37; op8b=0x2C  { packCCR(); D = CCR; }
 :TDP   is op8=0x37; op8b=0x2D  { packCCR(); CCR = (CCR & 0x000F) | (D & 0xFFF0); unpackCCR(); }
 
-# --- Add B to Index Register ---
+# = Add B to Index Register =
 :ABX   is op8=0x37; op8b=0x4F  { local ext:3 = (zext(XK:1) << 16) | zext(IX:2); ext = ext + zext(B:1); XK = ext[16,4]; IX = ext:2; }
 :ABY   is op8=0x37; op8b=0x5F  { local ext:3 = (zext(YK:1) << 16) | zext(IY:2); ext = ext + zext(B:1); YK = ext[16,4]; IY = ext:2; }
 :ABZ   is op8=0x37; op8b=0x6F  { local ext:3 = (zext(ZK:1) << 16) | zext(IZ:2); ext = ext + zext(B:1); ZK = ext[16,4]; IZ = ext:2; }
 
-# --- ADE/SDE ---
+# = ADE/SDE =
 :ADE   is op8=0x27; op8b=0x78  { addFlags16(E, D); E = E + D; setNZ16(E); }
 :SDE   is op8=0x27; op8b=0x79  { subFlags16(E, D); E = E - D; setNZ16(E); }
 
-# --- Add D/E to Index Registers ---
+# = Add D/E to Index Registers =
 :ADX   is op8=0x37; op8b=0xCD  { IX = IX + D; }
 :ADY   is op8=0x37; op8b=0xDD  { IY = IY + D; }
 :ADZ   is op8=0x37; op8b=0xED  { IZ = IZ + D; }
@@ -1021,7 +1021,7 @@ RmPC:  ""      is rm_pc=0  { }
 :AEY   is op8=0x37; op8b=0x5D  { IY = IY + E; }
 :AEZ   is op8=0x37; op8b=0x6D  { IZ = IZ + E; }
 
-# --- Add Immediate to Index / Stack ---
+# = Add Immediate to Index / Stack =
 :AIX "#"^simm8   is op8=0x3C; simm8    { IX = IX + sext(simm8:1); Z_flag = (IX == 0); }
 :AIY "#"^simm8   is op8=0x3D; simm8    { IY = IY + sext(simm8:1); Z_flag = (IY == 0); }
 :AIZ "#"^simm8   is op8=0x3E; simm8    { IZ = IZ + sext(simm8:1); Z_flag = (IZ == 0); }
@@ -1031,7 +1031,7 @@ RmPC:  ""      is rm_pc=0  { }
 :AIZ "#"^simm16  is op8=0x37; op8b=0x3E; simm16  { IZ = IZ + simm16; Z_flag = (IZ == 0); }
 :AIS "#"^simm16  is op8=0x37; op8b=0x3F; simm16  { SP = SP + simm16; }
 
-# --- Register Clear, Complement, Negate (Inherent) ---
+# = Register Clear, Complement, Negate (Inherent) =
 :CLRA   is op8=0x37; op8b=0x05  { A = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
 :CLRB   is op8=0x37; op8b=0x15  { B = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
 :CLRD   is op8=0x27; op8b=0xF5  { D = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
@@ -1058,7 +1058,7 @@ RmPC:  ""      is rm_pc=0  { }
 :TSTD   is op8=0x27; op8b=0xF6  { setNZ16(D); V_flag = 0; C_flag = 0; }
 :TSTE   is op8=0x27; op8b=0x76  { setNZ16(E); V_flag = 0; C_flag = 0; }
 
-# --- Shift/Rotate (Inherent) ---
+# = Shift/Rotate (Inherent) =
 :ASLA   is op8=0x37; op8b=0x04  { C_flag = A[7,1]; V_flag = A[7,1] ^ A[6,1]; A = A << 1; setNZ8(A); }
 :ASLB   is op8=0x37; op8b=0x14  { C_flag = B[7,1]; V_flag = B[7,1] ^ B[6,1]; B = B << 1; setNZ8(B); }
 :ASLD   is op8=0x27; op8b=0xF4  { C_flag = D[15,1]; V_flag = D[15,1] ^ D[14,1]; D = D << 1; setNZ16(D); }
@@ -1080,14 +1080,14 @@ RmPC:  ""      is rm_pc=0  { }
 :RORA   is op8=0x37; op8b=0x0E  { local c:1 = C_flag; C_flag = A[0,1]; V_flag = A[7,1] ^ C_flag; A = (A >> 1) | (c << 7); setNZ8(A); }
 :RORB   is op8=0x37; op8b=0x1E  { local c:1 = C_flag; C_flag = B[0,1]; V_flag = B[7,1] ^ C_flag; B = (B >> 1) | (c << 7); setNZ8(B); }
 
-# --- MUL: (A) * (B) => D ---
+# = MUL: (A) * (B) => D =
 :MUL    is op8=0x37; op8b=0x24  { D = zext(A:1) * zext(B:1); C_flag = D[7,1]; }
 
-# --- EMUL / EMULS: Unsigned/Signed 16x16 => 32 multiply ---
+# = EMUL / EMULS: Unsigned/Signed 16x16 => 32 multiply =
 :EMUL   is op8=0x37; op8b=0x25  { local res:4 = zext(D:2) * zext(IX:2); E = res[16,16]; D = res[0,16]; C_flag = D[15,1]; setNZ16(D); }
 :EMULS  is op8=0x37; op8b=0x26  { local res:4 = sext(D:2) * sext(IX:2); E = res[16,16]; D = res[0,16]; setNZ16(D); }
 
-# --- EDIV / EDIVS ---
+# = EDIV / EDIVS =
 :EDIV   is op8=0x37; op8b=0x28  {
     local dividend:4 = (zext(E:2) << 16) | zext(D:2);
     local divisor:4 = zext(IX:2);
@@ -1105,7 +1105,7 @@ RmPC:  ""      is rm_pc=0  { }
     <done>
 }
 
-# --- EDIVS ---
+# = EDIVS =
 :EDIVS  is op8=0x37; op8b=0x29  {
     local dividend:4 = (zext(E:2) << 16) | zext(D:2);
     local divisor:4 = sext(IX:2);
@@ -1123,7 +1123,7 @@ RmPC:  ""      is rm_pc=0  { }
     <done>
 }
 
-# --- IDIV ---
+# = IDIV =
 :IDIV   is op8=0x37; op8b=0x2A  {
     C_flag = (IX == 0);
     V_flag = 0;
@@ -1139,7 +1139,7 @@ RmPC:  ""      is rm_pc=0  { }
     <done>
 }
 
-# --- FDIV ---
+# = FDIV =
 :FDIV   is op8=0x37; op8b=0x2B  {
     local dividend:4 = zext(D:2) << 16;
     local divisor:4 = zext(IX:2);
@@ -1156,7 +1156,7 @@ RmPC:  ""      is rm_pc=0  { }
     <done>
 }
 
-# --- DAA ---
+# = DAA =
 :DAA   is op8=0x37; op8b=0x21  {
     # Decimal Adjust Accumulator A (placeholder - complex BCD logic)
     local tmp:2 = zext(A:1);
@@ -1175,13 +1175,13 @@ RmPC:  ""      is rm_pc=0  { }
     setNZ8(A);
 }
 
-# --- NOP ---
+# = NOP =
 :NOP    is op8=0x27; op8b=0x4C  { }
 
-# --- BGND ---
+# = BGND =
 :BGND   is op8=0x37; op8b=0xA6  { }
 
-# --- ANDP / ORP (CCR manipulation) ---
+# = ANDP / ORP (CCR manipulation) =
 :ANDP "#"^imm16  is op8=0x37; op8b=0x3A; imm16  { CCR = CCR & imm16; unpackCCR(); }
 :ORP  "#"^imm16  is op8=0x37; op8b=0x3B; imm16  { CCR = CCR | imm16; unpackCCR(); }
 
@@ -1192,7 +1192,7 @@ RmPC:  ""      is rm_pc=0  { }
 # Page 2: 170x=IND16,X  171x=IND16,Y  172x=IND16,Z  173x=EXT
 # ============================================================================
 
-# --- COM: ~(M) => M ---
+# = COM: ~(M) => M =
 :COM IND8X     is op8=0x00; IND8X     { local val:1 = *:1 IND8X; val = ~val; *:1 IND8X = val; setNZ8(val); V_flag = 0; C_flag = 1; }
 :COM IND8Y     is op8=0x10; IND8Y     { local val:1 = *:1 IND8Y; val = ~val; *:1 IND8Y = val; setNZ8(val); V_flag = 0; C_flag = 1; }
 :COM IND8Z     is op8=0x20; IND8Z     { local val:1 = *:1 IND8Z; val = ~val; *:1 IND8Z = val; setNZ8(val); V_flag = 0; C_flag = 1; }
@@ -1201,7 +1201,7 @@ RmPC:  ""      is rm_pc=0  { }
 :COM IND16Z    is op8=0x17; op8b=0x20; IND16Z  { local val:1 = *:1 IND16Z; val = ~val; *:1 IND16Z = val; setNZ8(val); V_flag = 0; C_flag = 1; }
 :COM EXT16     is op8=0x17; op8b=0x30; EXT16   { local val:1 = *:1 EXT16;  val = ~val; *:1 EXT16 = val;  setNZ8(val); V_flag = 0; C_flag = 1; }
 
-# --- DEC: (M) - 1 => M ---
+# = DEC: (M) - 1 => M =
 :DEC IND8X     is op8=0x01; IND8X     { local val:1 = *:1 IND8X; V_flag = (val == 0x80); val = val - 1; *:1 IND8X = val; setNZ8(val); }
 :DEC IND8Y     is op8=0x11; IND8Y     { local val:1 = *:1 IND8Y; V_flag = (val == 0x80); val = val - 1; *:1 IND8Y = val; setNZ8(val); }
 :DEC IND8Z     is op8=0x21; IND8Z     { local val:1 = *:1 IND8Z; V_flag = (val == 0x80); val = val - 1; *:1 IND8Z = val; setNZ8(val); }
@@ -1210,7 +1210,7 @@ RmPC:  ""      is rm_pc=0  { }
 :DEC IND16Z    is op8=0x17; op8b=0x21; IND16Z  { local val:1 = *:1 IND16Z; V_flag = (val == 0x80); val = val - 1; *:1 IND16Z = val; setNZ8(val); }
 :DEC EXT16     is op8=0x17; op8b=0x31; EXT16   { local val:1 = *:1 EXT16;  V_flag = (val == 0x80); val = val - 1; *:1 EXT16 = val;  setNZ8(val); }
 
-# --- NEG: 0 - (M) => M ---
+# = NEG: 0 - (M) => M =
 :NEG IND8X     is op8=0x02; IND8X     { local val:1 = *:1 IND8X; V_flag = (val == 0x80); C_flag = (val != 0); val = -val; *:1 IND8X = val; setNZ8(val); }
 :NEG IND8Y     is op8=0x12; IND8Y     { local val:1 = *:1 IND8Y; V_flag = (val == 0x80); C_flag = (val != 0); val = -val; *:1 IND8Y = val; setNZ8(val); }
 :NEG IND8Z     is op8=0x22; IND8Z     { local val:1 = *:1 IND8Z; V_flag = (val == 0x80); C_flag = (val != 0); val = -val; *:1 IND8Z = val; setNZ8(val); }
@@ -1219,7 +1219,7 @@ RmPC:  ""      is rm_pc=0  { }
 :NEG IND16Z    is op8=0x17; op8b=0x22; IND16Z  { local val:1 = *:1 IND16Z; V_flag = (val == 0x80); C_flag = (val != 0); val = -val; *:1 IND16Z = val; setNZ8(val); }
 :NEG EXT16     is op8=0x17; op8b=0x32; EXT16   { local val:1 = *:1 EXT16;  V_flag = (val == 0x80); C_flag = (val != 0); val = -val; *:1 EXT16 = val;  setNZ8(val); }
 
-# --- INC: (M) + 1 => M ---
+# = INC: (M) + 1 => M =
 :INC IND8X     is op8=0x03; IND8X     { local val:1 = *:1 IND8X; V_flag = (val == 0x7F); val = val + 1; *:1 IND8X = val; setNZ8(val); }
 :INC IND8Y     is op8=0x13; IND8Y     { local val:1 = *:1 IND8Y; V_flag = (val == 0x7F); val = val + 1; *:1 IND8Y = val; setNZ8(val); }
 :INC IND8Z     is op8=0x23; IND8Z     { local val:1 = *:1 IND8Z; V_flag = (val == 0x7F); val = val + 1; *:1 IND8Z = val; setNZ8(val); }
@@ -1228,7 +1228,7 @@ RmPC:  ""      is rm_pc=0  { }
 :INC IND16Z    is op8=0x17; op8b=0x23; IND16Z  { local val:1 = *:1 IND16Z; V_flag = (val == 0x7F); val = val + 1; *:1 IND16Z = val; setNZ8(val); }
 :INC EXT16     is op8=0x17; op8b=0x33; EXT16   { local val:1 = *:1 EXT16;  V_flag = (val == 0x7F); val = val + 1; *:1 EXT16 = val;  setNZ8(val); }
 
-# --- ASL (memory byte) ---
+# = ASL (memory byte) =
 :ASL IND8X     is op8=0x04; IND8X     { local val:1 = *:1 IND8X; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = val << 1; *:1 IND8X = val; setNZ8(val); }
 :ASL IND8Y     is op8=0x14; IND8Y     { local val:1 = *:1 IND8Y; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = val << 1; *:1 IND8Y = val; setNZ8(val); }
 :ASL IND8Z     is op8=0x24; IND8Z     { local val:1 = *:1 IND8Z; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = val << 1; *:1 IND8Z = val; setNZ8(val); }
@@ -1237,7 +1237,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ASL IND16Z    is op8=0x17; op8b=0x24; IND16Z  { local val:1 = *:1 IND16Z; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = val << 1; *:1 IND16Z = val; setNZ8(val); }
 :ASL EXT16     is op8=0x17; op8b=0x34; EXT16   { local val:1 = *:1 EXT16;  C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = val << 1; *:1 EXT16 = val;  setNZ8(val); }
 
-# --- CLR: $00 => M ---
+# = CLR: $00 => M =
 :CLR IND8X     is op8=0x05; IND8X     { *:1 IND8X = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
 :CLR IND8Y     is op8=0x15; IND8Y     { *:1 IND8Y = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
 :CLR IND8Z     is op8=0x25; IND8Z     { *:1 IND8Z = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
@@ -1246,7 +1246,7 @@ RmPC:  ""      is rm_pc=0  { }
 :CLR IND16Z    is op8=0x17; op8b=0x25; IND16Z  { *:1 IND16Z = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
 :CLR EXT16     is op8=0x17; op8b=0x35; EXT16   { *:1 EXT16 = 0;  N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
 
-# --- TST: test memory byte ---
+# = TST: test memory byte =
 :TST IND8X     is op8=0x06; IND8X     { local val:1 = *:1 IND8X; setNZ8(val); V_flag = 0; C_flag = 0; }
 :TST IND8Y     is op8=0x16; IND8Y     { local val:1 = *:1 IND8Y; setNZ8(val); V_flag = 0; C_flag = 0; }
 :TST IND8Z     is op8=0x26; IND8Z     { local val:1 = *:1 IND8Z; setNZ8(val); V_flag = 0; C_flag = 0; }
@@ -1255,7 +1255,7 @@ RmPC:  ""      is rm_pc=0  { }
 :TST IND16Z    is op8=0x17; op8b=0x26; IND16Z  { local val:1 = *:1 IND16Z; setNZ8(val); V_flag = 0; C_flag = 0; }
 :TST EXT16     is op8=0x17; op8b=0x36; EXT16   { local val:1 = *:1 EXT16;  setNZ8(val); V_flag = 0; C_flag = 0; }
 
-# --- ASR (memory byte) ---
+# = ASR (memory byte) =
 :ASR IND8X     is op8=0x0D; IND8X     { local val:1 = *:1 IND8X; C_flag = val[0,1]; V_flag = val[7,1] ^ val[0,1]; val = val s>> 1; *:1 IND8X = val; setNZ8(val); }
 :ASR IND8Y     is op8=0x1D; IND8Y     { local val:1 = *:1 IND8Y; C_flag = val[0,1]; V_flag = val[7,1] ^ val[0,1]; val = val s>> 1; *:1 IND8Y = val; setNZ8(val); }
 :ASR IND8Z     is op8=0x2D; IND8Z     { local val:1 = *:1 IND8Z; C_flag = val[0,1]; V_flag = val[7,1] ^ val[0,1]; val = val s>> 1; *:1 IND8Z = val; setNZ8(val); }
@@ -1264,7 +1264,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ASR IND16Z    is op8=0x17; op8b=0x2D; IND16Z  { local val:1 = *:1 IND16Z; C_flag = val[0,1]; V_flag = val[7,1] ^ val[0,1]; val = val s>> 1; *:1 IND16Z = val; setNZ8(val); }
 :ASR EXT16     is op8=0x17; op8b=0x3D; EXT16   { local val:1 = *:1 EXT16;  C_flag = val[0,1]; V_flag = val[7,1] ^ val[0,1]; val = val s>> 1; *:1 EXT16 = val;  setNZ8(val); }
 
-# --- LSR (memory byte) ---
+# = LSR (memory byte) =
 :LSR IND8X     is op8=0x0F; IND8X     { local val:1 = *:1 IND8X; C_flag = val[0,1]; val = val >> 1; *:1 IND8X = val; setNZ8(val); V_flag = N_flag ^ C_flag; }
 :LSR IND8Y     is op8=0x1F; IND8Y     { local val:1 = *:1 IND8Y; C_flag = val[0,1]; val = val >> 1; *:1 IND8Y = val; setNZ8(val); V_flag = N_flag ^ C_flag; }
 :LSR IND8Z     is op8=0x2F; IND8Z     { local val:1 = *:1 IND8Z; C_flag = val[0,1]; val = val >> 1; *:1 IND8Z = val; setNZ8(val); V_flag = N_flag ^ C_flag; }
@@ -1273,7 +1273,7 @@ RmPC:  ""      is rm_pc=0  { }
 :LSR IND16Z    is op8=0x17; op8b=0x2F; IND16Z  { local val:1 = *:1 IND16Z; C_flag = val[0,1]; val = val >> 1; *:1 IND16Z = val; setNZ8(val); V_flag = N_flag ^ C_flag; }
 :LSR EXT16     is op8=0x17; op8b=0x3F; EXT16   { local val:1 = *:1 EXT16;  C_flag = val[0,1]; val = val >> 1; *:1 EXT16 = val;  setNZ8(val); V_flag = N_flag ^ C_flag; }
 
-# --- ROL (memory byte) --- ROL=0x0C per CPU16RM
+# = ROL (memory byte) = ROL=0x0C per CPU16RM
 :ROL IND8X     is op8=0x0C; IND8X     { local val:1 = *:1 IND8X; local c:1 = C_flag; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = (val << 1) | c; *:1 IND8X = val; setNZ8(val); }
 :ROL IND8Y     is op8=0x1C; IND8Y     { local val:1 = *:1 IND8Y; local c:1 = C_flag; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = (val << 1) | c; *:1 IND8Y = val; setNZ8(val); }
 :ROL IND8Z     is op8=0x2C; IND8Z     { local val:1 = *:1 IND8Z; local c:1 = C_flag; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = (val << 1) | c; *:1 IND8Z = val; setNZ8(val); }
@@ -1282,7 +1282,7 @@ RmPC:  ""      is rm_pc=0  { }
 :ROL IND16Z    is op8=0x17; op8b=0x2C; IND16Z  { local val:1 = *:1 IND16Z; local c:1 = C_flag; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = (val << 1) | c; *:1 IND16Z = val; setNZ8(val); }
 :ROL EXT16     is op8=0x17; op8b=0x3C; EXT16   { local val:1 = *:1 EXT16;  local c:1 = C_flag; C_flag = val[7,1]; V_flag = val[7,1] ^ val[6,1]; val = (val << 1) | c; *:1 EXT16 = val;  setNZ8(val); }
 
-# --- ROR (memory byte) --- ROR=0x0E per CPU16RM
+# = ROR (memory byte) = ROR=0x0E per CPU16RM
 :ROR IND8X     is op8=0x0E; IND8X     { local val:1 = *:1 IND8X; local c:1 = C_flag; C_flag = val[0,1]; V_flag = val[7,1] ^ C_flag; val = (val >> 1) | (c << 7); *:1 IND8X = val; setNZ8(val); }
 :ROR IND8Y     is op8=0x1E; IND8Y     { local val:1 = *:1 IND8Y; local c:1 = C_flag; C_flag = val[0,1]; V_flag = val[7,1] ^ C_flag; val = (val >> 1) | (c << 7); *:1 IND8Y = val; setNZ8(val); }
 :ROR IND8Z     is op8=0x2E; IND8Z     { local val:1 = *:1 IND8Z; local c:1 = C_flag; C_flag = val[0,1]; V_flag = val[7,1] ^ C_flag; val = (val >> 1) | (c << 7); *:1 IND8Z = val; setNZ8(val); }
@@ -1434,14 +1434,14 @@ RmPC:  ""      is rm_pc=0  { }
 # SECTION: DSP / MAC INSTRUCTIONS (basics)
 # ============================================================================
 
-# --- CLRM: Clear MAC Accumulator ---
+# = CLRM: Clear MAC Accumulator =
 :CLRM   is op8=0x27; op8b=0xB7  { AM = 0; AM_EXT = 0; MV_flag = 0; EV_flag = 0; }
 
-# --- ASLM / ASRM ---
+# = ASLM / ASRM =
 :ASLM   is op8=0x27; op8b=0xB6  { local c:1 = AM[31,1]; AM = AM << 1; AM_EXT = (AM_EXT << 1) | c; }
 :ASRM   is op8=0x27; op8b=0xBA  { local c:1 = AM_EXT[0,1]; AM = (AM s>> 1); AM[31,1] = c; }
 
-# --- LDHI: Load HR and IR (used to initialize MAC before first MAC instruction) ---
+# = LDHI: Load HR and IR (used to initialize MAC before first MAC instruction) =
 # Opcode: 27B0, INH (no operand), 8 cycles
 # Operation: (M:M+1)X => HR, (M:M+1)Y => IR
 # Loads HR from the word at (XK:IX) and IR from the word at (YK:IY).
@@ -1453,7 +1453,7 @@ RmPC:  ""      is rm_pc=0  { }
     IR = *:2 yaddr;
 }
 
-# --- FMULS: Fractional Multiply Signed ---
+# = FMULS: Fractional Multiply Signed =
 :FMULS  is op8=0x37; op8b=0x27  {
     local prod:4 = sext(E:2) * sext(D:2);
     prod = prod << 1;
@@ -1461,10 +1461,10 @@ RmPC:  ""      is rm_pc=0  { }
     D = prod[0,16];
 }
 
-# --- ACE: Add E to AM ---
+# = ACE: Add E to AM =
 :ACE    is op8=0x37; op8b=0x22  { AM = AM + sext(E:2); }
 
-# --- ACED: Add E:D to AM ---
+# = ACED: Add E:D to AM =
 :ACED   is op8=0x37; op8b=0x23  { local ed:4 = (zext(E:2) << 16) | zext(D:2); AM = AM + ed; }
 
 
@@ -1473,20 +1473,20 @@ RmPC:  ""      is rm_pc=0  { }
 # Only has IND16 and EXT modes (no IND8)
 # ============================================================================
 
-# --- LDE ---
+# = LDE =
 :LDE "#"^imm16    is op8=0x37; op8b=0x35; imm16  { E = imm16; setNZ16(E); V_flag = 0; }
 :LDE IND16X       is op8=0x37; op8b=0x45; IND16X  { E = *:2 IND16X; setNZ16(E); V_flag = 0; }
 :LDE IND16Y       is op8=0x37; op8b=0x55; IND16Y  { E = *:2 IND16Y; setNZ16(E); V_flag = 0; }
 :LDE IND16Z       is op8=0x37; op8b=0x65; IND16Z  { E = *:2 IND16Z; setNZ16(E); V_flag = 0; }
 :LDE EXT16        is op8=0x37; op8b=0x75; EXT16   { E = *:2 EXT16;  setNZ16(E); V_flag = 0; }
 
-# --- STE ---
+# = STE =
 :STE IND16X       is op8=0x37; op8b=0x4A; IND16X  { *:2 IND16X = E; setNZ16(E); V_flag = 0; }
 :STE IND16Y       is op8=0x37; op8b=0x5A; IND16Y  { *:2 IND16Y = E; setNZ16(E); V_flag = 0; }
 :STE IND16Z       is op8=0x37; op8b=0x6A; IND16Z  { *:2 IND16Z = E; setNZ16(E); V_flag = 0; }
 :STE EXT16        is op8=0x37; op8b=0x7A; EXT16   { *:2 EXT16  = E; setNZ16(E); V_flag = 0; }
 
-# --- ADDE ---
+# = ADDE =
 :ADDE "#"^simm8   is op8=0x7C; simm8   { local val:2 = sext(simm8:1); addFlags16(E, val); E = E + val; setNZ16(E); }
 :ADDE "#"^imm16   is op8=0x37; op8b=0x31; imm16  { local val:2 = imm16; addFlags16(E, val); E = E + val; setNZ16(E); }
 :ADDE IND16X      is op8=0x37; op8b=0x41; IND16X  { local val:2 = *:2 IND16X; addFlags16(E, val); E = E + val; setNZ16(E); }
@@ -1494,35 +1494,35 @@ RmPC:  ""      is rm_pc=0  { }
 :ADDE IND16Z      is op8=0x37; op8b=0x61; IND16Z  { local val:2 = *:2 IND16Z; addFlags16(E, val); E = E + val; setNZ16(E); }
 :ADDE EXT16       is op8=0x37; op8b=0x71; EXT16   { local val:2 = *:2 EXT16;  addFlags16(E, val); E = E + val; setNZ16(E); }
 
-# --- SUBE ---
+# = SUBE =
 :SUBE "#"^imm16   is op8=0x37; op8b=0x30; imm16  { local val:2 = imm16; subFlags16(E, val); E = E - val; setNZ16(E); }
 :SUBE IND16X      is op8=0x37; op8b=0x40; IND16X  { local val:2 = *:2 IND16X; subFlags16(E, val); E = E - val; setNZ16(E); }
 :SUBE IND16Y      is op8=0x37; op8b=0x50; IND16Y  { local val:2 = *:2 IND16Y; subFlags16(E, val); E = E - val; setNZ16(E); }
 :SUBE IND16Z      is op8=0x37; op8b=0x60; IND16Z  { local val:2 = *:2 IND16Z; subFlags16(E, val); E = E - val; setNZ16(E); }
 :SUBE EXT16       is op8=0x37; op8b=0x70; EXT16   { local val:2 = *:2 EXT16;  subFlags16(E, val); E = E - val; setNZ16(E); }
 
-# --- CPE ---
+# = CPE =
 :CPE "#"^imm16    is op8=0x37; op8b=0x38; imm16  { local val:2 = imm16; local tmp:2 = E - val; subFlags16(E, val); setNZ16(tmp); }
 :CPE IND16X       is op8=0x37; op8b=0x48; IND16X  { local val:2 = *:2 IND16X; local tmp:2 = E - val; subFlags16(E, val); setNZ16(tmp); }
 :CPE IND16Y       is op8=0x37; op8b=0x58; IND16Y  { local val:2 = *:2 IND16Y; local tmp:2 = E - val; subFlags16(E, val); setNZ16(tmp); }
 :CPE IND16Z       is op8=0x37; op8b=0x68; IND16Z  { local val:2 = *:2 IND16Z; local tmp:2 = E - val; subFlags16(E, val); setNZ16(tmp); }
 :CPE EXT16        is op8=0x37; op8b=0x78; EXT16   { local val:2 = *:2 EXT16;  local tmp:2 = E - val; subFlags16(E, val); setNZ16(tmp); }
 
-# --- ANDE ---
+# = ANDE =
 :ANDE "#"^imm16   is op8=0x37; op8b=0x36; imm16  { E = E & imm16; setNZ16(E); V_flag = 0; }
 :ANDE IND16X      is op8=0x37; op8b=0x46; IND16X  { E = E & (*:2 IND16X); setNZ16(E); V_flag = 0; }
 :ANDE IND16Y      is op8=0x37; op8b=0x56; IND16Y  { E = E & (*:2 IND16Y); setNZ16(E); V_flag = 0; }
 :ANDE IND16Z      is op8=0x37; op8b=0x66; IND16Z  { E = E & (*:2 IND16Z); setNZ16(E); V_flag = 0; }
 :ANDE EXT16       is op8=0x37; op8b=0x76; EXT16   { E = E & (*:2 EXT16);  setNZ16(E); V_flag = 0; }
 
-# --- ORE ---
+# = ORE =
 :ORE "#"^imm16    is op8=0x37; op8b=0x37; imm16  { E = E | imm16; setNZ16(E); V_flag = 0; }
 :ORE IND16X       is op8=0x37; op8b=0x47; IND16X  { E = E | (*:2 IND16X); setNZ16(E); V_flag = 0; }
 :ORE IND16Y       is op8=0x37; op8b=0x57; IND16Y  { E = E | (*:2 IND16Y); setNZ16(E); V_flag = 0; }
 :ORE IND16Z       is op8=0x37; op8b=0x67; IND16Z  { E = E | (*:2 IND16Z); setNZ16(E); V_flag = 0; }
 :ORE EXT16        is op8=0x37; op8b=0x77; EXT16   { E = E | (*:2 EXT16);  setNZ16(E); V_flag = 0; }
 
-# --- EORE ---
+# = EORE =
 :EORE "#"^imm16   is op8=0x37; op8b=0x34; imm16  { E = E ^ imm16; setNZ16(E); V_flag = 0; }
 :EORE IND16X      is op8=0x37; op8b=0x44; IND16X  { E = E ^ (*:2 IND16X); setNZ16(E); V_flag = 0; }
 :EORE IND16Y      is op8=0x37; op8b=0x54; IND16Y  { E = E ^ (*:2 IND16Y); setNZ16(E); V_flag = 0; }
@@ -1670,37 +1670,37 @@ RmPC:  ""      is rm_pc=0  { }
 # These were missing from the original B-accumulator section
 # ============================================================================
 
-# --- SBCB E,offset ---
+# = SBCB E,offset =
 :SBCB EOFFX     is op8=0x27; op8b=0xC2; EOFFX   { local val:1 = *:1 EOFFX;  local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
 :SBCB EOFFY     is op8=0x27; op8b=0xD2; EOFFY   { local val:1 = *:1 EOFFY;  local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
 :SBCB EOFFZ     is op8=0x27; op8b=0xE2; EOFFZ   { local val:1 = *:1 EOFFZ;  local c:1 = C_flag; subFlags(B, val+c); B = B - val - c; setNZ8(B); }
 
-# --- ADCB E,offset ---
+# = ADCB E,offset =
 :ADCB EOFFX     is op8=0x27; op8b=0xC3; EOFFX   { local val:1 = *:1 EOFFX;  local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
 :ADCB EOFFY     is op8=0x27; op8b=0xD3; EOFFY   { local val:1 = *:1 EOFFY;  local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
 :ADCB EOFFZ     is op8=0x27; op8b=0xE3; EOFFZ   { local val:1 = *:1 EOFFZ;  local c:1 = C_flag; addFlags(B, val+c); B = B + val + c; setNZ8(B); }
 
-# --- EORB E,offset ---
+# = EORB E,offset =
 :EORB EOFFX     is op8=0x27; op8b=0xC4; EOFFX   { B = B ^ (*:1 EOFFX);  setNZ8(B); V_flag = 0; }
 :EORB EOFFY     is op8=0x27; op8b=0xD4; EOFFY   { B = B ^ (*:1 EOFFY);  setNZ8(B); V_flag = 0; }
 :EORB EOFFZ     is op8=0x27; op8b=0xE4; EOFFZ   { B = B ^ (*:1 EOFFZ);  setNZ8(B); V_flag = 0; }
 
-# --- ANDB E,offset ---
+# = ANDB E,offset =
 :ANDB EOFFX     is op8=0x27; op8b=0xC6; EOFFX   { B = B & (*:1 EOFFX);  setNZ8(B); V_flag = 0; }
 :ANDB EOFFY     is op8=0x27; op8b=0xD6; EOFFY   { B = B & (*:1 EOFFY);  setNZ8(B); V_flag = 0; }
 :ANDB EOFFZ     is op8=0x27; op8b=0xE6; EOFFZ   { B = B & (*:1 EOFFZ);  setNZ8(B); V_flag = 0; }
 
-# --- ORAB E,offset ---
+# = ORAB E,offset =
 :ORAB EOFFX     is op8=0x27; op8b=0xC7; EOFFX   { B = B | (*:1 EOFFX);  setNZ8(B); V_flag = 0; }
 :ORAB EOFFY     is op8=0x27; op8b=0xD7; EOFFY   { B = B | (*:1 EOFFY);  setNZ8(B); V_flag = 0; }
 :ORAB EOFFZ     is op8=0x27; op8b=0xE7; EOFFZ   { B = B | (*:1 EOFFZ);  setNZ8(B); V_flag = 0; }
 
-# --- CMPB E,offset ---
+# = CMPB E,offset =
 :CMPB EOFFX     is op8=0x27; op8b=0xC8; EOFFX   { local val:1 = *:1 EOFFX;  local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
 :CMPB EOFFY     is op8=0x27; op8b=0xD8; EOFFY   { local val:1 = *:1 EOFFY;  local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
 :CMPB EOFFZ     is op8=0x27; op8b=0xE8; EOFFZ   { local val:1 = *:1 EOFFZ;  local tmp:1 = B - val; subFlags(B, val); setNZ8(tmp); }
 
-# --- BITB E,offset ---
+# = BITB E,offset =
 :BITB EOFFX     is op8=0x27; op8b=0xC9; EOFFX   { local tmp:1 = B & (*:1 EOFFX);  setNZ8(tmp); V_flag = 0; }
 :BITB EOFFY     is op8=0x27; op8b=0xD9; EOFFY   { local tmp:1 = B & (*:1 EOFFY);  setNZ8(tmp); V_flag = 0; }
 :BITB EOFFZ     is op8=0x27; op8b=0xE9; EOFFZ   { local tmp:1 = B & (*:1 EOFFZ);  setNZ8(tmp); V_flag = 0; }

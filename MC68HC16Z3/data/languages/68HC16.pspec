@@ -38,7 +38,7 @@
     <symbol name="VEC_PICR"           address="ram:0x0070"/>
 
     <!-- ================================================================
-         ADC -- Analog-to-Digital Converter  ($YFF700 - $YFF73F)
+         ADC - Analog-to-Digital Converter  ($YFF700 - $YFF73F)
          Source: MC68HC16ZUM Table D-1, EQUATES.ASM
          ================================================================ -->
     <symbol name="ADCMCR"   address="ram:0x0FF700"/>  <!-- ADC Module Configuration Register -->
@@ -73,7 +73,7 @@
     <symbol name="LJURR7"   address="ram:0x0FF73E"/>  <!-- Left-Justified Unsigned Result 7 -->
 
     <!-- ================================================================
-         MRM -- Masked ROM Module  ($YFF820 - $YFF83F)
+         MRM - Masked ROM Module  ($YFF820 - $YFF83F)
          Source: MC68HC16ZUM EQUATES.ASM
          ================================================================ -->
     <symbol name="MRMCR"      address="ram:0x0FF820"/>  <!-- MRM Module Configuration Register -->
@@ -87,7 +87,7 @@
     <symbol name="ROMBS3"     address="ram:0x0FF836"/>  <!-- ROM Bootstrap Word 3 -->
 
     <!-- ================================================================
-         GPT -- General-Purpose Timer  ($YFF900 - $YFF92F)
+         GPT - General-Purpose Timer  ($YFF900 - $YFF92F)
          Source: MC68HC16ZUM Table D-42, EQUATES.ASM
          ================================================================ -->
     <symbol name="GPTMCR"   address="ram:0x0FF900"/>  <!-- GPT Module Configuration Register -->
@@ -124,7 +124,7 @@
     <symbol name="PRESCL"   address="ram:0x0FF92C"/>  <!-- GPT Prescaler Register -->
 
     <!-- ================================================================
-         SIM -- System Integration Module  ($YFFA00 - $YFFA7F)
+         SIM - System Integration Module  ($YFFA00 - $YFFA7F)
          Source: MC68HC16ZUM Table D-2, EQUATES.ASM
          ================================================================ -->
     <symbol name="SIMCR"    address="ram:0x0FFA00"/>  <!-- SIM Module Configuration Register -->
@@ -179,7 +179,7 @@
     <symbol name="CSOR10"   address="ram:0x0FFA76"/>  <!-- Chip-Select Option Register 10 -->
 
     <!-- ================================================================
-         SRAM -- Standby RAM Module  ($YFFB00 - $YFFB07)
+         SRAM - Standby RAM Module  ($YFFB00 - $YFFB07)
          Source: MC68HC16ZUM EQUATES.ASM
          ================================================================ -->
     <symbol name="RAMMCR"   address="ram:0x0FFB00"/>  <!-- RAM Module Configuration Register -->
@@ -188,7 +188,7 @@
     <symbol name="RAMBAL"   address="ram:0x0FFB06"/>  <!-- RAM Array Base Address Low -->
 
     <!-- ================================================================
-         QSM -- Queued Serial Module  ($YFFC00 - $YFFDFF)
+         QSM - Queued Serial Module  ($YFFC00 - $YFFDFF)
          Includes SCI (Serial Communications Interface) and
          SPI (Serial Peripheral Interface)
          Source: MC68HC16ZUM Table D-5, EQUATES.ASM

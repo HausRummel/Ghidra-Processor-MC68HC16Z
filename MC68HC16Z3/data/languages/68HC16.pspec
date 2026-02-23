@@ -3,7 +3,7 @@
 <processor_spec>
   <programcounter register="PC"/>
   <volatile outputop="write_volatile" inputop="read_volatile">
-    <range space="ram" first="0x0FF000" last="0x0FFFFF"/>
+    <range space="ram" first="0x0FF700" last="0x0FFFFF"/>
   </volatile>
   <default_symbols>
 

@@ -219,6 +219,15 @@
 
   </default_symbols>
   <default_memory_blocks>
+    <!-- CS0: External peripheral at bank 4, 2KB, 8-bit port, R/W
+         CSBAR0=0x0400 CSOR0=0x7C70 -->
+    <memory_block name="EXT_PERIPH" start_address="ram:0x040000" length="0x800" initialized="false" mode="rw"/>
+    <!-- Internal SRAM: base at 0x0F8000 (RAMBAH=0x00FF, RAMBAL=0x8000)
+         4KB for Z3 variant. Stack lives here (SK:SP = 0x0F:0x8FFC).
+         IZ base points here (ZK:IZ = 0x0F:0x8000). -->
+    <memory_block name="INT_SRAM" start_address="ram:0x0F8000" length="0x1000" initialized="false" mode="rw"/>
+    <!-- I/O register blocks: ADC, MRM, GPT, SIM, SRAM ctrl, QSM
+         0x0FF700 to 0x0FFFFF -->
     <memory_block name="IO_REGS" start_address="ram:0x0FF700" length="0x900" initialized="false" mode="rwv"/>
   </default_memory_blocks>
   <register_data>

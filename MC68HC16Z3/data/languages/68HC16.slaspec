@@ -898,7 +898,7 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 
 # = JMP (Extended 20-bit and Indexed 20-bit) =
-:JMP EXT20ADDR       is op8=0x7A; EXT20ADDR           { goto [EXT20ADDR]; }
+:JMP EXT20ADDR       is op8=0x7A; EXT20ADDR           { goto EXT20ADDR; }
 :JMP IND20X          is op8=0x4B; IND20X               { goto [IND20X]; }
 :JMP IND20Y          is op8=0x5B; IND20Y               { goto [IND20Y]; }
 :JMP IND20Z          is op8=0x6B; IND20Z               { goto [IND20Z]; }
@@ -908,7 +908,7 @@ RmPC:  ""      is rm_pc=0  { }
     push16(PC:2);
     packCCR();
     push16(CCR);
-    call [EXT20ADDR];
+    call EXT20ADDR;
 }
 :JSR IND20X          is op8=0x89; IND20X {
     push16(PC:2);

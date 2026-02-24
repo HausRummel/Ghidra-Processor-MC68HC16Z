@@ -25,21 +25,21 @@
                           builds the function body, stack frame, and call
                           graph automatically without manual F-key creation.
          Handler addresses confirmed from JTEC+ firmware vector table scan. -->
-    <symbol name="STARTUP"            address="ram:0x020000" entry="true" type="function"/>
-    <symbol name="IRQ_DEFAULT_STUB"   address="ram:0x000882" entry="true" type="function"/>
-    <symbol name="IRQ_BKPT"           address="ram:0x000886" entry="true" type="function"/>
-    <symbol name="IRQ_BERR"           address="ram:0x00088a" entry="true" type="function"/>
-    <symbol name="IRQ_SWI"            address="ram:0x00088e" entry="true" type="function"/>
-    <symbol name="IRQ_ILLEGAL"        address="ram:0x000892" entry="true" type="function"/>
-    <symbol name="IRQ_DIV_ZERO"       address="ram:0x000896" entry="true" type="function"/>
-    <symbol name="IRQ_UNINIT"         address="ram:0x00089a" entry="true" type="function"/>
-    <symbol name="IRQ_LVL1"           address="ram:0x00089e" entry="true" type="function"/>
-    <symbol name="IRQ_LVL2"           address="ram:0x0008a2" entry="true" type="function"/>
-    <symbol name="IRQ_LVL3"           address="ram:0x0008a6" entry="true" type="function"/>
-    <symbol name="IRQ_LVL4"           address="ram:0x0008aa" entry="true" type="function"/>
-    <symbol name="IRQ_LVL6"           address="ram:0x0008ae" entry="true" type="function"/>
-    <symbol name="IRQ_LVL7"           address="ram:0x0008b2" entry="true" type="function"/>
-    <symbol name="IRQ_SPURIOUS"       address="ram:0x0008b6" entry="true" type="function"/>
+    <symbol name="STARTUP"            address="ram:0x020000" entry="true" type="code"/>
+    <symbol name="IRQ_DEFAULT_STUB"   address="ram:0x000882" entry="true" type="code"/>
+    <symbol name="IRQ_BKPT"           address="ram:0x000886" entry="true" type="code"/>
+    <symbol name="IRQ_BERR"           address="ram:0x00088a" entry="true" type="code"/>
+    <symbol name="IRQ_SWI"            address="ram:0x00088e" entry="true" type="code"/>
+    <symbol name="IRQ_ILLEGAL"        address="ram:0x000892" entry="true" type="code"/>
+    <symbol name="IRQ_DIV_ZERO"       address="ram:0x000896" entry="true" type="code"/>
+    <symbol name="IRQ_UNINIT"         address="ram:0x00089a" entry="true" type="code"/>
+    <symbol name="IRQ_LVL1"           address="ram:0x00089e" entry="true" type="code"/>
+    <symbol name="IRQ_LVL2"           address="ram:0x0008a2" entry="true" type="code"/>
+    <symbol name="IRQ_LVL3"           address="ram:0x0008a6" entry="true" type="code"/>
+    <symbol name="IRQ_LVL4"           address="ram:0x0008aa" entry="true" type="code"/>
+    <symbol name="IRQ_LVL6"           address="ram:0x0008ae" entry="true" type="code"/>
+    <symbol name="IRQ_LVL7"           address="ram:0x0008b2" entry="true" type="code"/>
+    <symbol name="IRQ_SPURIOUS"       address="ram:0x0008b6" entry="true" type="code"/>
     <symbol name="VEC_RESET_SP"       address="ram:0x0004"/>
     <symbol name="VEC_RESET_IZ"       address="ram:0x0006"/>
     <symbol name="VEC_BKPT"           address="ram:0x0008"/>

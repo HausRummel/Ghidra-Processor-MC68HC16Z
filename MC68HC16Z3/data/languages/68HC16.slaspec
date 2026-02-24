@@ -279,28 +279,45 @@ EXT20ADDR: ext20_bank^":"^ext20_addr  is ext20_pad=0 & ext20_bank & ext20_addr {
 }
 
 # = 20-bit Indexed (IND20) - for JMP/JSR =
-# ext20_pad must be 0 to disambiguate from BRSET/BRCLR
-IND20X: ext20_addr^",X"  is ext20_pad=0 & ext20_bank & ext20_addr {
-    local offset:3 = sext(ext20_addr:2);
+# ext20_pad must be 0 to disambiguate from BRSET/BRCLR sharing the same opcodes.
+#
+# The 3-byte operand encodes a 20-bit UNSIGNED offset split as:
+#   ext20_bank (bits 19-16) : the bank contribution (0–15)
+#   ext20_addr (bits 15-0)  : the low 16-bit contribution
+#
+# EA = (XK:IX) + (ext20_bank << 16) | ext20_addr
+#
+# IMPORTANT: The offset is UNSIGNED here (zext, not sext).  With ext20_pad=0
+# we can only decode non-negative offsets (0x00000–0x0FFFF).  Negative 20-bit
+# offsets would require bits 23-20 to be set, violating ext20_pad=0, so they
+# are handled by separate encodings (if present).  In practice, Chrysler JTEC+
+# firmware (and most 68HC16 banked code) uses this mode exclusively to add a
+# positive bank constant (+0x10000, +0x20000, +0x30000) to the loaded pointer.
+#
+# Display: "bank:addr,X" mirrors EXT20ADDR notation for consistency and makes
+# the bank contribution immediately visible to the analyst.
+IND20X: ext20_bank^":"^ext20_addr^",X"  is ext20_pad=0 & ext20_bank & ext20_addr {
+    local offset:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
     local base:3 = (zext(XK:1) << 16) | zext(IX:2);
     local ea:3 = base + offset;
     export ea;
 }
-IND20Y: ext20_addr^",Y"  is ext20_pad=0 & ext20_bank & ext20_addr {
-    local offset:3 = sext(ext20_addr:2);
+IND20Y: ext20_bank^":"^ext20_addr^",Y"  is ext20_pad=0 & ext20_bank & ext20_addr {
+    local offset:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
     local base:3 = (zext(YK:1) << 16) | zext(IY:2);
     local ea:3 = base + offset;
     export ea;
 }
-IND20Z: ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr {
-    local offset:3 = sext(ext20_addr:2);
+IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr {
+    local offset:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
     local base:3 = (zext(ZK:1) << 16) | zext(IZ:2);
     local ea:3 = base + offset;
     export ea;
 }
 
-# = PSHM register mask display sub-constructors (matches PSHM bit ordering) =
-# PSHM bits: 0=D, 1=E, 2=IX, 3=IY, 4=IZ, 5=K, 6=CCR, 7=(reserved)
+# = PSHM/PULM register mask display sub-constructors =
+# Each bit in the mask selects a register. We display set bits as register names.
+# A trailing comma on the last register is accepted for simplicity.
 RmD:   "D,"    is rm_d=1   { }
 RmD:   ""      is rm_d=0   { }
 RmE:   "E,"    is rm_e=1   { }
@@ -315,23 +332,8 @@ RmK:   "K,"    is rm_k=1   { }
 RmK:   ""      is rm_k=0   { }
 RmCCR: "CCR,"  is rm_ccr=1 { }
 RmCCR: ""      is rm_ccr=0 { }
-
-# = PULM register mask display sub-constructors (reversed bit ordering) =
-# PULM bits: 0=CCR, 1=K, 2=IZ, 3=IY, 4=IX, 5=E, 6=D, 7=(reserved)
-PmCCR: "CCR,"  is rm_d=1   { }
-PmCCR: ""      is rm_d=0   { }
-PmK:   "K,"    is rm_e=1   { }
-PmK:   ""      is rm_e=0   { }
-PmIZ:  "IZ,"   is rm_ix=1  { }
-PmIZ:  ""      is rm_ix=0  { }
-PmIY:  "IY,"   is rm_iy=1  { }
-PmIY:  ""      is rm_iy=0  { }
-PmIX:  "IX,"   is rm_iz=1  { }
-PmIX:  ""      is rm_iz=0  { }
-PmE:   "E,"    is rm_k=1   { }
-PmE:   ""      is rm_k=0   { }
-PmD:   "D,"    is rm_ccr=1 { }
-PmD:   ""      is rm_ccr=0 { }
+RmPC:  "PC,"   is rm_pc=1  { }
+RmPC:  ""      is rm_pc=0  { }
 
 # =============================================================================
 # INSTRUCTION DEFINITIONS
@@ -971,7 +973,7 @@ PmD:   ""      is rm_ccr=0 { }
 :TAB   is op8=0x37; op8b=0x17  { B = A; setNZ8(B); V_flag = 0; }
 :TBA   is op8=0x37; op8b=0x07  { A = B; setNZ8(A); V_flag = 0; }
 :XGAB  is op8=0x37; op8b=0x1A  { local tmp:1 = A; A = B; B = tmp; }
-:XGDE  is op8=0x27; op8b=0x7A  { local tmp:2 = D; D = E; E = tmp; }
+:XGDE  is op8=0x27; op8b=0x7A  { local tmp:2 = D; D = E; E = tmp; setNZ16(D); }
 :XGDX  is op8=0x37; op8b=0xCC  { local tmp:2 = D; D = IX; IX = tmp; }
 :XGDY  is op8=0x37; op8b=0xDC  { local tmp:2 = D; D = IY; IY = tmp; }
 :XGDZ  is op8=0x37; op8b=0xEC  { local tmp:2 = D; D = IZ; IZ = tmp; }
@@ -982,12 +984,12 @@ PmD:   ""      is rm_ccr=0 { }
 # = TDE/TED/TDP/TPD etc. =
 :TDE   is op8=0x27; op8b=0x7B  { E = D; }
 :TED   is op8=0x27; op8b=0xFB  { D = E; }
-:TXS   is op8=0x37; op8b=0x4E  { SK = XK; SP = IX - 2; }
-:TYS   is op8=0x37; op8b=0x5E  { SK = YK; SP = IY - 2; }
-:TZS   is op8=0x37; op8b=0x6E  { SK = ZK; SP = IZ - 2; }
-:TSX   is op8=0x27; op8b=0x4F  { XK = SK; IX = SP + 2; }
-:TSY   is op8=0x27; op8b=0x5F  { YK = SK; IY = SP + 2; }
-:TSZ   is op8=0x27; op8b=0x6F  { ZK = SK; IZ = SP + 2; }
+:TXS   is op8=0x37; op8b=0x4E  { SP = IX; }
+:TYS   is op8=0x37; op8b=0x5E  { SP = IY; }
+:TZS   is op8=0x37; op8b=0x6E  { SP = IZ; }
+:TSX   is op8=0x27; op8b=0x4F  { IX = SP; }
+:TSY   is op8=0x27; op8b=0x5F  { IY = SP; }
+:TSZ   is op8=0x27; op8b=0x6F  { IZ = SP; }
 
 # = Inter-index-register transfers =
 :TXY   is op8=0x27; op8b=0x5C  { YK = XK; IY = IX; }
@@ -1378,16 +1380,15 @@ PmD:   ""      is rm_ccr=0 { }
 # ============================================================================
 # SECTION: PSHM / PULM (Push/Pull Multiple Registers)
 # These use an 8-bit mask to indicate which registers to push/pull
-# CRITICAL: The bit-to-register mappings are REVERSED between PSHM and PULM!
-#
-# PSHM bits: 0=D, 1=E, 2=IX, 3=IY, 4=IZ, 5=K, 6=CCR, 7=(reserved)
-# Push order: highest bit first → CCR, K, IZ, IY, IX, E, D
-#
-# PULM bits: 0=CCR, 1=K, 2=IZ, 3=IY, 4=IX, 5=E, 6=D, 7=(reserved)
-# Pull order: lowest bit first → CCR, K, IZ, IY, IX, E, D
+# Bit 0=D, 1=E, 2=IX, 3=IY, 4=IZ, 5=K, 6=CCR (PSHM only), 7=PC (PSHM only)
+# Push order: PC, CCR, K, IZ, IY, IX, E, D (MSB first)
+# Pull order: D, E, IX, IY, IZ, K, CCR (LSB first)
 # ============================================================================
-:PSHM RmD^RmE^RmIX^RmIY^RmIZ^RmK^RmCCR  is op8=0x34; regmask & RmD & RmE & RmIX & RmIY & RmIZ & RmK & RmCCR & rm_pc {
+:PSHM RmD^RmE^RmIX^RmIY^RmIZ^RmK^RmCCR^RmPC  is op8=0x34; regmask & RmD & RmE & RmIX & RmIY & RmIZ & RmK & RmCCR & RmPC {
     local mask:1 = regmask;
+    if ((mask & 0x80) == 0) goto <nopc>;
+    push16(PC:2);
+    <nopc>
     if ((mask & 0x40) == 0) goto <noccr>;
     packCCR();
     push16(CCR);
@@ -1413,14 +1414,24 @@ PmD:   ""      is rm_ccr=0 { }
     <nod>
 }
 
-:PULM PmCCR^PmK^PmIZ^PmIY^PmIX^PmE^PmD  is op8=0x35; regmask & PmCCR & PmK & PmIZ & PmIY & PmIX & PmE & PmD & rm_pc {
+:PULM RmD^RmE^RmIX^RmIY^RmIZ^RmK^RmCCR  is op8=0x35; regmask & RmD & RmE & RmIX & RmIY & RmIZ & RmK & RmCCR & rm_pc {
     local mask:1 = regmask;
-    # PULM bit mapping: 0=CCR, 1=K, 2=IZ, 3=IY, 4=IX, 5=E, 6=D
-    if ((mask & 0x01) == 0) goto <noccr>;
-    pull16(CCR);
-    unpackCCR();
-    <noccr>
-    if ((mask & 0x02) == 0) goto <nok>;
+    if ((mask & 0x01) == 0) goto <nod>;
+    pull16(D);
+    <nod>
+    if ((mask & 0x02) == 0) goto <noe>;
+    pull16(E);
+    <noe>
+    if ((mask & 0x04) == 0) goto <noix>;
+    pull16(IX);
+    <noix>
+    if ((mask & 0x08) == 0) goto <noiy>;
+    pull16(IY);
+    <noiy>
+    if ((mask & 0x10) == 0) goto <noiz>;
+    pull16(IZ);
+    <noiz>
+    if ((mask & 0x20) == 0) goto <nok>;
     local kreg:2;
     pull16(kreg);
     EK = kreg[12,4];
@@ -1428,21 +1439,10 @@ PmD:   ""      is rm_ccr=0 { }
     YK = kreg[4,4];
     ZK = kreg[0,4];
     <nok>
-    if ((mask & 0x04) == 0) goto <noiz>;
-    pull16(IZ);
-    <noiz>
-    if ((mask & 0x08) == 0) goto <noiy>;
-    pull16(IY);
-    <noiy>
-    if ((mask & 0x10) == 0) goto <noix>;
-    pull16(IX);
-    <noix>
-    if ((mask & 0x20) == 0) goto <noe>;
-    pull16(E);
-    <noe>
-    if ((mask & 0x40) == 0) goto <nod>;
-    pull16(D);
-    <nod>
+    if ((mask & 0x40) == 0) goto <noccr>;
+    pull16(CCR);
+    unpackCCR();
+    <noccr>
 }
 
 

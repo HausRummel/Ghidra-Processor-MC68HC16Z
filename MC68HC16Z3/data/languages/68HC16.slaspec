@@ -273,10 +273,8 @@ BRREL16: reloc is rel16_2 [ reloc = inst_start + 6 + rel16_2; ] { export *:1 rel
 
 # = Extended 20-bit (EXT20) - for JMP/JSR =
 # ext20_pad must be 0 to disambiguate from BRSET/BRCLR sharing same opcodes
-EXT20ADDR: ext20_bank^":"^ext20_addr  is ext20_pad=0 & ext20_bank & ext20_addr {
-    local ea:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
-    export ea;
-}
+EXT20ADDR: reloc  is ext20_pad=0 & ext20_bank & ext20_addr [ reloc = (ext20_bank << 16) | ext20_addr; ]
+    { export *:3 reloc; }
 
 # = 20-bit Indexed (IND20) - for JMP/JSR =
 # ext20_pad must be 0 to disambiguate from BRSET/BRCLR sharing the same opcodes.

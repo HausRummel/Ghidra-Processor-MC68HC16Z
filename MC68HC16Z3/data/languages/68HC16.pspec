@@ -3,7 +3,7 @@
 <processor_spec>
   <programcounter register="PC"/>
   <volatile outputop="write_volatile" inputop="read_volatile">
-    <range space="ram" first="0x0FF700" last="0x0FFFFF"/>
+    <range space="ram" first="0x0FF000" last="0x0FFFFF"/>
   </volatile>
   <default_symbols>
 
@@ -13,8 +13,31 @@
          Vectors 0-3 (0x0000-0x0006): Reset initialization values
          Vectors 4+ (0x0008-0x01FE): Exception/interrupt handler addresses
          ================================================================ -->
-    <symbol name="VEC_RESET_ZK_SK_PK" address="ram:0x0000" entry="true"/>
-    <symbol name="VEC_RESET_PC"       address="ram:0x0002" entry="true"/>
+    <!-- Vector table slots: 16-bit PC values only, NOT full 20-bit pointers.
+         Define as Word (2-byte) data in the listing, never as Pointer type.
+         The bank context is encoded separately in VEC_RESET_ZK_SK_PK. -->
+    <symbol name="VEC_RESET_ZK_SK_PK" address="ram:0x0000"/>
+    <symbol name="VEC_RESET_PC"       address="ram:0x0002"/>
+
+    <!-- Actual handler entry points derived from vector table values.
+         These are marked entry=true so Ghidra seeds function analysis here
+         without requiring manual pointer definition on the vector table.
+         Handler addresses confirmed from JTEC+ firmware vector table scan. -->
+    <symbol name="STARTUP"            address="ram:0x020000" entry="true"/>
+    <symbol name="IRQ_DEFAULT_STUB"   address="ram:0x000882" entry="true"/>
+    <symbol name="IRQ_BKPT"          address="ram:0x000886" entry="true"/>
+    <symbol name="IRQ_BERR"          address="ram:0x00088a" entry="true"/>
+    <symbol name="IRQ_SWI"           address="ram:0x00088e" entry="true"/>
+    <symbol name="IRQ_ILLEGAL"       address="ram:0x000892" entry="true"/>
+    <symbol name="IRQ_DIV_ZERO"      address="ram:0x000896" entry="true"/>
+    <symbol name="IRQ_UNINIT"        address="ram:0x00089a" entry="true"/>
+    <symbol name="IRQ_LVL1"         address="ram:0x00089e" entry="true"/>
+    <symbol name="IRQ_LVL2"         address="ram:0x0008a2" entry="true"/>
+    <symbol name="IRQ_LVL3"         address="ram:0x0008a6" entry="true"/>
+    <symbol name="IRQ_LVL4"         address="ram:0x0008aa" entry="true"/>
+    <symbol name="IRQ_LVL6"         address="ram:0x0008ae" entry="true"/>
+    <symbol name="IRQ_LVL7"         address="ram:0x0008b2" entry="true"/>
+    <symbol name="IRQ_SPURIOUS"      address="ram:0x0008b6" entry="true"/>
     <symbol name="VEC_RESET_SP"       address="ram:0x0004"/>
     <symbol name="VEC_RESET_IZ"       address="ram:0x0006"/>
     <symbol name="VEC_BKPT"           address="ram:0x0008"/>

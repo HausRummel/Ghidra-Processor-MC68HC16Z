@@ -1383,64 +1383,31 @@ RmPC:  ""      is rm_pc=0  { }
 # Pull order: D, E, IX, IY, IZ, K, CCR (LSB first)
 # ============================================================================
 :PSHM RmD^RmE^RmIX^RmIY^RmIZ^RmK^RmCCR^RmPC  is op8=0x34; regmask & RmD & RmE & RmIX & RmIY & RmIZ & RmK & RmCCR & RmPC {
-    local mask:1 = regmask;
-    if ((mask & 0x80) == 0) goto <nopc>;
-    push16(PC:2);
-    <nopc>
-    if ((mask & 0x40) == 0) goto <noccr>;
-    packCCR();
-    push16(CCR);
-    <noccr>
-    if ((mask & 0x20) == 0) goto <nok>;
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
-    <nok>
-    if ((mask & 0x10) == 0) goto <noiz>;
-    push16(IZ);
-    <noiz>
-    if ((mask & 0x08) == 0) goto <noiy>;
-    push16(IY);
-    <noiy>
-    if ((mask & 0x04) == 0) goto <noix>;
-    push16(IX);
-    <noix>
-    if ((mask & 0x02) == 0) goto <noe>;
-    push16(E);
-    <noe>
-    if ((mask & 0x01) == 0) goto <nod>;
-    push16(D);
-    <nod>
+    # Push order: PC, CCR, K, IZ, IY, IX, E, D (MSB first, highest stack address)
+    # Using individual rm_x token fields (1-bit constants at decode time) instead of
+    # masking the combined regmask variable. This allows the decompiler to constant-fold
+    # each conditional at analysis time, eliminating spurious unreachable block warnings.
+    if (rm_pc  == 0) goto <nopc>;   push16(PC:2);                                                                                                    <nopc>
+    if (rm_ccr == 0) goto <noccr>;  packCCR(); push16(CCR);                                                                                          <noccr>
+    if (rm_k   == 0) goto <nok>;    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1); push16(kreg_p);    <nok>
+    if (rm_iz  == 0) goto <noiz>;   push16(IZ);                                                                                                       <noiz>
+    if (rm_iy  == 0) goto <noiy>;   push16(IY);                                                                                                       <noiy>
+    if (rm_ix  == 0) goto <noix>;   push16(IX);                                                                                                       <noix>
+    if (rm_e   == 0) goto <noe>;    push16(E);                                                                                                        <noe>
+    if (rm_d   == 0) goto <nod>;    push16(D);                                                                                                        <nod>
 }
 
 :PULM RmD^RmE^RmIX^RmIY^RmIZ^RmK^RmCCR  is op8=0x35; regmask & RmD & RmE & RmIX & RmIY & RmIZ & RmK & RmCCR & rm_pc {
-    local mask:1 = regmask;
-    if ((mask & 0x01) == 0) goto <nod>;
-    pull16(D);
-    <nod>
-    if ((mask & 0x02) == 0) goto <noe>;
-    pull16(E);
-    <noe>
-    if ((mask & 0x04) == 0) goto <noix>;
-    pull16(IX);
-    <noix>
-    if ((mask & 0x08) == 0) goto <noiy>;
-    pull16(IY);
-    <noiy>
-    if ((mask & 0x10) == 0) goto <noiz>;
-    pull16(IZ);
-    <noiz>
-    if ((mask & 0x20) == 0) goto <nok>;
-    local kreg:2;
-    pull16(kreg);
-    EK = kreg[12,4];
-    XK = kreg[8,4];
-    YK = kreg[4,4];
-    ZK = kreg[0,4];
-    <nok>
-    if ((mask & 0x40) == 0) goto <noccr>;
-    pull16(CCR);
-    unpackCCR();
-    <noccr>
+    # Pull order: D, E, IX, IY, IZ, K, CCR (LSB first, lowest stack address)
+    # Using individual rm_x token fields (1-bit constants at decode time) for
+    # decompiler constant-folding of conditionals.
+    if (rm_d   == 0) goto <nod>;    pull16(D);                                                                                                        <nod>
+    if (rm_e   == 0) goto <noe>;    pull16(E);                                                                                                        <noe>
+    if (rm_ix  == 0) goto <noix>;   pull16(IX);                                                                                                       <noix>
+    if (rm_iy  == 0) goto <noiy>;   pull16(IY);                                                                                                       <noiy>
+    if (rm_iz  == 0) goto <noiz>;   pull16(IZ);                                                                                                       <noiz>
+    if (rm_k   == 0) goto <nok>;    local kreg_u:2; pull16(kreg_u); EK = kreg_u[12,4]; XK = kreg_u[8,4]; YK = kreg_u[4,4]; ZK = kreg_u[0,4];      <nok>
+    if (rm_ccr == 0) goto <noccr>;  pull16(CCR); unpackCCR();                                                                                         <noccr>
 }
 
 

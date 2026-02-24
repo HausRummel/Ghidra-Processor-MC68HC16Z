@@ -316,22 +316,27 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # = PSHM/PULM register mask display sub-constructors =
 # Each bit in the mask selects a register. We display set bits as register names.
 # A trailing comma on the last register is accepted for simplicity.
-RmD:   "D,"    is rm_d=1   { }
-RmD:   ""      is rm_d=0   { }
-RmE:   "E,"    is rm_e=1   { }
-RmE:   ""      is rm_e=0   { }
-RmIX:  "IX,"   is rm_ix=1  { }
-RmIX:  ""      is rm_ix=0  { }
-RmIY:  "IY,"   is rm_iy=1  { }
-RmIY:  ""      is rm_iy=0  { }
-RmIZ:  "IZ,"   is rm_iz=1  { }
-RmIZ:  ""      is rm_iz=0  { }
-RmK:   "K,"    is rm_k=1   { }
-RmK:   ""      is rm_k=0   { }
-RmCCR: "CCR,"  is rm_ccr=1 { }
-RmCCR: ""      is rm_ccr=0 { }
-RmPC:  "PC,"   is rm_pc=1  { }
-RmPC:  ""      is rm_pc=0  { }
+#
+# Each variant exports its decoded bit as a literal 1:1 or 0:1 constant.
+# This allows the PSHM/PULM pcode bodies to reference RmD, RmE etc. as values
+# that Ghidra substitutes at decode time — enabling the decompiler to
+# constant-fold the push/pull conditionals and eliminate unreachable block warnings.
+RmD:   "D,"    is rm_d=1   { export 1:1; }
+RmD:   ""      is rm_d=0   { export 0:1; }
+RmE:   "E,"    is rm_e=1   { export 1:1; }
+RmE:   ""      is rm_e=0   { export 0:1; }
+RmIX:  "IX,"   is rm_ix=1  { export 1:1; }
+RmIX:  ""      is rm_ix=0  { export 0:1; }
+RmIY:  "IY,"   is rm_iy=1  { export 1:1; }
+RmIY:  ""      is rm_iy=0  { export 0:1; }
+RmIZ:  "IZ,"   is rm_iz=1  { export 1:1; }
+RmIZ:  ""      is rm_iz=0  { export 0:1; }
+RmK:   "K,"    is rm_k=1   { export 1:1; }
+RmK:   ""      is rm_k=0   { export 0:1; }
+RmCCR: "CCR,"  is rm_ccr=1 { export 1:1; }
+RmCCR: ""      is rm_ccr=0 { export 0:1; }
+RmPC:  "PC,"   is rm_pc=1  { export 1:1; }
+RmPC:  ""      is rm_pc=0  { export 0:1; }
 
 # =============================================================================
 # INSTRUCTION DEFINITIONS
@@ -1384,30 +1389,28 @@ RmPC:  ""      is rm_pc=0  { }
 # ============================================================================
 :PSHM RmD^RmE^RmIX^RmIY^RmIZ^RmK^RmCCR^RmPC  is op8=0x34; regmask & RmD & RmE & RmIX & RmIY & RmIZ & RmK & RmCCR & RmPC {
     # Push order: PC, CCR, K, IZ, IY, IX, E, D (MSB first, highest stack address)
-    # Using individual rm_x token fields (1-bit constants at decode time) instead of
-    # masking the combined regmask variable. This allows the decompiler to constant-fold
-    # each conditional at analysis time, eliminating spurious unreachable block warnings.
-    if (rm_pc  == 0) goto <nopc>;   push16(PC:2);                                                                                                    <nopc>
-    if (rm_ccr == 0) goto <noccr>;  packCCR(); push16(CCR);                                                                                          <noccr>
-    if (rm_k   == 0) goto <nok>;    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1); push16(kreg_p);    <nok>
-    if (rm_iz  == 0) goto <noiz>;   push16(IZ);                                                                                                       <noiz>
-    if (rm_iy  == 0) goto <noiy>;   push16(IY);                                                                                                       <noiy>
-    if (rm_ix  == 0) goto <noix>;   push16(IX);                                                                                                       <noix>
-    if (rm_e   == 0) goto <noe>;    push16(E);                                                                                                        <noe>
-    if (rm_d   == 0) goto <nod>;    push16(D);                                                                                                        <nod>
+    # RmX sub-constructors export literal 0:1 or 1:1 constants at decode time.
+    # The decompiler constant-folds these conditions, eliminating unreachable block warnings.
+    if (RmPC  == 0) goto <nopc>;   push16(PC:2);                                                                                                    <nopc>
+    if (RmCCR == 0) goto <noccr>;  packCCR(); push16(CCR);                                                                                          <noccr>
+    if (RmK   == 0) goto <nok>;    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1); push16(kreg_p);    <nok>
+    if (RmIZ  == 0) goto <noiz>;   push16(IZ);                                                                                                       <noiz>
+    if (RmIY  == 0) goto <noiy>;   push16(IY);                                                                                                       <noiy>
+    if (RmIX  == 0) goto <noix>;   push16(IX);                                                                                                       <noix>
+    if (RmE   == 0) goto <noe>;    push16(E);                                                                                                        <noe>
+    if (RmD   == 0) goto <nod>;    push16(D);                                                                                                        <nod>
 }
 
 :PULM RmD^RmE^RmIX^RmIY^RmIZ^RmK^RmCCR  is op8=0x35; regmask & RmD & RmE & RmIX & RmIY & RmIZ & RmK & RmCCR & rm_pc {
     # Pull order: D, E, IX, IY, IZ, K, CCR (LSB first, lowest stack address)
-    # Using individual rm_x token fields (1-bit constants at decode time) for
-    # decompiler constant-folding of conditionals.
-    if (rm_d   == 0) goto <nod>;    pull16(D);                                                                                                        <nod>
-    if (rm_e   == 0) goto <noe>;    pull16(E);                                                                                                        <noe>
-    if (rm_ix  == 0) goto <noix>;   pull16(IX);                                                                                                       <noix>
-    if (rm_iy  == 0) goto <noiy>;   pull16(IY);                                                                                                       <noiy>
-    if (rm_iz  == 0) goto <noiz>;   pull16(IZ);                                                                                                       <noiz>
-    if (rm_k   == 0) goto <nok>;    local kreg_u:2; pull16(kreg_u); EK = kreg_u[12,4]; XK = kreg_u[8,4]; YK = kreg_u[4,4]; ZK = kreg_u[0,4];      <nok>
-    if (rm_ccr == 0) goto <noccr>;  pull16(CCR); unpackCCR();                                                                                         <noccr>
+    # RmX sub-constructors export literal 0:1 or 1:1 constants at decode time.
+    if (RmD   == 0) goto <nod>;    pull16(D);                                                                                                        <nod>
+    if (RmE   == 0) goto <noe>;    pull16(E);                                                                                                        <noe>
+    if (RmIX  == 0) goto <noix>;   pull16(IX);                                                                                                       <noix>
+    if (RmIY  == 0) goto <noiy>;   pull16(IY);                                                                                                       <noiy>
+    if (RmIZ  == 0) goto <noiz>;   pull16(IZ);                                                                                                       <noiz>
+    if (RmK   == 0) goto <nok>;    local kreg_u:2; pull16(kreg_u); EK = kreg_u[12,4]; XK = kreg_u[8,4]; YK = kreg_u[4,4]; ZK = kreg_u[0,4];      <nok>
+    if (RmCCR == 0) goto <noccr>;  pull16(CCR); unpackCCR();                                                                                         <noccr>
 }
 
 

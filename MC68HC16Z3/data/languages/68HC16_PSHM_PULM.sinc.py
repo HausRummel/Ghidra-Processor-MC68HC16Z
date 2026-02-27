@@ -23,7 +23,7 @@ def generate_68hc16_pshm_pulm_sinc(filename):
             if (i & 0x02): pshm_pcode.append("push16(E);")
             if (i & 0x01): pshm_pcode.append("push16(D);")
 
-            f.write(f'pshmList: "{",".join(active)}" is regmask={i} {{ {" ".join(pshm_pcode)} }}\n')
+            f.write(f'pshmList: "{",".join(active)}" is regmask=0x{i:02X} {{ {" ".join(pshm_pcode)} }}\n')
 
         f.write("\n")
         f.write("# --- PULM: Forward Display (CCR->D), Reverse P-Code (D->CCR) ---\n")
@@ -42,7 +42,7 @@ def generate_68hc16_pshm_pulm_sinc(filename):
             if (i & 0x02): pulm_pcode.append("local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4];")
             if (i & 0x01): pulm_pcode.append("pull16(CCR); unpackCCR();")
 
-            f.write(f'pulmList: "{",".join(active)}" is regmask={i} {{ {" ".join(pulm_pcode)} }}\n')
+            f.write(f'pulmList: "{",".join(active)}" is regmask=0x{i:02X} {{ {" ".join(pulm_pcode)} }}\n')
 
     print(f"Generated {filename}")
 

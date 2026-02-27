@@ -1358,178 +1358,187 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # ============================================================================
 # ============================================================================
-# SECTION: PSHM / PULM (Push/Pull Multiple Registers)
+# ============================================================================
+# SECTION: PSHM / PULM (Push/Pull Multiple Registers) - Explicit 256 Variants
+# Generated automatically. Uses ^" reg,list" concatenation so Ghidra renders
+# the operand display correctly in the listing window.
 #
-# 256 explicit PSHM variants + 256 explicit PULM variants.
-# Each matches one specific mask byte and contains only STORE/COPY pcode —
-# zero CBRANCH ops. This keeps the CFG builder happy and gives the
-# decompiler a clean fall-through edge for every instruction.
-#
-# Bit 0=D, 1=E, 2=IX, 3=IY, 4=IZ, 5=K, 6=CCR, 7=PC (PSHM only)
-# PSHM push order:  PC, CCR, K, IZ, IY, IX, E, D  (high bit first)
-# PULM pull order:  D, E, IX, IY, IZ, K, CCR       (low bit first)
+# PSHM mask bits: bit0=D, bit1=E, bit2=IX, bit3=IY, bit4=IZ, bit5=K, bit6=CCR, bit7=PC
+# PULM mask bits: bit0=D, bit1=E, bit2=IX, bit3=IY, bit4=IZ, bit5=K, bit6=CCR
+# Push order: PC,CCR,K,IZ,IY,IX,E,D   Pull order: D,E,IX,IY,IZ,K,CCR
 # ============================================================================
 
-# ---- PSHM: 256 variants (opcode 0x34 + mask byte) ----
-
-:PSHM "#0x00"  is op8=0x34; regmask=0x00 { }
+# --- PSHM variants (256 total) ---
+:PSHM  is op8=0x34; regmask=0x00 {
+    # push nothing
+}
 
-:PSHM "D"  is op8=0x34; regmask=0x01 { push16(D); }
+:PSHM^" D"  is op8=0x34; regmask=0x01 {
+    push16(D);
+}
 
-:PSHM "E"  is op8=0x34; regmask=0x02 { push16(E); }
+:PSHM^" E"  is op8=0x34; regmask=0x02 {
+    push16(E);
+}
 
-:PSHM "E,D"  is op8=0x34; regmask=0x03 {
+:PSHM^" D,E"  is op8=0x34; regmask=0x03 {
     push16(E);
     push16(D);
 }
 
-:PSHM "IX"  is op8=0x34; regmask=0x04 { push16(IX); }
+:PSHM^" IX"  is op8=0x34; regmask=0x04 {
+    push16(IX);
+}
 
-:PSHM "IX,D"  is op8=0x34; regmask=0x05 {
+:PSHM^" D,IX"  is op8=0x34; regmask=0x05 {
     push16(IX);
     push16(D);
 }
 
-:PSHM "IX,E"  is op8=0x34; regmask=0x06 {
+:PSHM^" E,IX"  is op8=0x34; regmask=0x06 {
     push16(IX);
     push16(E);
 }
 
-:PSHM "IX,E,D"  is op8=0x34; regmask=0x07 {
+:PSHM^" D,E,IX"  is op8=0x34; regmask=0x07 {
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "IY"  is op8=0x34; regmask=0x08 { push16(IY); }
+:PSHM^" IY"  is op8=0x34; regmask=0x08 {
+    push16(IY);
+}
 
-:PSHM "IY,D"  is op8=0x34; regmask=0x09 {
+:PSHM^" D,IY"  is op8=0x34; regmask=0x09 {
     push16(IY);
     push16(D);
 }
 
-:PSHM "IY,E"  is op8=0x34; regmask=0x0A {
+:PSHM^" E,IY"  is op8=0x34; regmask=0x0a {
     push16(IY);
     push16(E);
 }
 
-:PSHM "IY,E,D"  is op8=0x34; regmask=0x0B {
+:PSHM^" D,E,IY"  is op8=0x34; regmask=0x0b {
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "IY,IX"  is op8=0x34; regmask=0x0C {
+:PSHM^" IX,IY"  is op8=0x34; regmask=0x0c {
     push16(IY);
     push16(IX);
 }
 
-:PSHM "IY,IX,D"  is op8=0x34; regmask=0x0D {
+:PSHM^" D,IX,IY"  is op8=0x34; regmask=0x0d {
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "IY,IX,E"  is op8=0x34; regmask=0x0E {
+:PSHM^" E,IX,IY"  is op8=0x34; regmask=0x0e {
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "IY,IX,E,D"  is op8=0x34; regmask=0x0F {
+:PSHM^" D,E,IX,IY"  is op8=0x34; regmask=0x0f {
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "IZ"  is op8=0x34; regmask=0x10 { push16(IZ); }
+:PSHM^" IZ"  is op8=0x34; regmask=0x10 {
+    push16(IZ);
+}
 
-:PSHM "IZ,D"  is op8=0x34; regmask=0x11 {
+:PSHM^" D,IZ"  is op8=0x34; regmask=0x11 {
     push16(IZ);
     push16(D);
 }
 
-:PSHM "IZ,E"  is op8=0x34; regmask=0x12 {
+:PSHM^" E,IZ"  is op8=0x34; regmask=0x12 {
     push16(IZ);
     push16(E);
 }
 
-:PSHM "IZ,E,D"  is op8=0x34; regmask=0x13 {
+:PSHM^" D,E,IZ"  is op8=0x34; regmask=0x13 {
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "IZ,IX"  is op8=0x34; regmask=0x14 {
+:PSHM^" IX,IZ"  is op8=0x34; regmask=0x14 {
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "IZ,IX,D"  is op8=0x34; regmask=0x15 {
+:PSHM^" D,IX,IZ"  is op8=0x34; regmask=0x15 {
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "IZ,IX,E"  is op8=0x34; regmask=0x16 {
+:PSHM^" E,IX,IZ"  is op8=0x34; regmask=0x16 {
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "IZ,IX,E,D"  is op8=0x34; regmask=0x17 {
+:PSHM^" D,E,IX,IZ"  is op8=0x34; regmask=0x17 {
     push16(IZ);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "IZ,IY"  is op8=0x34; regmask=0x18 {
+:PSHM^" IY,IZ"  is op8=0x34; regmask=0x18 {
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "IZ,IY,D"  is op8=0x34; regmask=0x19 {
+:PSHM^" D,IY,IZ"  is op8=0x34; regmask=0x19 {
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "IZ,IY,E"  is op8=0x34; regmask=0x1A {
+:PSHM^" E,IY,IZ"  is op8=0x34; regmask=0x1a {
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "IZ,IY,E,D"  is op8=0x34; regmask=0x1B {
+:PSHM^" D,E,IY,IZ"  is op8=0x34; regmask=0x1b {
     push16(IZ);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "IZ,IY,IX"  is op8=0x34; regmask=0x1C {
+:PSHM^" IX,IY,IZ"  is op8=0x34; regmask=0x1c {
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "IZ,IY,IX,D"  is op8=0x34; regmask=0x1D {
+:PSHM^" D,IX,IY,IZ"  is op8=0x34; regmask=0x1d {
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "IZ,IY,IX,E"  is op8=0x34; regmask=0x1E {
+:PSHM^" E,IX,IY,IZ"  is op8=0x34; regmask=0x1e {
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "IZ,IY,IX,E,D"  is op8=0x34; regmask=0x1F {
+:PSHM^" D,E,IX,IY,IZ"  is op8=0x34; regmask=0x1f {
     push16(IZ);
     push16(IY);
     push16(IX);
@@ -1537,239 +1546,239 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "K"  is op8=0x34; regmask=0x20 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" K"  is op8=0x34; regmask=0x20 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
 }
 
-:PSHM "K,D"  is op8=0x34; regmask=0x21 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,K"  is op8=0x34; regmask=0x21 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(D);
 }
 
-:PSHM "K,E"  is op8=0x34; regmask=0x22 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,K"  is op8=0x34; regmask=0x22 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
 }
 
-:PSHM "K,E,D"  is op8=0x34; regmask=0x23 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,K"  is op8=0x34; regmask=0x23 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
     push16(D);
 }
 
-:PSHM "K,IX"  is op8=0x34; regmask=0x24 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,K"  is op8=0x34; regmask=0x24 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
 }
 
-:PSHM "K,IX,D"  is op8=0x34; regmask=0x25 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,K"  is op8=0x34; regmask=0x25 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(D);
 }
 
-:PSHM "K,IX,E"  is op8=0x34; regmask=0x26 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,K"  is op8=0x34; regmask=0x26 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
 }
 
-:PSHM "K,IX,E,D"  is op8=0x34; regmask=0x27 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,K"  is op8=0x34; regmask=0x27 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "K,IY"  is op8=0x34; regmask=0x28 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IY,K"  is op8=0x34; regmask=0x28 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
 }
 
-:PSHM "K,IY,D"  is op8=0x34; regmask=0x29 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IY,K"  is op8=0x34; regmask=0x29 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(D);
 }
 
-:PSHM "K,IY,E"  is op8=0x34; regmask=0x2A {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IY,K"  is op8=0x34; regmask=0x2a {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
 }
 
-:PSHM "K,IY,E,D"  is op8=0x34; regmask=0x2B {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IY,K"  is op8=0x34; regmask=0x2b {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "K,IY,IX"  is op8=0x34; regmask=0x2C {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,IY,K"  is op8=0x34; regmask=0x2c {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "K,IY,IX,D"  is op8=0x34; regmask=0x2D {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,IY,K"  is op8=0x34; regmask=0x2d {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "K,IY,IX,E"  is op8=0x34; regmask=0x2E {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,IY,K"  is op8=0x34; regmask=0x2e {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "K,IY,IX,E,D"  is op8=0x34; regmask=0x2F {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,IY,K"  is op8=0x34; regmask=0x2f {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "K,IZ"  is op8=0x34; regmask=0x30 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IZ,K"  is op8=0x34; regmask=0x30 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
 }
 
-:PSHM "K,IZ,D"  is op8=0x34; regmask=0x31 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IZ,K"  is op8=0x34; regmask=0x31 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(D);
 }
 
-:PSHM "K,IZ,E"  is op8=0x34; regmask=0x32 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IZ,K"  is op8=0x34; regmask=0x32 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
 }
 
-:PSHM "K,IZ,E,D"  is op8=0x34; regmask=0x33 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IZ,K"  is op8=0x34; regmask=0x33 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "K,IZ,IX"  is op8=0x34; regmask=0x34 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,IZ,K"  is op8=0x34; regmask=0x34 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "K,IZ,IX,D"  is op8=0x34; regmask=0x35 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,IZ,K"  is op8=0x34; regmask=0x35 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "K,IZ,IX,E"  is op8=0x34; regmask=0x36 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,IZ,K"  is op8=0x34; regmask=0x36 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "K,IZ,IX,E,D"  is op8=0x34; regmask=0x37 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,IZ,K"  is op8=0x34; regmask=0x37 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "K,IZ,IY"  is op8=0x34; regmask=0x38 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IY,IZ,K"  is op8=0x34; regmask=0x38 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "K,IZ,IY,D"  is op8=0x34; regmask=0x39 {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IY,IZ,K"  is op8=0x34; regmask=0x39 {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "K,IZ,IY,E"  is op8=0x34; regmask=0x3A {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IY,IZ,K"  is op8=0x34; regmask=0x3a {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "K,IZ,IY,E,D"  is op8=0x34; regmask=0x3B {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IY,IZ,K"  is op8=0x34; regmask=0x3b {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "K,IZ,IY,IX"  is op8=0x34; regmask=0x3C {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,IY,IZ,K"  is op8=0x34; regmask=0x3c {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "K,IZ,IY,IX,D"  is op8=0x34; regmask=0x3D {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,IY,IZ,K"  is op8=0x34; regmask=0x3d {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "K,IZ,IY,IX,E"  is op8=0x34; regmask=0x3E {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,IY,IZ,K"  is op8=0x34; regmask=0x3e {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "K,IZ,IY,IX,E,D"  is op8=0x34; regmask=0x3F {
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,IY,IZ,K"  is op8=0x34; regmask=0x3f {
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
@@ -1777,205 +1786,239 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "CCR"  is op8=0x34; regmask=0x40 { packCCR(); push16(CCR); }
+:PSHM^" CCR"  is op8=0x34; regmask=0x40 {
+    packCCR();
+    push16(CCR);
+}
 
-:PSHM "CCR,D"  is op8=0x34; regmask=0x41 {
-    packCCR(); push16(CCR);
+:PSHM^" D,CCR"  is op8=0x34; regmask=0x41 {
+    packCCR();
+    push16(CCR);
     push16(D);
 }
 
-:PSHM "CCR,E"  is op8=0x34; regmask=0x42 {
-    packCCR(); push16(CCR);
+:PSHM^" E,CCR"  is op8=0x34; regmask=0x42 {
+    packCCR();
+    push16(CCR);
     push16(E);
 }
 
-:PSHM "CCR,E,D"  is op8=0x34; regmask=0x43 {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,CCR"  is op8=0x34; regmask=0x43 {
+    packCCR();
+    push16(CCR);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,IX"  is op8=0x34; regmask=0x44 {
-    packCCR(); push16(CCR);
+:PSHM^" IX,CCR"  is op8=0x34; regmask=0x44 {
+    packCCR();
+    push16(CCR);
     push16(IX);
 }
 
-:PSHM "CCR,IX,D"  is op8=0x34; regmask=0x45 {
-    packCCR(); push16(CCR);
+:PSHM^" D,IX,CCR"  is op8=0x34; regmask=0x45 {
+    packCCR();
+    push16(CCR);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,IX,E"  is op8=0x34; regmask=0x46 {
-    packCCR(); push16(CCR);
+:PSHM^" E,IX,CCR"  is op8=0x34; regmask=0x46 {
+    packCCR();
+    push16(CCR);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,IX,E,D"  is op8=0x34; regmask=0x47 {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,IX,CCR"  is op8=0x34; regmask=0x47 {
+    packCCR();
+    push16(CCR);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,IY"  is op8=0x34; regmask=0x48 {
-    packCCR(); push16(CCR);
+:PSHM^" IY,CCR"  is op8=0x34; regmask=0x48 {
+    packCCR();
+    push16(CCR);
     push16(IY);
 }
 
-:PSHM "CCR,IY,D"  is op8=0x34; regmask=0x49 {
-    packCCR(); push16(CCR);
+:PSHM^" D,IY,CCR"  is op8=0x34; regmask=0x49 {
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(D);
 }
 
-:PSHM "CCR,IY,E"  is op8=0x34; regmask=0x4A {
-    packCCR(); push16(CCR);
+:PSHM^" E,IY,CCR"  is op8=0x34; regmask=0x4a {
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(E);
 }
 
-:PSHM "CCR,IY,E,D"  is op8=0x34; regmask=0x4B {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,IY,CCR"  is op8=0x34; regmask=0x4b {
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,IY,IX"  is op8=0x34; regmask=0x4C {
-    packCCR(); push16(CCR);
+:PSHM^" IX,IY,CCR"  is op8=0x34; regmask=0x4c {
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "CCR,IY,IX,D"  is op8=0x34; regmask=0x4D {
-    packCCR(); push16(CCR);
+:PSHM^" D,IX,IY,CCR"  is op8=0x34; regmask=0x4d {
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,IY,IX,E"  is op8=0x34; regmask=0x4E {
-    packCCR(); push16(CCR);
+:PSHM^" E,IX,IY,CCR"  is op8=0x34; regmask=0x4e {
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,IY,IX,E,D"  is op8=0x34; regmask=0x4F {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,IX,IY,CCR"  is op8=0x34; regmask=0x4f {
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,IZ"  is op8=0x34; regmask=0x50 {
-    packCCR(); push16(CCR);
+:PSHM^" IZ,CCR"  is op8=0x34; regmask=0x50 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
 }
 
-:PSHM "CCR,IZ,D"  is op8=0x34; regmask=0x51 {
-    packCCR(); push16(CCR);
+:PSHM^" D,IZ,CCR"  is op8=0x34; regmask=0x51 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(D);
 }
 
-:PSHM "CCR,IZ,E"  is op8=0x34; regmask=0x52 {
-    packCCR(); push16(CCR);
+:PSHM^" E,IZ,CCR"  is op8=0x34; regmask=0x52 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(E);
 }
 
-:PSHM "CCR,IZ,E,D"  is op8=0x34; regmask=0x53 {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,IZ,CCR"  is op8=0x34; regmask=0x53 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,IZ,IX"  is op8=0x34; regmask=0x54 {
-    packCCR(); push16(CCR);
+:PSHM^" IX,IZ,CCR"  is op8=0x34; regmask=0x54 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "CCR,IZ,IX,D"  is op8=0x34; regmask=0x55 {
-    packCCR(); push16(CCR);
+:PSHM^" D,IX,IZ,CCR"  is op8=0x34; regmask=0x55 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,IZ,IX,E"  is op8=0x34; regmask=0x56 {
-    packCCR(); push16(CCR);
+:PSHM^" E,IX,IZ,CCR"  is op8=0x34; regmask=0x56 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,IZ,IX,E,D"  is op8=0x34; regmask=0x57 {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,IX,IZ,CCR"  is op8=0x34; regmask=0x57 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,IZ,IY"  is op8=0x34; regmask=0x58 {
-    packCCR(); push16(CCR);
+:PSHM^" IY,IZ,CCR"  is op8=0x34; regmask=0x58 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "CCR,IZ,IY,D"  is op8=0x34; regmask=0x59 {
-    packCCR(); push16(CCR);
+:PSHM^" D,IY,IZ,CCR"  is op8=0x34; regmask=0x59 {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "CCR,IZ,IY,E"  is op8=0x34; regmask=0x5A {
-    packCCR(); push16(CCR);
+:PSHM^" E,IY,IZ,CCR"  is op8=0x34; regmask=0x5a {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "CCR,IZ,IY,E,D"  is op8=0x34; regmask=0x5B {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,IY,IZ,CCR"  is op8=0x34; regmask=0x5b {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,IZ,IY,IX"  is op8=0x34; regmask=0x5C {
-    packCCR(); push16(CCR);
+:PSHM^" IX,IY,IZ,CCR"  is op8=0x34; regmask=0x5c {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "CCR,IZ,IY,IX,D"  is op8=0x34; regmask=0x5D {
-    packCCR(); push16(CCR);
+:PSHM^" D,IX,IY,IZ,CCR"  is op8=0x34; regmask=0x5d {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,IZ,IY,IX,E"  is op8=0x34; regmask=0x5E {
-    packCCR(); push16(CCR);
+:PSHM^" E,IX,IY,IZ,CCR"  is op8=0x34; regmask=0x5e {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,IZ,IY,IX,E,D"  is op8=0x34; regmask=0x5F {
-    packCCR(); push16(CCR);
+:PSHM^" D,E,IX,IY,IZ,CCR"  is op8=0x34; regmask=0x5f {
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
@@ -1983,271 +2026,303 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "CCR,K"  is op8=0x34; regmask=0x60 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" K,CCR"  is op8=0x34; regmask=0x60 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
 }
 
-:PSHM "CCR,K,D"  is op8=0x34; regmask=0x61 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,K,CCR"  is op8=0x34; regmask=0x61 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(D);
 }
 
-:PSHM "CCR,K,E"  is op8=0x34; regmask=0x62 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,K,CCR"  is op8=0x34; regmask=0x62 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
 }
 
-:PSHM "CCR,K,E,D"  is op8=0x34; regmask=0x63 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,K,CCR"  is op8=0x34; regmask=0x63 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,K,IX"  is op8=0x34; regmask=0x64 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,K,CCR"  is op8=0x34; regmask=0x64 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
 }
 
-:PSHM "CCR,K,IX,D"  is op8=0x34; regmask=0x65 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,K,CCR"  is op8=0x34; regmask=0x65 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,K,IX,E"  is op8=0x34; regmask=0x66 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,K,CCR"  is op8=0x34; regmask=0x66 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,K,IX,E,D"  is op8=0x34; regmask=0x67 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,K,CCR"  is op8=0x34; regmask=0x67 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,K,IY"  is op8=0x34; regmask=0x68 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IY,K,CCR"  is op8=0x34; regmask=0x68 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
 }
 
-:PSHM "CCR,K,IY,D"  is op8=0x34; regmask=0x69 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IY,K,CCR"  is op8=0x34; regmask=0x69 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(D);
 }
 
-:PSHM "CCR,K,IY,E"  is op8=0x34; regmask=0x6A {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IY,K,CCR"  is op8=0x34; regmask=0x6a {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
 }
 
-:PSHM "CCR,K,IY,E,D"  is op8=0x34; regmask=0x6B {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IY,K,CCR"  is op8=0x34; regmask=0x6b {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,K,IY,IX"  is op8=0x34; regmask=0x6C {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,IY,K,CCR"  is op8=0x34; regmask=0x6c {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "CCR,K,IY,IX,D"  is op8=0x34; regmask=0x6D {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,IY,K,CCR"  is op8=0x34; regmask=0x6d {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,K,IY,IX,E"  is op8=0x34; regmask=0x6E {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,IY,K,CCR"  is op8=0x34; regmask=0x6e {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,K,IY,IX,E,D"  is op8=0x34; regmask=0x6F {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,IY,K,CCR"  is op8=0x34; regmask=0x6f {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ"  is op8=0x34; regmask=0x70 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IZ,K,CCR"  is op8=0x34; regmask=0x70 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
 }
 
-:PSHM "CCR,K,IZ,D"  is op8=0x34; regmask=0x71 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IZ,K,CCR"  is op8=0x34; regmask=0x71 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ,E"  is op8=0x34; regmask=0x72 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IZ,K,CCR"  is op8=0x34; regmask=0x72 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
 }
 
-:PSHM "CCR,K,IZ,E,D"  is op8=0x34; regmask=0x73 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IZ,K,CCR"  is op8=0x34; regmask=0x73 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ,IX"  is op8=0x34; regmask=0x74 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,IZ,K,CCR"  is op8=0x34; regmask=0x74 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "CCR,K,IZ,IX,D"  is op8=0x34; regmask=0x75 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,IZ,K,CCR"  is op8=0x34; regmask=0x75 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ,IX,E"  is op8=0x34; regmask=0x76 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,IZ,K,CCR"  is op8=0x34; regmask=0x76 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,K,IZ,IX,E,D"  is op8=0x34; regmask=0x77 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,IZ,K,CCR"  is op8=0x34; regmask=0x77 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ,IY"  is op8=0x34; regmask=0x78 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IY,IZ,K,CCR"  is op8=0x34; regmask=0x78 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "CCR,K,IZ,IY,D"  is op8=0x34; regmask=0x79 {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IY,IZ,K,CCR"  is op8=0x34; regmask=0x79 {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ,IY,E"  is op8=0x34; regmask=0x7A {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IY,IZ,K,CCR"  is op8=0x34; regmask=0x7a {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "CCR,K,IZ,IY,E,D"  is op8=0x34; regmask=0x7B {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IY,IZ,K,CCR"  is op8=0x34; regmask=0x7b {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ,IY,IX"  is op8=0x34; regmask=0x7C {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" IX,IY,IZ,K,CCR"  is op8=0x34; regmask=0x7c {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "CCR,K,IZ,IY,IX,D"  is op8=0x34; regmask=0x7D {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,IX,IY,IZ,K,CCR"  is op8=0x34; regmask=0x7d {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "CCR,K,IZ,IY,IX,E"  is op8=0x34; regmask=0x7E {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" E,IX,IY,IZ,K,CCR"  is op8=0x34; regmask=0x7e {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "CCR,K,IZ,IY,IX,E,D"  is op8=0x34; regmask=0x7F {
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+:PSHM^" D,E,IX,IY,IZ,K,CCR"  is op8=0x34; regmask=0x7f {
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
@@ -2255,93 +2330,95 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC"  is op8=0x34; regmask=0x80 { push16(PC:2); }
+:PSHM^" PC"  is op8=0x34; regmask=0x80 {
+    push16(PC:2);
+}
 
-:PSHM "PC,D"  is op8=0x34; regmask=0x81 {
+:PSHM^" D,PC"  is op8=0x34; regmask=0x81 {
     push16(PC:2);
     push16(D);
 }
 
-:PSHM "PC,E"  is op8=0x34; regmask=0x82 {
+:PSHM^" E,PC"  is op8=0x34; regmask=0x82 {
     push16(PC:2);
     push16(E);
 }
 
-:PSHM "PC,E,D"  is op8=0x34; regmask=0x83 {
+:PSHM^" D,E,PC"  is op8=0x34; regmask=0x83 {
     push16(PC:2);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,IX"  is op8=0x34; regmask=0x84 {
+:PSHM^" IX,PC"  is op8=0x34; regmask=0x84 {
     push16(PC:2);
     push16(IX);
 }
 
-:PSHM "PC,IX,D"  is op8=0x34; regmask=0x85 {
+:PSHM^" D,IX,PC"  is op8=0x34; regmask=0x85 {
     push16(PC:2);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,IX,E"  is op8=0x34; regmask=0x86 {
+:PSHM^" E,IX,PC"  is op8=0x34; regmask=0x86 {
     push16(PC:2);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,IX,E,D"  is op8=0x34; regmask=0x87 {
+:PSHM^" D,E,IX,PC"  is op8=0x34; regmask=0x87 {
     push16(PC:2);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,IY"  is op8=0x34; regmask=0x88 {
+:PSHM^" IY,PC"  is op8=0x34; regmask=0x88 {
     push16(PC:2);
     push16(IY);
 }
 
-:PSHM "PC,IY,D"  is op8=0x34; regmask=0x89 {
+:PSHM^" D,IY,PC"  is op8=0x34; regmask=0x89 {
     push16(PC:2);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,IY,E"  is op8=0x34; regmask=0x8A {
+:PSHM^" E,IY,PC"  is op8=0x34; regmask=0x8a {
     push16(PC:2);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,IY,E,D"  is op8=0x34; regmask=0x8B {
+:PSHM^" D,E,IY,PC"  is op8=0x34; regmask=0x8b {
     push16(PC:2);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,IY,IX"  is op8=0x34; regmask=0x8C {
+:PSHM^" IX,IY,PC"  is op8=0x34; regmask=0x8c {
     push16(PC:2);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,IY,IX,D"  is op8=0x34; regmask=0x8D {
+:PSHM^" D,IX,IY,PC"  is op8=0x34; regmask=0x8d {
     push16(PC:2);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,IY,IX,E"  is op8=0x34; regmask=0x8E {
+:PSHM^" E,IX,IY,PC"  is op8=0x34; regmask=0x8e {
     push16(PC:2);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,IY,IX,E,D"  is op8=0x34; regmask=0x8F {
+:PSHM^" D,E,IX,IY,PC"  is op8=0x34; regmask=0x8f {
     push16(PC:2);
     push16(IY);
     push16(IX);
@@ -2349,51 +2426,51 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC,IZ"  is op8=0x34; regmask=0x90 {
+:PSHM^" IZ,PC"  is op8=0x34; regmask=0x90 {
     push16(PC:2);
     push16(IZ);
 }
 
-:PSHM "PC,IZ,D"  is op8=0x34; regmask=0x91 {
+:PSHM^" D,IZ,PC"  is op8=0x34; regmask=0x91 {
     push16(PC:2);
     push16(IZ);
     push16(D);
 }
 
-:PSHM "PC,IZ,E"  is op8=0x34; regmask=0x92 {
+:PSHM^" E,IZ,PC"  is op8=0x34; regmask=0x92 {
     push16(PC:2);
     push16(IZ);
     push16(E);
 }
 
-:PSHM "PC,IZ,E,D"  is op8=0x34; regmask=0x93 {
+:PSHM^" D,E,IZ,PC"  is op8=0x34; regmask=0x93 {
     push16(PC:2);
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,IZ,IX"  is op8=0x34; regmask=0x94 {
+:PSHM^" IX,IZ,PC"  is op8=0x34; regmask=0x94 {
     push16(PC:2);
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "PC,IZ,IX,D"  is op8=0x34; regmask=0x95 {
+:PSHM^" D,IX,IZ,PC"  is op8=0x34; regmask=0x95 {
     push16(PC:2);
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,IZ,IX,E"  is op8=0x34; regmask=0x96 {
+:PSHM^" E,IX,IZ,PC"  is op8=0x34; regmask=0x96 {
     push16(PC:2);
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,IZ,IX,E,D"  is op8=0x34; regmask=0x97 {
+:PSHM^" D,E,IX,IZ,PC"  is op8=0x34; regmask=0x97 {
     push16(PC:2);
     push16(IZ);
     push16(IX);
@@ -2401,27 +2478,27 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC,IZ,IY"  is op8=0x34; regmask=0x98 {
+:PSHM^" IY,IZ,PC"  is op8=0x34; regmask=0x98 {
     push16(PC:2);
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "PC,IZ,IY,D"  is op8=0x34; regmask=0x99 {
+:PSHM^" D,IY,IZ,PC"  is op8=0x34; regmask=0x99 {
     push16(PC:2);
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,IZ,IY,E"  is op8=0x34; regmask=0x9A {
+:PSHM^" E,IY,IZ,PC"  is op8=0x34; regmask=0x9a {
     push16(PC:2);
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,IZ,IY,E,D"  is op8=0x34; regmask=0x9B {
+:PSHM^" D,E,IY,IZ,PC"  is op8=0x34; regmask=0x9b {
     push16(PC:2);
     push16(IZ);
     push16(IY);
@@ -2429,14 +2506,14 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC,IZ,IY,IX"  is op8=0x34; regmask=0x9C {
+:PSHM^" IX,IY,IZ,PC"  is op8=0x34; regmask=0x9c {
     push16(PC:2);
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,IZ,IY,IX,D"  is op8=0x34; regmask=0x9D {
+:PSHM^" D,IX,IY,IZ,PC"  is op8=0x34; regmask=0x9d {
     push16(PC:2);
     push16(IZ);
     push16(IY);
@@ -2444,7 +2521,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC,IZ,IY,IX,E"  is op8=0x34; regmask=0x9E {
+:PSHM^" E,IX,IY,IZ,PC"  is op8=0x34; regmask=0x9e {
     push16(PC:2);
     push16(IZ);
     push16(IY);
@@ -2452,7 +2529,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(E);
 }
 
-:PSHM "PC,IZ,IY,IX,E,D"  is op8=0x34; regmask=0x9F {
+:PSHM^" D,E,IX,IY,IZ,PC"  is op8=0x34; regmask=0x9f {
     push16(PC:2);
     push16(IZ);
     push16(IY);
@@ -2461,271 +2538,271 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC,K"  is op8=0x34; regmask=0xA0 {
+:PSHM^" K,PC"  is op8=0x34; regmask=0xa0 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
 }
 
-:PSHM "PC,K,D"  is op8=0x34; regmask=0xA1 {
+:PSHM^" D,K,PC"  is op8=0x34; regmask=0xa1 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(D);
 }
 
-:PSHM "PC,K,E"  is op8=0x34; regmask=0xA2 {
+:PSHM^" E,K,PC"  is op8=0x34; regmask=0xa2 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
 }
 
-:PSHM "PC,K,E,D"  is op8=0x34; regmask=0xA3 {
+:PSHM^" D,E,K,PC"  is op8=0x34; regmask=0xa3 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,K,IX"  is op8=0x34; regmask=0xA4 {
+:PSHM^" IX,K,PC"  is op8=0x34; regmask=0xa4 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
 }
 
-:PSHM "PC,K,IX,D"  is op8=0x34; regmask=0xA5 {
+:PSHM^" D,IX,K,PC"  is op8=0x34; regmask=0xa5 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,K,IX,E"  is op8=0x34; regmask=0xA6 {
+:PSHM^" E,IX,K,PC"  is op8=0x34; regmask=0xa6 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,K,IX,E,D"  is op8=0x34; regmask=0xA7 {
+:PSHM^" D,E,IX,K,PC"  is op8=0x34; regmask=0xa7 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,K,IY"  is op8=0x34; regmask=0xA8 {
+:PSHM^" IY,K,PC"  is op8=0x34; regmask=0xa8 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
 }
 
-:PSHM "PC,K,IY,D"  is op8=0x34; regmask=0xA9 {
+:PSHM^" D,IY,K,PC"  is op8=0x34; regmask=0xa9 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,K,IY,E"  is op8=0x34; regmask=0xAA {
+:PSHM^" E,IY,K,PC"  is op8=0x34; regmask=0xaa {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,K,IY,E,D"  is op8=0x34; regmask=0xAB {
+:PSHM^" D,E,IY,K,PC"  is op8=0x34; regmask=0xab {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,K,IY,IX"  is op8=0x34; regmask=0xAC {
+:PSHM^" IX,IY,K,PC"  is op8=0x34; regmask=0xac {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,K,IY,IX,D"  is op8=0x34; regmask=0xAD {
+:PSHM^" D,IX,IY,K,PC"  is op8=0x34; regmask=0xad {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,K,IY,IX,E"  is op8=0x34; regmask=0xAE {
+:PSHM^" E,IX,IY,K,PC"  is op8=0x34; regmask=0xae {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,K,IY,IX,E,D"  is op8=0x34; regmask=0xAF {
+:PSHM^" D,E,IX,IY,K,PC"  is op8=0x34; regmask=0xaf {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,K,IZ"  is op8=0x34; regmask=0xB0 {
+:PSHM^" IZ,K,PC"  is op8=0x34; regmask=0xb0 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
 }
 
-:PSHM "PC,K,IZ,D"  is op8=0x34; regmask=0xB1 {
+:PSHM^" D,IZ,K,PC"  is op8=0x34; regmask=0xb1 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(D);
 }
 
-:PSHM "PC,K,IZ,E"  is op8=0x34; regmask=0xB2 {
+:PSHM^" E,IZ,K,PC"  is op8=0x34; regmask=0xb2 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
 }
 
-:PSHM "PC,K,IZ,E,D"  is op8=0x34; regmask=0xB3 {
+:PSHM^" D,E,IZ,K,PC"  is op8=0x34; regmask=0xb3 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,K,IZ,IX"  is op8=0x34; regmask=0xB4 {
+:PSHM^" IX,IZ,K,PC"  is op8=0x34; regmask=0xb4 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "PC,K,IZ,IX,D"  is op8=0x34; regmask=0xB5 {
+:PSHM^" D,IX,IZ,K,PC"  is op8=0x34; regmask=0xb5 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,K,IZ,IX,E"  is op8=0x34; regmask=0xB6 {
+:PSHM^" E,IX,IZ,K,PC"  is op8=0x34; regmask=0xb6 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,K,IZ,IX,E,D"  is op8=0x34; regmask=0xB7 {
+:PSHM^" D,E,IX,IZ,K,PC"  is op8=0x34; regmask=0xb7 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,K,IZ,IY"  is op8=0x34; regmask=0xB8 {
+:PSHM^" IY,IZ,K,PC"  is op8=0x34; regmask=0xb8 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "PC,K,IZ,IY,D"  is op8=0x34; regmask=0xB9 {
+:PSHM^" D,IY,IZ,K,PC"  is op8=0x34; regmask=0xb9 {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,K,IZ,IY,E"  is op8=0x34; regmask=0xBA {
+:PSHM^" E,IY,IZ,K,PC"  is op8=0x34; regmask=0xba {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,K,IZ,IY,E,D"  is op8=0x34; regmask=0xBB {
+:PSHM^" D,E,IY,IZ,K,PC"  is op8=0x34; regmask=0xbb {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,K,IZ,IY,IX"  is op8=0x34; regmask=0xBC {
+:PSHM^" IX,IY,IZ,K,PC"  is op8=0x34; regmask=0xbc {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,K,IZ,IY,IX,D"  is op8=0x34; regmask=0xBD {
+:PSHM^" D,IX,IY,IZ,K,PC"  is op8=0x34; regmask=0xbd {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,K,IZ,IY,IX,E"  is op8=0x34; regmask=0xBE {
+:PSHM^" E,IX,IY,IZ,K,PC"  is op8=0x34; regmask=0xbe {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,K,IZ,IY,IX,E,D"  is op8=0x34; regmask=0xBF {
+:PSHM^" D,E,IX,IY,IZ,K,PC"  is op8=0x34; regmask=0xbf {
     push16(PC:2);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
@@ -2733,239 +2810,271 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC,CCR"  is op8=0x34; regmask=0xC0 {
+:PSHM^" CCR,PC"  is op8=0x34; regmask=0xc0 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
 }
 
-:PSHM "PC,CCR,D"  is op8=0x34; regmask=0xC1 {
+:PSHM^" D,CCR,PC"  is op8=0x34; regmask=0xc1 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(D);
 }
 
-:PSHM "PC,CCR,E"  is op8=0x34; regmask=0xC2 {
+:PSHM^" E,CCR,PC"  is op8=0x34; regmask=0xc2 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(E);
 }
 
-:PSHM "PC,CCR,E,D"  is op8=0x34; regmask=0xC3 {
+:PSHM^" D,E,CCR,PC"  is op8=0x34; regmask=0xc3 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,IX"  is op8=0x34; regmask=0xC4 {
+:PSHM^" IX,CCR,PC"  is op8=0x34; regmask=0xc4 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IX);
 }
 
-:PSHM "PC,CCR,IX,D"  is op8=0x34; regmask=0xC5 {
+:PSHM^" D,IX,CCR,PC"  is op8=0x34; regmask=0xc5 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,IX,E"  is op8=0x34; regmask=0xC6 {
+:PSHM^" E,IX,CCR,PC"  is op8=0x34; regmask=0xc6 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,IX,E,D"  is op8=0x34; regmask=0xC7 {
+:PSHM^" D,E,IX,CCR,PC"  is op8=0x34; regmask=0xc7 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,IY"  is op8=0x34; regmask=0xC8 {
+:PSHM^" IY,CCR,PC"  is op8=0x34; regmask=0xc8 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
 }
 
-:PSHM "PC,CCR,IY,D"  is op8=0x34; regmask=0xC9 {
+:PSHM^" D,IY,CCR,PC"  is op8=0x34; regmask=0xc9 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,CCR,IY,E"  is op8=0x34; regmask=0xCA {
+:PSHM^" E,IY,CCR,PC"  is op8=0x34; regmask=0xca {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,CCR,IY,E,D"  is op8=0x34; regmask=0xCB {
+:PSHM^" D,E,IY,CCR,PC"  is op8=0x34; regmask=0xcb {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,IY,IX"  is op8=0x34; regmask=0xCC {
+:PSHM^" IX,IY,CCR,PC"  is op8=0x34; regmask=0xcc {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,CCR,IY,IX,D"  is op8=0x34; regmask=0xCD {
+:PSHM^" D,IX,IY,CCR,PC"  is op8=0x34; regmask=0xcd {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,IY,IX,E"  is op8=0x34; regmask=0xCE {
+:PSHM^" E,IX,IY,CCR,PC"  is op8=0x34; regmask=0xce {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,IY,IX,E,D"  is op8=0x34; regmask=0xCF {
+:PSHM^" D,E,IX,IY,CCR,PC"  is op8=0x34; regmask=0xcf {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ"  is op8=0x34; regmask=0xD0 {
+:PSHM^" IZ,CCR,PC"  is op8=0x34; regmask=0xd0 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
 }
 
-:PSHM "PC,CCR,IZ,D"  is op8=0x34; regmask=0xD1 {
+:PSHM^" D,IZ,CCR,PC"  is op8=0x34; regmask=0xd1 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ,E"  is op8=0x34; regmask=0xD2 {
+:PSHM^" E,IZ,CCR,PC"  is op8=0x34; regmask=0xd2 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(E);
 }
 
-:PSHM "PC,CCR,IZ,E,D"  is op8=0x34; regmask=0xD3 {
+:PSHM^" D,E,IZ,CCR,PC"  is op8=0x34; regmask=0xd3 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ,IX"  is op8=0x34; regmask=0xD4 {
+:PSHM^" IX,IZ,CCR,PC"  is op8=0x34; regmask=0xd4 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "PC,CCR,IZ,IX,D"  is op8=0x34; regmask=0xD5 {
+:PSHM^" D,IX,IZ,CCR,PC"  is op8=0x34; regmask=0xd5 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ,IX,E"  is op8=0x34; regmask=0xD6 {
+:PSHM^" E,IX,IZ,CCR,PC"  is op8=0x34; regmask=0xd6 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,IZ,IX,E,D"  is op8=0x34; regmask=0xD7 {
+:PSHM^" D,E,IX,IZ,CCR,PC"  is op8=0x34; regmask=0xd7 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ,IY"  is op8=0x34; regmask=0xD8 {
+:PSHM^" IY,IZ,CCR,PC"  is op8=0x34; regmask=0xd8 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "PC,CCR,IZ,IY,D"  is op8=0x34; regmask=0xD9 {
+:PSHM^" D,IY,IZ,CCR,PC"  is op8=0x34; regmask=0xd9 {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ,IY,E"  is op8=0x34; regmask=0xDA {
+:PSHM^" E,IY,IZ,CCR,PC"  is op8=0x34; regmask=0xda {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,CCR,IZ,IY,E,D"  is op8=0x34; regmask=0xDB {
+:PSHM^" D,E,IY,IZ,CCR,PC"  is op8=0x34; regmask=0xdb {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ,IY,IX"  is op8=0x34; regmask=0xDC {
+:PSHM^" IX,IY,IZ,CCR,PC"  is op8=0x34; regmask=0xdc {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,CCR,IZ,IY,IX,D"  is op8=0x34; regmask=0xDD {
+:PSHM^" D,IX,IY,IZ,CCR,PC"  is op8=0x34; regmask=0xdd {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,IZ,IY,IX,E"  is op8=0x34; regmask=0xDE {
+:PSHM^" E,IX,IY,IZ,CCR,PC"  is op8=0x34; regmask=0xde {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,IZ,IY,IX,E,D"  is op8=0x34; regmask=0xDF {
+:PSHM^" D,E,IX,IY,IZ,CCR,PC"  is op8=0x34; regmask=0xdf {
     push16(PC:2);
-    packCCR(); push16(CCR);
+    packCCR();
+    push16(CCR);
     push16(IZ);
     push16(IY);
     push16(IX);
@@ -2973,472 +3082,513 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(D);
 }
 
-:PSHM "PC,CCR,K"  is op8=0x34; regmask=0xE0 {
+:PSHM^" K,CCR,PC"  is op8=0x34; regmask=0xe0 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
 }
 
-:PSHM "PC,CCR,K,D"  is op8=0x34; regmask=0xE1 {
+:PSHM^" D,K,CCR,PC"  is op8=0x34; regmask=0xe1 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,E"  is op8=0x34; regmask=0xE2 {
+:PSHM^" E,K,CCR,PC"  is op8=0x34; regmask=0xe2 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,E,D"  is op8=0x34; regmask=0xE3 {
+:PSHM^" D,E,K,CCR,PC"  is op8=0x34; regmask=0xe3 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IX"  is op8=0x34; regmask=0xE4 {
+:PSHM^" IX,K,CCR,PC"  is op8=0x34; regmask=0xe4 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
 }
 
-:PSHM "PC,CCR,K,IX,D"  is op8=0x34; regmask=0xE5 {
+:PSHM^" D,IX,K,CCR,PC"  is op8=0x34; regmask=0xe5 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IX,E"  is op8=0x34; regmask=0xE6 {
+:PSHM^" E,IX,K,CCR,PC"  is op8=0x34; regmask=0xe6 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,IX,E,D"  is op8=0x34; regmask=0xE7 {
+:PSHM^" D,E,IX,K,CCR,PC"  is op8=0x34; regmask=0xe7 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IY"  is op8=0x34; regmask=0xE8 {
+:PSHM^" IY,K,CCR,PC"  is op8=0x34; regmask=0xe8 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
 }
 
-:PSHM "PC,CCR,K,IY,D"  is op8=0x34; regmask=0xE9 {
+:PSHM^" D,IY,K,CCR,PC"  is op8=0x34; regmask=0xe9 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IY,E"  is op8=0x34; regmask=0xEA {
+:PSHM^" E,IY,K,CCR,PC"  is op8=0x34; regmask=0xea {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,IY,E,D"  is op8=0x34; regmask=0xEB {
+:PSHM^" D,E,IY,K,CCR,PC"  is op8=0x34; regmask=0xeb {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IY,IX"  is op8=0x34; regmask=0xEC {
+:PSHM^" IX,IY,K,CCR,PC"  is op8=0x34; regmask=0xec {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,CCR,K,IY,IX,D"  is op8=0x34; regmask=0xED {
+:PSHM^" D,IX,IY,K,CCR,PC"  is op8=0x34; regmask=0xed {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IY,IX,E"  is op8=0x34; regmask=0xEE {
+:PSHM^" E,IX,IY,K,CCR,PC"  is op8=0x34; regmask=0xee {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,IY,IX,E,D"  is op8=0x34; regmask=0xEF {
+:PSHM^" D,E,IX,IY,K,CCR,PC"  is op8=0x34; regmask=0xef {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ"  is op8=0x34; regmask=0xF0 {
+:PSHM^" IZ,K,CCR,PC"  is op8=0x34; regmask=0xf0 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
 }
 
-:PSHM "PC,CCR,K,IZ,D"  is op8=0x34; regmask=0xF1 {
+:PSHM^" D,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf1 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ,E"  is op8=0x34; regmask=0xF2 {
+:PSHM^" E,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf2 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,IZ,E,D"  is op8=0x34; regmask=0xF3 {
+:PSHM^" D,E,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf3 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ,IX"  is op8=0x34; regmask=0xF4 {
+:PSHM^" IX,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf4 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
 }
 
-:PSHM "PC,CCR,K,IZ,IX,D"  is op8=0x34; regmask=0xF5 {
+:PSHM^" D,IX,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf5 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ,IX,E"  is op8=0x34; regmask=0xF6 {
+:PSHM^" E,IX,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf6 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,IZ,IX,E,D"  is op8=0x34; regmask=0xF7 {
+:PSHM^" D,E,IX,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf7 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IX);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ,IY"  is op8=0x34; regmask=0xF8 {
+:PSHM^" IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf8 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
 }
 
-:PSHM "PC,CCR,K,IZ,IY,D"  is op8=0x34; regmask=0xF9 {
+:PSHM^" D,IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xf9 {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ,IY,E"  is op8=0x34; regmask=0xFA {
+:PSHM^" E,IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xfa {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,IZ,IY,E,D"  is op8=0x34; regmask=0xFB {
+:PSHM^" D,E,IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xfb {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(E);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ,IY,IX"  is op8=0x34; regmask=0xFC {
+:PSHM^" IX,IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xfc {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
 }
 
-:PSHM "PC,CCR,K,IZ,IY,IX,D"  is op8=0x34; regmask=0xFD {
+:PSHM^" D,IX,IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xfd {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(D);
 }
 
-:PSHM "PC,CCR,K,IZ,IY,IX,E"  is op8=0x34; regmask=0xFE {
+:PSHM^" E,IX,IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xfe {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
 }
 
-:PSHM "PC,CCR,K,IZ,IY,IX,E,D"  is op8=0x34; regmask=0xFF {
+:PSHM^" D,E,IX,IY,IZ,K,CCR,PC"  is op8=0x34; regmask=0xff {
     push16(PC:2);
-    packCCR(); push16(CCR);
-    local kreg:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
-    push16(kreg);
+    packCCR();
+    push16(CCR);
+    local kreg_p:2 = (zext(EK:1) << 12) | (zext(XK:1) << 8) | (zext(YK:1) << 4) | zext(ZK:1);
+    push16(kreg_p);
     push16(IZ);
     push16(IY);
     push16(IX);
     push16(E);
     push16(D);
 }
-
-# ---- PULM: 256 variants (opcode 0x35 + mask byte) ----
-# Bit 7 is ignored by PULM (PC cannot be pulled); the 256 entries
-# ensure any mask byte in the binary matches without a CBRANCH.
 
-:PULM "#0x00"  is op8=0x35; regmask=0x00 { }
+# --- PULM variants (256 total, bit7 ignored in display) ---
+:PULM  is op8=0x35; regmask=0x00 {
+    # pull nothing
+}
 
-:PULM "D"  is op8=0x35; regmask=0x01 { pull16(D); }
+:PULM^" D"  is op8=0x35; regmask=0x01 {
+    pull16(D);
+}
 
-:PULM "E"  is op8=0x35; regmask=0x02 { pull16(E); }
+:PULM^" E"  is op8=0x35; regmask=0x02 {
+    pull16(E);
+}
 
-:PULM "D,E"  is op8=0x35; regmask=0x03 {
+:PULM^" D,E"  is op8=0x35; regmask=0x03 {
     pull16(D);
     pull16(E);
 }
 
-:PULM "IX"  is op8=0x35; regmask=0x04 { pull16(IX); }
+:PULM^" IX"  is op8=0x35; regmask=0x04 {
+    pull16(IX);
+}
 
-:PULM "D,IX"  is op8=0x35; regmask=0x05 {
+:PULM^" D,IX"  is op8=0x35; regmask=0x05 {
     pull16(D);
     pull16(IX);
 }
 
-:PULM "E,IX"  is op8=0x35; regmask=0x06 {
+:PULM^" E,IX"  is op8=0x35; regmask=0x06 {
     pull16(E);
     pull16(IX);
 }
 
-:PULM "D,E,IX"  is op8=0x35; regmask=0x07 {
+:PULM^" D,E,IX"  is op8=0x35; regmask=0x07 {
     pull16(D);
     pull16(E);
     pull16(IX);
 }
 
-:PULM "IY"  is op8=0x35; regmask=0x08 { pull16(IY); }
+:PULM^" IY"  is op8=0x35; regmask=0x08 {
+    pull16(IY);
+}
 
-:PULM "D,IY"  is op8=0x35; regmask=0x09 {
+:PULM^" D,IY"  is op8=0x35; regmask=0x09 {
     pull16(D);
     pull16(IY);
 }
 
-:PULM "E,IY"  is op8=0x35; regmask=0x0A {
+:PULM^" E,IY"  is op8=0x35; regmask=0x0a {
     pull16(E);
     pull16(IY);
 }
 
-:PULM "D,E,IY"  is op8=0x35; regmask=0x0B {
+:PULM^" D,E,IY"  is op8=0x35; regmask=0x0b {
     pull16(D);
     pull16(E);
     pull16(IY);
 }
 
-:PULM "IX,IY"  is op8=0x35; regmask=0x0C {
+:PULM^" IX,IY"  is op8=0x35; regmask=0x0c {
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "D,IX,IY"  is op8=0x35; regmask=0x0D {
+:PULM^" D,IX,IY"  is op8=0x35; regmask=0x0d {
     pull16(D);
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "E,IX,IY"  is op8=0x35; regmask=0x0E {
+:PULM^" E,IX,IY"  is op8=0x35; regmask=0x0e {
     pull16(E);
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "D,E,IX,IY"  is op8=0x35; regmask=0x0F {
+:PULM^" D,E,IX,IY"  is op8=0x35; regmask=0x0f {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "IZ"  is op8=0x35; regmask=0x10 { pull16(IZ); }
+:PULM^" IZ"  is op8=0x35; regmask=0x10 {
+    pull16(IZ);
+}
 
-:PULM "D,IZ"  is op8=0x35; regmask=0x11 {
+:PULM^" D,IZ"  is op8=0x35; regmask=0x11 {
     pull16(D);
     pull16(IZ);
 }
 
-:PULM "E,IZ"  is op8=0x35; regmask=0x12 {
+:PULM^" E,IZ"  is op8=0x35; regmask=0x12 {
     pull16(E);
     pull16(IZ);
 }
 
-:PULM "D,E,IZ"  is op8=0x35; regmask=0x13 {
+:PULM^" D,E,IZ"  is op8=0x35; regmask=0x13 {
     pull16(D);
     pull16(E);
     pull16(IZ);
 }
 
-:PULM "IX,IZ"  is op8=0x35; regmask=0x14 {
+:PULM^" IX,IZ"  is op8=0x35; regmask=0x14 {
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "D,IX,IZ"  is op8=0x35; regmask=0x15 {
+:PULM^" D,IX,IZ"  is op8=0x35; regmask=0x15 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "E,IX,IZ"  is op8=0x35; regmask=0x16 {
+:PULM^" E,IX,IZ"  is op8=0x35; regmask=0x16 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "D,E,IX,IZ"  is op8=0x35; regmask=0x17 {
+:PULM^" D,E,IX,IZ"  is op8=0x35; regmask=0x17 {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "IY,IZ"  is op8=0x35; regmask=0x18 {
+:PULM^" IY,IZ"  is op8=0x35; regmask=0x18 {
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,IY,IZ"  is op8=0x35; regmask=0x19 {
+:PULM^" D,IY,IZ"  is op8=0x35; regmask=0x19 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "E,IY,IZ"  is op8=0x35; regmask=0x1A {
+:PULM^" E,IY,IZ"  is op8=0x35; regmask=0x1a {
     pull16(E);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,E,IY,IZ"  is op8=0x35; regmask=0x1B {
+:PULM^" D,E,IY,IZ"  is op8=0x35; regmask=0x1b {
     pull16(D);
     pull16(E);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "IX,IY,IZ"  is op8=0x35; regmask=0x1C {
+:PULM^" IX,IY,IZ"  is op8=0x35; regmask=0x1c {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,IX,IY,IZ"  is op8=0x35; regmask=0x1D {
+:PULM^" D,IX,IY,IZ"  is op8=0x35; regmask=0x1d {
     pull16(D);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "E,IX,IY,IZ"  is op8=0x35; regmask=0x1E {
+:PULM^" E,IX,IY,IZ"  is op8=0x35; regmask=0x1e {
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,E,IX,IY,IZ"  is op8=0x35; regmask=0x1F {
+:PULM^" D,E,IX,IY,IZ"  is op8=0x35; regmask=0x1f {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -3446,419 +3596,419 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     pull16(IZ);
 }
 
-:PULM "K"  is op8=0x35; regmask=0x20 {
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+:PULM^" K"  is op8=0x35; regmask=0x20 {
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,K"  is op8=0x35; regmask=0x21 {
+:PULM^" D,K"  is op8=0x35; regmask=0x21 {
     pull16(D);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,K"  is op8=0x35; regmask=0x22 {
+:PULM^" E,K"  is op8=0x35; regmask=0x22 {
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,K"  is op8=0x35; regmask=0x23 {
+:PULM^" D,E,K"  is op8=0x35; regmask=0x23 {
     pull16(D);
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,K"  is op8=0x35; regmask=0x24 {
+:PULM^" IX,K"  is op8=0x35; regmask=0x24 {
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,K"  is op8=0x35; regmask=0x25 {
+:PULM^" D,IX,K"  is op8=0x35; regmask=0x25 {
     pull16(D);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,K"  is op8=0x35; regmask=0x26 {
+:PULM^" E,IX,K"  is op8=0x35; regmask=0x26 {
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,K"  is op8=0x35; regmask=0x27 {
+:PULM^" D,E,IX,K"  is op8=0x35; regmask=0x27 {
     pull16(D);
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IY,K"  is op8=0x35; regmask=0x28 {
+:PULM^" IY,K"  is op8=0x35; regmask=0x28 {
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IY,K"  is op8=0x35; regmask=0x29 {
+:PULM^" D,IY,K"  is op8=0x35; regmask=0x29 {
     pull16(D);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IY,K"  is op8=0x35; regmask=0x2A {
+:PULM^" E,IY,K"  is op8=0x35; regmask=0x2a {
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IY,K"  is op8=0x35; regmask=0x2B {
+:PULM^" D,E,IY,K"  is op8=0x35; regmask=0x2b {
     pull16(D);
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,IY,K"  is op8=0x35; regmask=0x2C {
+:PULM^" IX,IY,K"  is op8=0x35; regmask=0x2c {
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,IY,K"  is op8=0x35; regmask=0x2D {
+:PULM^" D,IX,IY,K"  is op8=0x35; regmask=0x2d {
     pull16(D);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,IY,K"  is op8=0x35; regmask=0x2E {
+:PULM^" E,IX,IY,K"  is op8=0x35; regmask=0x2e {
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,IY,K"  is op8=0x35; regmask=0x2F {
+:PULM^" D,E,IX,IY,K"  is op8=0x35; regmask=0x2f {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IZ,K"  is op8=0x35; regmask=0x30 {
+:PULM^" IZ,K"  is op8=0x35; regmask=0x30 {
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IZ,K"  is op8=0x35; regmask=0x31 {
+:PULM^" D,IZ,K"  is op8=0x35; regmask=0x31 {
     pull16(D);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IZ,K"  is op8=0x35; regmask=0x32 {
+:PULM^" E,IZ,K"  is op8=0x35; regmask=0x32 {
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IZ,K"  is op8=0x35; regmask=0x33 {
+:PULM^" D,E,IZ,K"  is op8=0x35; regmask=0x33 {
     pull16(D);
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,IZ,K"  is op8=0x35; regmask=0x34 {
+:PULM^" IX,IZ,K"  is op8=0x35; regmask=0x34 {
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,IZ,K"  is op8=0x35; regmask=0x35 {
+:PULM^" D,IX,IZ,K"  is op8=0x35; regmask=0x35 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,IZ,K"  is op8=0x35; regmask=0x36 {
+:PULM^" E,IX,IZ,K"  is op8=0x35; regmask=0x36 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,IZ,K"  is op8=0x35; regmask=0x37 {
+:PULM^" D,E,IX,IZ,K"  is op8=0x35; regmask=0x37 {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IY,IZ,K"  is op8=0x35; regmask=0x38 {
+:PULM^" IY,IZ,K"  is op8=0x35; regmask=0x38 {
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IY,IZ,K"  is op8=0x35; regmask=0x39 {
+:PULM^" D,IY,IZ,K"  is op8=0x35; regmask=0x39 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IY,IZ,K"  is op8=0x35; regmask=0x3A {
+:PULM^" E,IY,IZ,K"  is op8=0x35; regmask=0x3a {
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IY,IZ,K"  is op8=0x35; regmask=0x3B {
+:PULM^" D,E,IY,IZ,K"  is op8=0x35; regmask=0x3b {
     pull16(D);
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,IY,IZ,K"  is op8=0x35; regmask=0x3C {
+:PULM^" IX,IY,IZ,K"  is op8=0x35; regmask=0x3c {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,IY,IZ,K"  is op8=0x35; regmask=0x3D {
+:PULM^" D,IX,IY,IZ,K"  is op8=0x35; regmask=0x3d {
     pull16(D);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,IY,IZ,K"  is op8=0x35; regmask=0x3E {
+:PULM^" E,IX,IY,IZ,K"  is op8=0x35; regmask=0x3e {
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,IY,IZ,K"  is op8=0x35; regmask=0x3F {
+:PULM^" D,E,IX,IY,IZ,K"  is op8=0x35; regmask=0x3f {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "CCR"  is op8=0x35; regmask=0x40 {
+:PULM^" CCR"  is op8=0x35; regmask=0x40 {
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,CCR"  is op8=0x35; regmask=0x41 {
+:PULM^" D,CCR"  is op8=0x35; regmask=0x41 {
     pull16(D);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,CCR"  is op8=0x35; regmask=0x42 {
+:PULM^" E,CCR"  is op8=0x35; regmask=0x42 {
     pull16(E);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,CCR"  is op8=0x35; regmask=0x43 {
+:PULM^" D,E,CCR"  is op8=0x35; regmask=0x43 {
     pull16(D);
     pull16(E);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,CCR"  is op8=0x35; regmask=0x44 {
+:PULM^" IX,CCR"  is op8=0x35; regmask=0x44 {
     pull16(IX);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,CCR"  is op8=0x35; regmask=0x45 {
+:PULM^" D,IX,CCR"  is op8=0x35; regmask=0x45 {
     pull16(D);
     pull16(IX);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,CCR"  is op8=0x35; regmask=0x46 {
+:PULM^" E,IX,CCR"  is op8=0x35; regmask=0x46 {
     pull16(E);
     pull16(IX);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,CCR"  is op8=0x35; regmask=0x47 {
+:PULM^" D,E,IX,CCR"  is op8=0x35; regmask=0x47 {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -3866,27 +4016,27 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IY,CCR"  is op8=0x35; regmask=0x48 {
+:PULM^" IY,CCR"  is op8=0x35; regmask=0x48 {
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,CCR"  is op8=0x35; regmask=0x49 {
+:PULM^" D,IY,CCR"  is op8=0x35; regmask=0x49 {
     pull16(D);
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IY,CCR"  is op8=0x35; regmask=0x4A {
+:PULM^" E,IY,CCR"  is op8=0x35; regmask=0x4a {
     pull16(E);
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IY,CCR"  is op8=0x35; regmask=0x4B {
+:PULM^" D,E,IY,CCR"  is op8=0x35; regmask=0x4b {
     pull16(D);
     pull16(E);
     pull16(IY);
@@ -3894,14 +4044,14 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IX,IY,CCR"  is op8=0x35; regmask=0x4C {
+:PULM^" IX,IY,CCR"  is op8=0x35; regmask=0x4c {
     pull16(IX);
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IY,CCR"  is op8=0x35; regmask=0x4D {
+:PULM^" D,IX,IY,CCR"  is op8=0x35; regmask=0x4d {
     pull16(D);
     pull16(IX);
     pull16(IY);
@@ -3909,7 +4059,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IX,IY,CCR"  is op8=0x35; regmask=0x4E {
+:PULM^" E,IX,IY,CCR"  is op8=0x35; regmask=0x4e {
     pull16(E);
     pull16(IX);
     pull16(IY);
@@ -3917,7 +4067,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,CCR"  is op8=0x35; regmask=0x4F {
+:PULM^" D,E,IX,IY,CCR"  is op8=0x35; regmask=0x4f {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -3926,27 +4076,27 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IZ,CCR"  is op8=0x35; regmask=0x50 {
+:PULM^" IZ,CCR"  is op8=0x35; regmask=0x50 {
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IZ,CCR"  is op8=0x35; regmask=0x51 {
+:PULM^" D,IZ,CCR"  is op8=0x35; regmask=0x51 {
     pull16(D);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IZ,CCR"  is op8=0x35; regmask=0x52 {
+:PULM^" E,IZ,CCR"  is op8=0x35; regmask=0x52 {
     pull16(E);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IZ,CCR"  is op8=0x35; regmask=0x53 {
+:PULM^" D,E,IZ,CCR"  is op8=0x35; regmask=0x53 {
     pull16(D);
     pull16(E);
     pull16(IZ);
@@ -3954,14 +4104,14 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IX,IZ,CCR"  is op8=0x35; regmask=0x54 {
+:PULM^" IX,IZ,CCR"  is op8=0x35; regmask=0x54 {
     pull16(IX);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IZ,CCR"  is op8=0x35; regmask=0x55 {
+:PULM^" D,IX,IZ,CCR"  is op8=0x35; regmask=0x55 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
@@ -3969,7 +4119,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IX,IZ,CCR"  is op8=0x35; regmask=0x56 {
+:PULM^" E,IX,IZ,CCR"  is op8=0x35; regmask=0x56 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
@@ -3977,7 +4127,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IX,IZ,CCR"  is op8=0x35; regmask=0x57 {
+:PULM^" D,E,IX,IZ,CCR"  is op8=0x35; regmask=0x57 {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -3986,14 +4136,14 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IY,IZ,CCR"  is op8=0x35; regmask=0x58 {
+:PULM^" IY,IZ,CCR"  is op8=0x35; regmask=0x58 {
     pull16(IY);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,IZ,CCR"  is op8=0x35; regmask=0x59 {
+:PULM^" D,IY,IZ,CCR"  is op8=0x35; regmask=0x59 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
@@ -4001,7 +4151,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IY,IZ,CCR"  is op8=0x35; regmask=0x5A {
+:PULM^" E,IY,IZ,CCR"  is op8=0x35; regmask=0x5a {
     pull16(E);
     pull16(IY);
     pull16(IZ);
@@ -4009,7 +4159,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IY,IZ,CCR"  is op8=0x35; regmask=0x5B {
+:PULM^" D,E,IY,IZ,CCR"  is op8=0x35; regmask=0x5b {
     pull16(D);
     pull16(E);
     pull16(IY);
@@ -4018,7 +4168,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5C {
+:PULM^" IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5c {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
@@ -4026,7 +4176,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5D {
+:PULM^" D,IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5d {
     pull16(D);
     pull16(IX);
     pull16(IY);
@@ -4035,7 +4185,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5E {
+:PULM^" E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5e {
     pull16(E);
     pull16(IX);
     pull16(IY);
@@ -4044,7 +4194,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5F {
+:PULM^" D,E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0x5f {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -4054,596 +4204,608 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "K,CCR"  is op8=0x35; regmask=0x60 {
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+:PULM^" K,CCR"  is op8=0x35; regmask=0x60 {
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,K,CCR"  is op8=0x35; regmask=0x61 {
+:PULM^" D,K,CCR"  is op8=0x35; regmask=0x61 {
     pull16(D);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,K,CCR"  is op8=0x35; regmask=0x62 {
+:PULM^" E,K,CCR"  is op8=0x35; regmask=0x62 {
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,K,CCR"  is op8=0x35; regmask=0x63 {
+:PULM^" D,E,K,CCR"  is op8=0x35; regmask=0x63 {
     pull16(D);
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,K,CCR"  is op8=0x35; regmask=0x64 {
+:PULM^" IX,K,CCR"  is op8=0x35; regmask=0x64 {
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,K,CCR"  is op8=0x35; regmask=0x65 {
+:PULM^" D,IX,K,CCR"  is op8=0x35; regmask=0x65 {
     pull16(D);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,K,CCR"  is op8=0x35; regmask=0x66 {
+:PULM^" E,IX,K,CCR"  is op8=0x35; regmask=0x66 {
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,K,CCR"  is op8=0x35; regmask=0x67 {
+:PULM^" D,E,IX,K,CCR"  is op8=0x35; regmask=0x67 {
     pull16(D);
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IY,K,CCR"  is op8=0x35; regmask=0x68 {
+:PULM^" IY,K,CCR"  is op8=0x35; regmask=0x68 {
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,K,CCR"  is op8=0x35; regmask=0x69 {
+:PULM^" D,IY,K,CCR"  is op8=0x35; regmask=0x69 {
     pull16(D);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IY,K,CCR"  is op8=0x35; regmask=0x6A {
+:PULM^" E,IY,K,CCR"  is op8=0x35; regmask=0x6a {
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IY,K,CCR"  is op8=0x35; regmask=0x6B {
+:PULM^" D,E,IY,K,CCR"  is op8=0x35; regmask=0x6b {
     pull16(D);
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,IY,K,CCR"  is op8=0x35; regmask=0x6C {
+:PULM^" IX,IY,K,CCR"  is op8=0x35; regmask=0x6c {
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IY,K,CCR"  is op8=0x35; regmask=0x6D {
+:PULM^" D,IX,IY,K,CCR"  is op8=0x35; regmask=0x6d {
     pull16(D);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,IY,K,CCR"  is op8=0x35; regmask=0x6E {
+:PULM^" E,IX,IY,K,CCR"  is op8=0x35; regmask=0x6e {
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,K,CCR"  is op8=0x35; regmask=0x6F {
+:PULM^" D,E,IX,IY,K,CCR"  is op8=0x35; regmask=0x6f {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IZ,K,CCR"  is op8=0x35; regmask=0x70 {
+:PULM^" IZ,K,CCR"  is op8=0x35; regmask=0x70 {
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IZ,K,CCR"  is op8=0x35; regmask=0x71 {
+:PULM^" D,IZ,K,CCR"  is op8=0x35; regmask=0x71 {
     pull16(D);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IZ,K,CCR"  is op8=0x35; regmask=0x72 {
+:PULM^" E,IZ,K,CCR"  is op8=0x35; regmask=0x72 {
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IZ,K,CCR"  is op8=0x35; regmask=0x73 {
+:PULM^" D,E,IZ,K,CCR"  is op8=0x35; regmask=0x73 {
     pull16(D);
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,IZ,K,CCR"  is op8=0x35; regmask=0x74 {
+:PULM^" IX,IZ,K,CCR"  is op8=0x35; regmask=0x74 {
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IZ,K,CCR"  is op8=0x35; regmask=0x75 {
+:PULM^" D,IX,IZ,K,CCR"  is op8=0x35; regmask=0x75 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,IZ,K,CCR"  is op8=0x35; regmask=0x76 {
+:PULM^" E,IX,IZ,K,CCR"  is op8=0x35; regmask=0x76 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,IZ,K,CCR"  is op8=0x35; regmask=0x77 {
+:PULM^" D,E,IX,IZ,K,CCR"  is op8=0x35; regmask=0x77 {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IY,IZ,K,CCR"  is op8=0x35; regmask=0x78 {
+:PULM^" IY,IZ,K,CCR"  is op8=0x35; regmask=0x78 {
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,IZ,K,CCR"  is op8=0x35; regmask=0x79 {
+:PULM^" D,IY,IZ,K,CCR"  is op8=0x35; regmask=0x79 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7A {
+:PULM^" E,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7a {
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7B {
+:PULM^" D,E,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7b {
     pull16(D);
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7C {
+:PULM^" IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7c {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7D {
+:PULM^" D,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7d {
     pull16(D);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7E {
+:PULM^" E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7e {
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7F {
+:PULM^" D,E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0x7f {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "#0x00"  is op8=0x35; regmask=0x80 { }
+:PULM  is op8=0x35; regmask=0x80 {
+    # pull nothing
+}
 
-:PULM "D"  is op8=0x35; regmask=0x81 { pull16(D); }
+:PULM^" D"  is op8=0x35; regmask=0x81 {
+    pull16(D);
+}
 
-:PULM "E"  is op8=0x35; regmask=0x82 { pull16(E); }
+:PULM^" E"  is op8=0x35; regmask=0x82 {
+    pull16(E);
+}
 
-:PULM "D,E"  is op8=0x35; regmask=0x83 {
+:PULM^" D,E"  is op8=0x35; regmask=0x83 {
     pull16(D);
     pull16(E);
 }
 
-:PULM "IX"  is op8=0x35; regmask=0x84 { pull16(IX); }
+:PULM^" IX"  is op8=0x35; regmask=0x84 {
+    pull16(IX);
+}
 
-:PULM "D,IX"  is op8=0x35; regmask=0x85 {
+:PULM^" D,IX"  is op8=0x35; regmask=0x85 {
     pull16(D);
     pull16(IX);
 }
 
-:PULM "E,IX"  is op8=0x35; regmask=0x86 {
+:PULM^" E,IX"  is op8=0x35; regmask=0x86 {
     pull16(E);
     pull16(IX);
 }
 
-:PULM "D,E,IX"  is op8=0x35; regmask=0x87 {
+:PULM^" D,E,IX"  is op8=0x35; regmask=0x87 {
     pull16(D);
     pull16(E);
     pull16(IX);
 }
 
-:PULM "IY"  is op8=0x35; regmask=0x88 { pull16(IY); }
+:PULM^" IY"  is op8=0x35; regmask=0x88 {
+    pull16(IY);
+}
 
-:PULM "D,IY"  is op8=0x35; regmask=0x89 {
+:PULM^" D,IY"  is op8=0x35; regmask=0x89 {
     pull16(D);
     pull16(IY);
 }
 
-:PULM "E,IY"  is op8=0x35; regmask=0x8A {
+:PULM^" E,IY"  is op8=0x35; regmask=0x8a {
     pull16(E);
     pull16(IY);
 }
 
-:PULM "D,E,IY"  is op8=0x35; regmask=0x8B {
+:PULM^" D,E,IY"  is op8=0x35; regmask=0x8b {
     pull16(D);
     pull16(E);
     pull16(IY);
 }
 
-:PULM "IX,IY"  is op8=0x35; regmask=0x8C {
+:PULM^" IX,IY"  is op8=0x35; regmask=0x8c {
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "D,IX,IY"  is op8=0x35; regmask=0x8D {
+:PULM^" D,IX,IY"  is op8=0x35; regmask=0x8d {
     pull16(D);
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "E,IX,IY"  is op8=0x35; regmask=0x8E {
+:PULM^" E,IX,IY"  is op8=0x35; regmask=0x8e {
     pull16(E);
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "D,E,IX,IY"  is op8=0x35; regmask=0x8F {
+:PULM^" D,E,IX,IY"  is op8=0x35; regmask=0x8f {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
 }
 
-:PULM "IZ"  is op8=0x35; regmask=0x90 { pull16(IZ); }
+:PULM^" IZ"  is op8=0x35; regmask=0x90 {
+    pull16(IZ);
+}
 
-:PULM "D,IZ"  is op8=0x35; regmask=0x91 {
+:PULM^" D,IZ"  is op8=0x35; regmask=0x91 {
     pull16(D);
     pull16(IZ);
 }
 
-:PULM "E,IZ"  is op8=0x35; regmask=0x92 {
+:PULM^" E,IZ"  is op8=0x35; regmask=0x92 {
     pull16(E);
     pull16(IZ);
 }
 
-:PULM "D,E,IZ"  is op8=0x35; regmask=0x93 {
+:PULM^" D,E,IZ"  is op8=0x35; regmask=0x93 {
     pull16(D);
     pull16(E);
     pull16(IZ);
 }
 
-:PULM "IX,IZ"  is op8=0x35; regmask=0x94 {
+:PULM^" IX,IZ"  is op8=0x35; regmask=0x94 {
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "D,IX,IZ"  is op8=0x35; regmask=0x95 {
+:PULM^" D,IX,IZ"  is op8=0x35; regmask=0x95 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "E,IX,IZ"  is op8=0x35; regmask=0x96 {
+:PULM^" E,IX,IZ"  is op8=0x35; regmask=0x96 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "D,E,IX,IZ"  is op8=0x35; regmask=0x97 {
+:PULM^" D,E,IX,IZ"  is op8=0x35; regmask=0x97 {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IZ);
 }
 
-:PULM "IY,IZ"  is op8=0x35; regmask=0x98 {
+:PULM^" IY,IZ"  is op8=0x35; regmask=0x98 {
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,IY,IZ"  is op8=0x35; regmask=0x99 {
+:PULM^" D,IY,IZ"  is op8=0x35; regmask=0x99 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "E,IY,IZ"  is op8=0x35; regmask=0x9A {
+:PULM^" E,IY,IZ"  is op8=0x35; regmask=0x9a {
     pull16(E);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,E,IY,IZ"  is op8=0x35; regmask=0x9B {
+:PULM^" D,E,IY,IZ"  is op8=0x35; regmask=0x9b {
     pull16(D);
     pull16(E);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "IX,IY,IZ"  is op8=0x35; regmask=0x9C {
+:PULM^" IX,IY,IZ"  is op8=0x35; regmask=0x9c {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,IX,IY,IZ"  is op8=0x35; regmask=0x9D {
+:PULM^" D,IX,IY,IZ"  is op8=0x35; regmask=0x9d {
     pull16(D);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "E,IX,IY,IZ"  is op8=0x35; regmask=0x9E {
+:PULM^" E,IX,IY,IZ"  is op8=0x35; regmask=0x9e {
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
 }
 
-:PULM "D,E,IX,IY,IZ"  is op8=0x35; regmask=0x9F {
+:PULM^" D,E,IX,IY,IZ"  is op8=0x35; regmask=0x9f {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -4651,419 +4813,419 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     pull16(IZ);
 }
 
-:PULM "K"  is op8=0x35; regmask=0xA0 {
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+:PULM^" K"  is op8=0x35; regmask=0xa0 {
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,K"  is op8=0x35; regmask=0xA1 {
+:PULM^" D,K"  is op8=0x35; regmask=0xa1 {
     pull16(D);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,K"  is op8=0x35; regmask=0xA2 {
+:PULM^" E,K"  is op8=0x35; regmask=0xa2 {
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,K"  is op8=0x35; regmask=0xA3 {
+:PULM^" D,E,K"  is op8=0x35; regmask=0xa3 {
     pull16(D);
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,K"  is op8=0x35; regmask=0xA4 {
+:PULM^" IX,K"  is op8=0x35; regmask=0xa4 {
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,K"  is op8=0x35; regmask=0xA5 {
+:PULM^" D,IX,K"  is op8=0x35; regmask=0xa5 {
     pull16(D);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,K"  is op8=0x35; regmask=0xA6 {
+:PULM^" E,IX,K"  is op8=0x35; regmask=0xa6 {
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,K"  is op8=0x35; regmask=0xA7 {
+:PULM^" D,E,IX,K"  is op8=0x35; regmask=0xa7 {
     pull16(D);
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IY,K"  is op8=0x35; regmask=0xA8 {
+:PULM^" IY,K"  is op8=0x35; regmask=0xa8 {
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IY,K"  is op8=0x35; regmask=0xA9 {
+:PULM^" D,IY,K"  is op8=0x35; regmask=0xa9 {
     pull16(D);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IY,K"  is op8=0x35; regmask=0xAA {
+:PULM^" E,IY,K"  is op8=0x35; regmask=0xaa {
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IY,K"  is op8=0x35; regmask=0xAB {
+:PULM^" D,E,IY,K"  is op8=0x35; regmask=0xab {
     pull16(D);
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,IY,K"  is op8=0x35; regmask=0xAC {
+:PULM^" IX,IY,K"  is op8=0x35; regmask=0xac {
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,IY,K"  is op8=0x35; regmask=0xAD {
+:PULM^" D,IX,IY,K"  is op8=0x35; regmask=0xad {
     pull16(D);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,IY,K"  is op8=0x35; regmask=0xAE {
+:PULM^" E,IX,IY,K"  is op8=0x35; regmask=0xae {
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,IY,K"  is op8=0x35; regmask=0xAF {
+:PULM^" D,E,IX,IY,K"  is op8=0x35; regmask=0xaf {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IZ,K"  is op8=0x35; regmask=0xB0 {
+:PULM^" IZ,K"  is op8=0x35; regmask=0xb0 {
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IZ,K"  is op8=0x35; regmask=0xB1 {
+:PULM^" D,IZ,K"  is op8=0x35; regmask=0xb1 {
     pull16(D);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IZ,K"  is op8=0x35; regmask=0xB2 {
+:PULM^" E,IZ,K"  is op8=0x35; regmask=0xb2 {
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IZ,K"  is op8=0x35; regmask=0xB3 {
+:PULM^" D,E,IZ,K"  is op8=0x35; regmask=0xb3 {
     pull16(D);
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,IZ,K"  is op8=0x35; regmask=0xB4 {
+:PULM^" IX,IZ,K"  is op8=0x35; regmask=0xb4 {
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,IZ,K"  is op8=0x35; regmask=0xB5 {
+:PULM^" D,IX,IZ,K"  is op8=0x35; regmask=0xb5 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,IZ,K"  is op8=0x35; regmask=0xB6 {
+:PULM^" E,IX,IZ,K"  is op8=0x35; regmask=0xb6 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,IZ,K"  is op8=0x35; regmask=0xB7 {
+:PULM^" D,E,IX,IZ,K"  is op8=0x35; regmask=0xb7 {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IY,IZ,K"  is op8=0x35; regmask=0xB8 {
+:PULM^" IY,IZ,K"  is op8=0x35; regmask=0xb8 {
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IY,IZ,K"  is op8=0x35; regmask=0xB9 {
+:PULM^" D,IY,IZ,K"  is op8=0x35; regmask=0xb9 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IY,IZ,K"  is op8=0x35; regmask=0xBA {
+:PULM^" E,IY,IZ,K"  is op8=0x35; regmask=0xba {
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IY,IZ,K"  is op8=0x35; regmask=0xBB {
+:PULM^" D,E,IY,IZ,K"  is op8=0x35; regmask=0xbb {
     pull16(D);
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "IX,IY,IZ,K"  is op8=0x35; regmask=0xBC {
+:PULM^" IX,IY,IZ,K"  is op8=0x35; regmask=0xbc {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,IX,IY,IZ,K"  is op8=0x35; regmask=0xBD {
+:PULM^" D,IX,IY,IZ,K"  is op8=0x35; regmask=0xbd {
     pull16(D);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "E,IX,IY,IZ,K"  is op8=0x35; regmask=0xBE {
+:PULM^" E,IX,IY,IZ,K"  is op8=0x35; regmask=0xbe {
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "D,E,IX,IY,IZ,K"  is op8=0x35; regmask=0xBF {
+:PULM^" D,E,IX,IY,IZ,K"  is op8=0x35; regmask=0xbf {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
 }
 
-:PULM "CCR"  is op8=0x35; regmask=0xC0 {
+:PULM^" CCR"  is op8=0x35; regmask=0xc0 {
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,CCR"  is op8=0x35; regmask=0xC1 {
+:PULM^" D,CCR"  is op8=0x35; regmask=0xc1 {
     pull16(D);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,CCR"  is op8=0x35; regmask=0xC2 {
+:PULM^" E,CCR"  is op8=0x35; regmask=0xc2 {
     pull16(E);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,CCR"  is op8=0x35; regmask=0xC3 {
+:PULM^" D,E,CCR"  is op8=0x35; regmask=0xc3 {
     pull16(D);
     pull16(E);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,CCR"  is op8=0x35; regmask=0xC4 {
+:PULM^" IX,CCR"  is op8=0x35; regmask=0xc4 {
     pull16(IX);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,CCR"  is op8=0x35; regmask=0xC5 {
+:PULM^" D,IX,CCR"  is op8=0x35; regmask=0xc5 {
     pull16(D);
     pull16(IX);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,CCR"  is op8=0x35; regmask=0xC6 {
+:PULM^" E,IX,CCR"  is op8=0x35; regmask=0xc6 {
     pull16(E);
     pull16(IX);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,CCR"  is op8=0x35; regmask=0xC7 {
+:PULM^" D,E,IX,CCR"  is op8=0x35; regmask=0xc7 {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -5071,27 +5233,27 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IY,CCR"  is op8=0x35; regmask=0xC8 {
+:PULM^" IY,CCR"  is op8=0x35; regmask=0xc8 {
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,CCR"  is op8=0x35; regmask=0xC9 {
+:PULM^" D,IY,CCR"  is op8=0x35; regmask=0xc9 {
     pull16(D);
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IY,CCR"  is op8=0x35; regmask=0xCA {
+:PULM^" E,IY,CCR"  is op8=0x35; regmask=0xca {
     pull16(E);
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IY,CCR"  is op8=0x35; regmask=0xCB {
+:PULM^" D,E,IY,CCR"  is op8=0x35; regmask=0xcb {
     pull16(D);
     pull16(E);
     pull16(IY);
@@ -5099,14 +5261,14 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IX,IY,CCR"  is op8=0x35; regmask=0xCC {
+:PULM^" IX,IY,CCR"  is op8=0x35; regmask=0xcc {
     pull16(IX);
     pull16(IY);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IY,CCR"  is op8=0x35; regmask=0xCD {
+:PULM^" D,IX,IY,CCR"  is op8=0x35; regmask=0xcd {
     pull16(D);
     pull16(IX);
     pull16(IY);
@@ -5114,7 +5276,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IX,IY,CCR"  is op8=0x35; regmask=0xCE {
+:PULM^" E,IX,IY,CCR"  is op8=0x35; regmask=0xce {
     pull16(E);
     pull16(IX);
     pull16(IY);
@@ -5122,7 +5284,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,CCR"  is op8=0x35; regmask=0xCF {
+:PULM^" D,E,IX,IY,CCR"  is op8=0x35; regmask=0xcf {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -5131,27 +5293,27 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IZ,CCR"  is op8=0x35; regmask=0xD0 {
+:PULM^" IZ,CCR"  is op8=0x35; regmask=0xd0 {
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IZ,CCR"  is op8=0x35; regmask=0xD1 {
+:PULM^" D,IZ,CCR"  is op8=0x35; regmask=0xd1 {
     pull16(D);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IZ,CCR"  is op8=0x35; regmask=0xD2 {
+:PULM^" E,IZ,CCR"  is op8=0x35; regmask=0xd2 {
     pull16(E);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IZ,CCR"  is op8=0x35; regmask=0xD3 {
+:PULM^" D,E,IZ,CCR"  is op8=0x35; regmask=0xd3 {
     pull16(D);
     pull16(E);
     pull16(IZ);
@@ -5159,14 +5321,14 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IX,IZ,CCR"  is op8=0x35; regmask=0xD4 {
+:PULM^" IX,IZ,CCR"  is op8=0x35; regmask=0xd4 {
     pull16(IX);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IZ,CCR"  is op8=0x35; regmask=0xD5 {
+:PULM^" D,IX,IZ,CCR"  is op8=0x35; regmask=0xd5 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
@@ -5174,7 +5336,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IX,IZ,CCR"  is op8=0x35; regmask=0xD6 {
+:PULM^" E,IX,IZ,CCR"  is op8=0x35; regmask=0xd6 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
@@ -5182,7 +5344,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IX,IZ,CCR"  is op8=0x35; regmask=0xD7 {
+:PULM^" D,E,IX,IZ,CCR"  is op8=0x35; regmask=0xd7 {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -5191,14 +5353,14 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IY,IZ,CCR"  is op8=0x35; regmask=0xD8 {
+:PULM^" IY,IZ,CCR"  is op8=0x35; regmask=0xd8 {
     pull16(IY);
     pull16(IZ);
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,IZ,CCR"  is op8=0x35; regmask=0xD9 {
+:PULM^" D,IY,IZ,CCR"  is op8=0x35; regmask=0xd9 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
@@ -5206,7 +5368,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IY,IZ,CCR"  is op8=0x35; regmask=0xDA {
+:PULM^" E,IY,IZ,CCR"  is op8=0x35; regmask=0xda {
     pull16(E);
     pull16(IY);
     pull16(IZ);
@@ -5214,7 +5376,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IY,IZ,CCR"  is op8=0x35; regmask=0xDB {
+:PULM^" D,E,IY,IZ,CCR"  is op8=0x35; regmask=0xdb {
     pull16(D);
     pull16(E);
     pull16(IY);
@@ -5223,7 +5385,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "IX,IY,IZ,CCR"  is op8=0x35; regmask=0xDC {
+:PULM^" IX,IY,IZ,CCR"  is op8=0x35; regmask=0xdc {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
@@ -5231,7 +5393,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,IX,IY,IZ,CCR"  is op8=0x35; regmask=0xDD {
+:PULM^" D,IX,IY,IZ,CCR"  is op8=0x35; regmask=0xdd {
     pull16(D);
     pull16(IX);
     pull16(IY);
@@ -5240,7 +5402,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0xDE {
+:PULM^" E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0xde {
     pull16(E);
     pull16(IX);
     pull16(IY);
@@ -5249,7 +5411,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0xDF {
+:PULM^" D,E,IX,IY,IZ,CCR"  is op8=0x35; regmask=0xdf {
     pull16(D);
     pull16(E);
     pull16(IX);
@@ -5259,441 +5421,439 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     unpackCCR();
 }
 
-:PULM "K,CCR"  is op8=0x35; regmask=0xE0 {
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+:PULM^" K,CCR"  is op8=0x35; regmask=0xe0 {
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,K,CCR"  is op8=0x35; regmask=0xE1 {
+:PULM^" D,K,CCR"  is op8=0x35; regmask=0xe1 {
     pull16(D);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,K,CCR"  is op8=0x35; regmask=0xE2 {
+:PULM^" E,K,CCR"  is op8=0x35; regmask=0xe2 {
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,K,CCR"  is op8=0x35; regmask=0xE3 {
+:PULM^" D,E,K,CCR"  is op8=0x35; regmask=0xe3 {
     pull16(D);
     pull16(E);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,K,CCR"  is op8=0x35; regmask=0xE4 {
+:PULM^" IX,K,CCR"  is op8=0x35; regmask=0xe4 {
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,K,CCR"  is op8=0x35; regmask=0xE5 {
+:PULM^" D,IX,K,CCR"  is op8=0x35; regmask=0xe5 {
     pull16(D);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,K,CCR"  is op8=0x35; regmask=0xE6 {
+:PULM^" E,IX,K,CCR"  is op8=0x35; regmask=0xe6 {
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,K,CCR"  is op8=0x35; regmask=0xE7 {
+:PULM^" D,E,IX,K,CCR"  is op8=0x35; regmask=0xe7 {
     pull16(D);
     pull16(E);
     pull16(IX);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IY,K,CCR"  is op8=0x35; regmask=0xE8 {
+:PULM^" IY,K,CCR"  is op8=0x35; regmask=0xe8 {
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,K,CCR"  is op8=0x35; regmask=0xE9 {
+:PULM^" D,IY,K,CCR"  is op8=0x35; regmask=0xe9 {
     pull16(D);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IY,K,CCR"  is op8=0x35; regmask=0xEA {
+:PULM^" E,IY,K,CCR"  is op8=0x35; regmask=0xea {
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IY,K,CCR"  is op8=0x35; regmask=0xEB {
+:PULM^" D,E,IY,K,CCR"  is op8=0x35; regmask=0xeb {
     pull16(D);
     pull16(E);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,IY,K,CCR"  is op8=0x35; regmask=0xEC {
+:PULM^" IX,IY,K,CCR"  is op8=0x35; regmask=0xec {
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IY,K,CCR"  is op8=0x35; regmask=0xED {
+:PULM^" D,IX,IY,K,CCR"  is op8=0x35; regmask=0xed {
     pull16(D);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,IY,K,CCR"  is op8=0x35; regmask=0xEE {
+:PULM^" E,IX,IY,K,CCR"  is op8=0x35; regmask=0xee {
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,K,CCR"  is op8=0x35; regmask=0xEF {
+:PULM^" D,E,IX,IY,K,CCR"  is op8=0x35; regmask=0xef {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IZ,K,CCR"  is op8=0x35; regmask=0xF0 {
+:PULM^" IZ,K,CCR"  is op8=0x35; regmask=0xf0 {
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IZ,K,CCR"  is op8=0x35; regmask=0xF1 {
+:PULM^" D,IZ,K,CCR"  is op8=0x35; regmask=0xf1 {
     pull16(D);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IZ,K,CCR"  is op8=0x35; regmask=0xF2 {
+:PULM^" E,IZ,K,CCR"  is op8=0x35; regmask=0xf2 {
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IZ,K,CCR"  is op8=0x35; regmask=0xF3 {
+:PULM^" D,E,IZ,K,CCR"  is op8=0x35; regmask=0xf3 {
     pull16(D);
     pull16(E);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,IZ,K,CCR"  is op8=0x35; regmask=0xF4 {
+:PULM^" IX,IZ,K,CCR"  is op8=0x35; regmask=0xf4 {
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IZ,K,CCR"  is op8=0x35; regmask=0xF5 {
+:PULM^" D,IX,IZ,K,CCR"  is op8=0x35; regmask=0xf5 {
     pull16(D);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,IZ,K,CCR"  is op8=0x35; regmask=0xF6 {
+:PULM^" E,IX,IZ,K,CCR"  is op8=0x35; regmask=0xf6 {
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,IZ,K,CCR"  is op8=0x35; regmask=0xF7 {
+:PULM^" D,E,IX,IZ,K,CCR"  is op8=0x35; regmask=0xf7 {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IY,IZ,K,CCR"  is op8=0x35; regmask=0xF8 {
+:PULM^" IY,IZ,K,CCR"  is op8=0x35; regmask=0xf8 {
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IY,IZ,K,CCR"  is op8=0x35; regmask=0xF9 {
+:PULM^" D,IY,IZ,K,CCR"  is op8=0x35; regmask=0xf9 {
     pull16(D);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IY,IZ,K,CCR"  is op8=0x35; regmask=0xFA {
+:PULM^" E,IY,IZ,K,CCR"  is op8=0x35; regmask=0xfa {
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IY,IZ,K,CCR"  is op8=0x35; regmask=0xFB {
+:PULM^" D,E,IY,IZ,K,CCR"  is op8=0x35; regmask=0xfb {
     pull16(D);
     pull16(E);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xFC {
+:PULM^" IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xfc {
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xFD {
+:PULM^" D,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xfd {
     pull16(D);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xFE {
+:PULM^" E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xfe {
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
 
-:PULM "D,E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xFF {
+:PULM^" D,E,IX,IY,IZ,K,CCR"  is op8=0x35; regmask=0xff {
     pull16(D);
     pull16(E);
     pull16(IX);
     pull16(IY);
     pull16(IZ);
-    local kreg2:2;
-    pull16(kreg2);
-    EK = kreg2[12,4];
-    XK = kreg2[8,4];
-    YK = kreg2[4,4];
-    ZK = kreg2[0,4];
+    local kreg_u:2;
+    pull16(kreg_u);
+    EK = kreg_u[12,4];
+    XK = kreg_u[8,4];
+    YK = kreg_u[4,4];
+    ZK = kreg_u[0,4];
     pull16(CCR);
     unpackCCR();
 }
-
 
 
-# ============================================================================
 # SECTION: DSP / MAC INSTRUCTIONS (basics)
 # ============================================================================
 

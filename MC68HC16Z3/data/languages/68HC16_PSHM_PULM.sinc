@@ -1,0 +1,517 @@
+# 68HC16 PSHM/PULM Register Mapping
+
+# --- PSHM: Forward Display (D->CCR), Reverse P-Code (CCR->D) ---
+pshmList: "" is regmask=0 {  }
+pshmList: "D" is regmask=1 { push16(D); }
+pshmList: "E" is regmask=2 { push16(E); }
+pshmList: "D,E" is regmask=3 { push16(E); push16(D); }
+pshmList: "IX" is regmask=4 { push16(IX); }
+pshmList: "D,IX" is regmask=5 { push16(IX); push16(D); }
+pshmList: "E,IX" is regmask=6 { push16(IX); push16(E); }
+pshmList: "D,E,IX" is regmask=7 { push16(IX); push16(E); push16(D); }
+pshmList: "IY" is regmask=8 { push16(IY); }
+pshmList: "D,IY" is regmask=9 { push16(IY); push16(D); }
+pshmList: "E,IY" is regmask=10 { push16(IY); push16(E); }
+pshmList: "D,E,IY" is regmask=11 { push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY" is regmask=12 { push16(IY); push16(IX); }
+pshmList: "D,IX,IY" is regmask=13 { push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY" is regmask=14 { push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY" is regmask=15 { push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ" is regmask=16 { push16(IZ); }
+pshmList: "D,IZ" is regmask=17 { push16(IZ); push16(D); }
+pshmList: "E,IZ" is regmask=18 { push16(IZ); push16(E); }
+pshmList: "D,E,IZ" is regmask=19 { push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ" is regmask=20 { push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ" is regmask=21 { push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ" is regmask=22 { push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ" is regmask=23 { push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ" is regmask=24 { push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ" is regmask=25 { push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ" is regmask=26 { push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ" is regmask=27 { push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ" is regmask=28 { push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ" is regmask=29 { push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ" is regmask=30 { push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ" is regmask=31 { push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "K" is regmask=32 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); }
+pshmList: "D,K" is regmask=33 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(D); }
+pshmList: "E,K" is regmask=34 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); }
+pshmList: "D,E,K" is regmask=35 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); push16(D); }
+pshmList: "IX,K" is regmask=36 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); }
+pshmList: "D,IX,K" is regmask=37 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(D); }
+pshmList: "E,IX,K" is regmask=38 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); }
+pshmList: "D,E,IX,K" is regmask=39 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); push16(D); }
+pshmList: "IY,K" is regmask=40 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); }
+pshmList: "D,IY,K" is regmask=41 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(D); }
+pshmList: "E,IY,K" is regmask=42 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); }
+pshmList: "D,E,IY,K" is regmask=43 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,K" is regmask=44 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,K" is regmask=45 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,K" is regmask=46 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,K" is regmask=47 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ,K" is regmask=48 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); }
+pshmList: "D,IZ,K" is regmask=49 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(D); }
+pshmList: "E,IZ,K" is regmask=50 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); }
+pshmList: "D,E,IZ,K" is regmask=51 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ,K" is regmask=52 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ,K" is regmask=53 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ,K" is regmask=54 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ,K" is regmask=55 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ,K" is regmask=56 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ,K" is regmask=57 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ,K" is regmask=58 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ,K" is regmask=59 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ,K" is regmask=60 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ,K" is regmask=61 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ,K" is regmask=62 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ,K" is regmask=63 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "CCR" is regmask=64 { packCCR(); push16(CCR); }
+pshmList: "D,CCR" is regmask=65 { packCCR(); push16(CCR); push16(D); }
+pshmList: "E,CCR" is regmask=66 { packCCR(); push16(CCR); push16(E); }
+pshmList: "D,E,CCR" is regmask=67 { packCCR(); push16(CCR); push16(E); push16(D); }
+pshmList: "IX,CCR" is regmask=68 { packCCR(); push16(CCR); push16(IX); }
+pshmList: "D,IX,CCR" is regmask=69 { packCCR(); push16(CCR); push16(IX); push16(D); }
+pshmList: "E,IX,CCR" is regmask=70 { packCCR(); push16(CCR); push16(IX); push16(E); }
+pshmList: "D,E,IX,CCR" is regmask=71 { packCCR(); push16(CCR); push16(IX); push16(E); push16(D); }
+pshmList: "IY,CCR" is regmask=72 { packCCR(); push16(CCR); push16(IY); }
+pshmList: "D,IY,CCR" is regmask=73 { packCCR(); push16(CCR); push16(IY); push16(D); }
+pshmList: "E,IY,CCR" is regmask=74 { packCCR(); push16(CCR); push16(IY); push16(E); }
+pshmList: "D,E,IY,CCR" is regmask=75 { packCCR(); push16(CCR); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,CCR" is regmask=76 { packCCR(); push16(CCR); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,CCR" is regmask=77 { packCCR(); push16(CCR); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,CCR" is regmask=78 { packCCR(); push16(CCR); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,CCR" is regmask=79 { packCCR(); push16(CCR); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ,CCR" is regmask=80 { packCCR(); push16(CCR); push16(IZ); }
+pshmList: "D,IZ,CCR" is regmask=81 { packCCR(); push16(CCR); push16(IZ); push16(D); }
+pshmList: "E,IZ,CCR" is regmask=82 { packCCR(); push16(CCR); push16(IZ); push16(E); }
+pshmList: "D,E,IZ,CCR" is regmask=83 { packCCR(); push16(CCR); push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ,CCR" is regmask=84 { packCCR(); push16(CCR); push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ,CCR" is regmask=85 { packCCR(); push16(CCR); push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ,CCR" is regmask=86 { packCCR(); push16(CCR); push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ,CCR" is regmask=87 { packCCR(); push16(CCR); push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ,CCR" is regmask=88 { packCCR(); push16(CCR); push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ,CCR" is regmask=89 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ,CCR" is regmask=90 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ,CCR" is regmask=91 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ,CCR" is regmask=92 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ,CCR" is regmask=93 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ,CCR" is regmask=94 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ,CCR" is regmask=95 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "K,CCR" is regmask=96 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); }
+pshmList: "D,K,CCR" is regmask=97 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(D); }
+pshmList: "E,K,CCR" is regmask=98 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); }
+pshmList: "D,E,K,CCR" is regmask=99 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); push16(D); }
+pshmList: "IX,K,CCR" is regmask=100 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); }
+pshmList: "D,IX,K,CCR" is regmask=101 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(D); }
+pshmList: "E,IX,K,CCR" is regmask=102 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); }
+pshmList: "D,E,IX,K,CCR" is regmask=103 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); push16(D); }
+pshmList: "IY,K,CCR" is regmask=104 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); }
+pshmList: "D,IY,K,CCR" is regmask=105 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(D); }
+pshmList: "E,IY,K,CCR" is regmask=106 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); }
+pshmList: "D,E,IY,K,CCR" is regmask=107 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,K,CCR" is regmask=108 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,K,CCR" is regmask=109 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,K,CCR" is regmask=110 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,K,CCR" is regmask=111 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ,K,CCR" is regmask=112 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); }
+pshmList: "D,IZ,K,CCR" is regmask=113 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(D); }
+pshmList: "E,IZ,K,CCR" is regmask=114 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); }
+pshmList: "D,E,IZ,K,CCR" is regmask=115 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ,K,CCR" is regmask=116 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ,K,CCR" is regmask=117 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ,K,CCR" is regmask=118 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ,K,CCR" is regmask=119 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ,K,CCR" is regmask=120 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ,K,CCR" is regmask=121 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ,K,CCR" is regmask=122 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ,K,CCR" is regmask=123 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ,K,CCR" is regmask=124 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ,K,CCR" is regmask=125 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ,K,CCR" is regmask=126 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ,K,CCR" is regmask=127 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "" is regmask=128 {  }
+pshmList: "D" is regmask=129 { push16(D); }
+pshmList: "E" is regmask=130 { push16(E); }
+pshmList: "D,E" is regmask=131 { push16(E); push16(D); }
+pshmList: "IX" is regmask=132 { push16(IX); }
+pshmList: "D,IX" is regmask=133 { push16(IX); push16(D); }
+pshmList: "E,IX" is regmask=134 { push16(IX); push16(E); }
+pshmList: "D,E,IX" is regmask=135 { push16(IX); push16(E); push16(D); }
+pshmList: "IY" is regmask=136 { push16(IY); }
+pshmList: "D,IY" is regmask=137 { push16(IY); push16(D); }
+pshmList: "E,IY" is regmask=138 { push16(IY); push16(E); }
+pshmList: "D,E,IY" is regmask=139 { push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY" is regmask=140 { push16(IY); push16(IX); }
+pshmList: "D,IX,IY" is regmask=141 { push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY" is regmask=142 { push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY" is regmask=143 { push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ" is regmask=144 { push16(IZ); }
+pshmList: "D,IZ" is regmask=145 { push16(IZ); push16(D); }
+pshmList: "E,IZ" is regmask=146 { push16(IZ); push16(E); }
+pshmList: "D,E,IZ" is regmask=147 { push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ" is regmask=148 { push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ" is regmask=149 { push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ" is regmask=150 { push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ" is regmask=151 { push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ" is regmask=152 { push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ" is regmask=153 { push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ" is regmask=154 { push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ" is regmask=155 { push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ" is regmask=156 { push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ" is regmask=157 { push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ" is regmask=158 { push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ" is regmask=159 { push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "K" is regmask=160 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); }
+pshmList: "D,K" is regmask=161 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(D); }
+pshmList: "E,K" is regmask=162 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); }
+pshmList: "D,E,K" is regmask=163 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); push16(D); }
+pshmList: "IX,K" is regmask=164 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); }
+pshmList: "D,IX,K" is regmask=165 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(D); }
+pshmList: "E,IX,K" is regmask=166 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); }
+pshmList: "D,E,IX,K" is regmask=167 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); push16(D); }
+pshmList: "IY,K" is regmask=168 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); }
+pshmList: "D,IY,K" is regmask=169 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(D); }
+pshmList: "E,IY,K" is regmask=170 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); }
+pshmList: "D,E,IY,K" is regmask=171 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,K" is regmask=172 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,K" is regmask=173 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,K" is regmask=174 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,K" is regmask=175 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ,K" is regmask=176 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); }
+pshmList: "D,IZ,K" is regmask=177 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(D); }
+pshmList: "E,IZ,K" is regmask=178 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); }
+pshmList: "D,E,IZ,K" is regmask=179 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ,K" is regmask=180 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ,K" is regmask=181 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ,K" is regmask=182 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ,K" is regmask=183 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ,K" is regmask=184 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ,K" is regmask=185 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ,K" is regmask=186 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ,K" is regmask=187 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ,K" is regmask=188 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ,K" is regmask=189 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ,K" is regmask=190 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ,K" is regmask=191 { local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "CCR" is regmask=192 { packCCR(); push16(CCR); }
+pshmList: "D,CCR" is regmask=193 { packCCR(); push16(CCR); push16(D); }
+pshmList: "E,CCR" is regmask=194 { packCCR(); push16(CCR); push16(E); }
+pshmList: "D,E,CCR" is regmask=195 { packCCR(); push16(CCR); push16(E); push16(D); }
+pshmList: "IX,CCR" is regmask=196 { packCCR(); push16(CCR); push16(IX); }
+pshmList: "D,IX,CCR" is regmask=197 { packCCR(); push16(CCR); push16(IX); push16(D); }
+pshmList: "E,IX,CCR" is regmask=198 { packCCR(); push16(CCR); push16(IX); push16(E); }
+pshmList: "D,E,IX,CCR" is regmask=199 { packCCR(); push16(CCR); push16(IX); push16(E); push16(D); }
+pshmList: "IY,CCR" is regmask=200 { packCCR(); push16(CCR); push16(IY); }
+pshmList: "D,IY,CCR" is regmask=201 { packCCR(); push16(CCR); push16(IY); push16(D); }
+pshmList: "E,IY,CCR" is regmask=202 { packCCR(); push16(CCR); push16(IY); push16(E); }
+pshmList: "D,E,IY,CCR" is regmask=203 { packCCR(); push16(CCR); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,CCR" is regmask=204 { packCCR(); push16(CCR); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,CCR" is regmask=205 { packCCR(); push16(CCR); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,CCR" is regmask=206 { packCCR(); push16(CCR); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,CCR" is regmask=207 { packCCR(); push16(CCR); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ,CCR" is regmask=208 { packCCR(); push16(CCR); push16(IZ); }
+pshmList: "D,IZ,CCR" is regmask=209 { packCCR(); push16(CCR); push16(IZ); push16(D); }
+pshmList: "E,IZ,CCR" is regmask=210 { packCCR(); push16(CCR); push16(IZ); push16(E); }
+pshmList: "D,E,IZ,CCR" is regmask=211 { packCCR(); push16(CCR); push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ,CCR" is regmask=212 { packCCR(); push16(CCR); push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ,CCR" is regmask=213 { packCCR(); push16(CCR); push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ,CCR" is regmask=214 { packCCR(); push16(CCR); push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ,CCR" is regmask=215 { packCCR(); push16(CCR); push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ,CCR" is regmask=216 { packCCR(); push16(CCR); push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ,CCR" is regmask=217 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ,CCR" is regmask=218 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ,CCR" is regmask=219 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ,CCR" is regmask=220 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ,CCR" is regmask=221 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ,CCR" is regmask=222 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ,CCR" is regmask=223 { packCCR(); push16(CCR); push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "K,CCR" is regmask=224 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); }
+pshmList: "D,K,CCR" is regmask=225 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(D); }
+pshmList: "E,K,CCR" is regmask=226 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); }
+pshmList: "D,E,K,CCR" is regmask=227 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(E); push16(D); }
+pshmList: "IX,K,CCR" is regmask=228 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); }
+pshmList: "D,IX,K,CCR" is regmask=229 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(D); }
+pshmList: "E,IX,K,CCR" is regmask=230 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); }
+pshmList: "D,E,IX,K,CCR" is regmask=231 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IX); push16(E); push16(D); }
+pshmList: "IY,K,CCR" is regmask=232 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); }
+pshmList: "D,IY,K,CCR" is regmask=233 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(D); }
+pshmList: "E,IY,K,CCR" is regmask=234 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); }
+pshmList: "D,E,IY,K,CCR" is regmask=235 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,K,CCR" is regmask=236 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,K,CCR" is regmask=237 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,K,CCR" is regmask=238 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,K,CCR" is regmask=239 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IY); push16(IX); push16(E); push16(D); }
+pshmList: "IZ,K,CCR" is regmask=240 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); }
+pshmList: "D,IZ,K,CCR" is regmask=241 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(D); }
+pshmList: "E,IZ,K,CCR" is regmask=242 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); }
+pshmList: "D,E,IZ,K,CCR" is regmask=243 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(E); push16(D); }
+pshmList: "IX,IZ,K,CCR" is regmask=244 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); }
+pshmList: "D,IX,IZ,K,CCR" is regmask=245 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(D); }
+pshmList: "E,IX,IZ,K,CCR" is regmask=246 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); }
+pshmList: "D,E,IX,IZ,K,CCR" is regmask=247 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IX); push16(E); push16(D); }
+pshmList: "IY,IZ,K,CCR" is regmask=248 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); }
+pshmList: "D,IY,IZ,K,CCR" is regmask=249 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(D); }
+pshmList: "E,IY,IZ,K,CCR" is regmask=250 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); }
+pshmList: "D,E,IY,IZ,K,CCR" is regmask=251 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(E); push16(D); }
+pshmList: "IX,IY,IZ,K,CCR" is regmask=252 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); }
+pshmList: "D,IX,IY,IZ,K,CCR" is regmask=253 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(D); }
+pshmList: "E,IX,IY,IZ,K,CCR" is regmask=254 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); }
+pshmList: "D,E,IX,IY,IZ,K,CCR" is regmask=255 { packCCR(); push16(CCR); local pk:2=(zext(EK:1)<<12)|(zext(XK:1)<<8)|(zext(YK:1)<<4)|zext(ZK:1); push16(pk); push16(IZ); push16(IY); push16(IX); push16(E); push16(D); }
+
+# --- PULM: Forward Display (CCR->D), Reverse P-Code (D->CCR) ---
+pulmList: "" is regmask=0 {  }
+pulmList: "CCR" is regmask=1 { pull16(CCR); unpackCCR(); }
+pulmList: "K" is regmask=2 { local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K" is regmask=3 { local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ" is regmask=4 { pull16(IZ); }
+pulmList: "CCR,IZ" is regmask=5 { pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ" is regmask=6 { pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ" is regmask=7 { pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY" is regmask=8 { pull16(IY); }
+pulmList: "CCR,IY" is regmask=9 { pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY" is regmask=10 { pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY" is regmask=11 { pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY" is regmask=12 { pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY" is regmask=13 { pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY" is regmask=14 { pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY" is regmask=15 { pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX" is regmask=16 { pull16(IX); }
+pulmList: "CCR,IX" is regmask=17 { pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX" is regmask=18 { pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX" is regmask=19 { pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX" is regmask=20 { pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX" is regmask=21 { pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX" is regmask=22 { pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX" is regmask=23 { pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX" is regmask=24 { pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX" is regmask=25 { pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX" is regmask=26 { pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX" is regmask=27 { pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX" is regmask=28 { pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX" is regmask=29 { pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX" is regmask=30 { pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX" is regmask=31 { pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "E" is regmask=32 { pull16(E); }
+pulmList: "CCR,E" is regmask=33 { pull16(E); pull16(CCR); unpackCCR(); }
+pulmList: "K,E" is regmask=34 { pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,E" is regmask=35 { pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,E" is regmask=36 { pull16(E); pull16(IZ); }
+pulmList: "CCR,IZ,E" is regmask=37 { pull16(E); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,E" is regmask=38 { pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,E" is regmask=39 { pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,E" is regmask=40 { pull16(E); pull16(IY); }
+pulmList: "CCR,IY,E" is regmask=41 { pull16(E); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,E" is regmask=42 { pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,E" is regmask=43 { pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,E" is regmask=44 { pull16(E); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,E" is regmask=45 { pull16(E); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,E" is regmask=46 { pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,E" is regmask=47 { pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX,E" is regmask=48 { pull16(E); pull16(IX); }
+pulmList: "CCR,IX,E" is regmask=49 { pull16(E); pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX,E" is regmask=50 { pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX,E" is regmask=51 { pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX,E" is regmask=52 { pull16(E); pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX,E" is regmask=53 { pull16(E); pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX,E" is regmask=54 { pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX,E" is regmask=55 { pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX,E" is regmask=56 { pull16(E); pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX,E" is regmask=57 { pull16(E); pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX,E" is regmask=58 { pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX,E" is regmask=59 { pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX,E" is regmask=60 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX,E" is regmask=61 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX,E" is regmask=62 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX,E" is regmask=63 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "D" is regmask=64 { pull16(D); }
+pulmList: "CCR,D" is regmask=65 { pull16(D); pull16(CCR); unpackCCR(); }
+pulmList: "K,D" is regmask=66 { pull16(D); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,D" is regmask=67 { pull16(D); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,D" is regmask=68 { pull16(D); pull16(IZ); }
+pulmList: "CCR,IZ,D" is regmask=69 { pull16(D); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,D" is regmask=70 { pull16(D); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,D" is regmask=71 { pull16(D); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,D" is regmask=72 { pull16(D); pull16(IY); }
+pulmList: "CCR,IY,D" is regmask=73 { pull16(D); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,D" is regmask=74 { pull16(D); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,D" is regmask=75 { pull16(D); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,D" is regmask=76 { pull16(D); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,D" is regmask=77 { pull16(D); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,D" is regmask=78 { pull16(D); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,D" is regmask=79 { pull16(D); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX,D" is regmask=80 { pull16(D); pull16(IX); }
+pulmList: "CCR,IX,D" is regmask=81 { pull16(D); pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX,D" is regmask=82 { pull16(D); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX,D" is regmask=83 { pull16(D); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX,D" is regmask=84 { pull16(D); pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX,D" is regmask=85 { pull16(D); pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX,D" is regmask=86 { pull16(D); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX,D" is regmask=87 { pull16(D); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX,D" is regmask=88 { pull16(D); pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX,D" is regmask=89 { pull16(D); pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX,D" is regmask=90 { pull16(D); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX,D" is regmask=91 { pull16(D); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX,D" is regmask=92 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX,D" is regmask=93 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX,D" is regmask=94 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX,D" is regmask=95 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "E,D" is regmask=96 { pull16(D); pull16(E); }
+pulmList: "CCR,E,D" is regmask=97 { pull16(D); pull16(E); pull16(CCR); unpackCCR(); }
+pulmList: "K,E,D" is regmask=98 { pull16(D); pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,E,D" is regmask=99 { pull16(D); pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,E,D" is regmask=100 { pull16(D); pull16(E); pull16(IZ); }
+pulmList: "CCR,IZ,E,D" is regmask=101 { pull16(D); pull16(E); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,E,D" is regmask=102 { pull16(D); pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,E,D" is regmask=103 { pull16(D); pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,E,D" is regmask=104 { pull16(D); pull16(E); pull16(IY); }
+pulmList: "CCR,IY,E,D" is regmask=105 { pull16(D); pull16(E); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,E,D" is regmask=106 { pull16(D); pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,E,D" is regmask=107 { pull16(D); pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,E,D" is regmask=108 { pull16(D); pull16(E); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,E,D" is regmask=109 { pull16(D); pull16(E); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,E,D" is regmask=110 { pull16(D); pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,E,D" is regmask=111 { pull16(D); pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX,E,D" is regmask=112 { pull16(D); pull16(E); pull16(IX); }
+pulmList: "CCR,IX,E,D" is regmask=113 { pull16(D); pull16(E); pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX,E,D" is regmask=114 { pull16(D); pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX,E,D" is regmask=115 { pull16(D); pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX,E,D" is regmask=116 { pull16(D); pull16(E); pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX,E,D" is regmask=117 { pull16(D); pull16(E); pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX,E,D" is regmask=118 { pull16(D); pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX,E,D" is regmask=119 { pull16(D); pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX,E,D" is regmask=120 { pull16(D); pull16(E); pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX,E,D" is regmask=121 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX,E,D" is regmask=122 { pull16(D); pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX,E,D" is regmask=123 { pull16(D); pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX,E,D" is regmask=124 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX,E,D" is regmask=125 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX,E,D" is regmask=126 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX,E,D" is regmask=127 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "" is regmask=128 {  }
+pulmList: "CCR" is regmask=129 { pull16(CCR); unpackCCR(); }
+pulmList: "K" is regmask=130 { local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K" is regmask=131 { local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ" is regmask=132 { pull16(IZ); }
+pulmList: "CCR,IZ" is regmask=133 { pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ" is regmask=134 { pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ" is regmask=135 { pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY" is regmask=136 { pull16(IY); }
+pulmList: "CCR,IY" is regmask=137 { pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY" is regmask=138 { pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY" is regmask=139 { pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY" is regmask=140 { pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY" is regmask=141 { pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY" is regmask=142 { pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY" is regmask=143 { pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX" is regmask=144 { pull16(IX); }
+pulmList: "CCR,IX" is regmask=145 { pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX" is regmask=146 { pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX" is regmask=147 { pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX" is regmask=148 { pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX" is regmask=149 { pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX" is regmask=150 { pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX" is regmask=151 { pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX" is regmask=152 { pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX" is regmask=153 { pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX" is regmask=154 { pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX" is regmask=155 { pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX" is regmask=156 { pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX" is regmask=157 { pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX" is regmask=158 { pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX" is regmask=159 { pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "E" is regmask=160 { pull16(E); }
+pulmList: "CCR,E" is regmask=161 { pull16(E); pull16(CCR); unpackCCR(); }
+pulmList: "K,E" is regmask=162 { pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,E" is regmask=163 { pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,E" is regmask=164 { pull16(E); pull16(IZ); }
+pulmList: "CCR,IZ,E" is regmask=165 { pull16(E); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,E" is regmask=166 { pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,E" is regmask=167 { pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,E" is regmask=168 { pull16(E); pull16(IY); }
+pulmList: "CCR,IY,E" is regmask=169 { pull16(E); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,E" is regmask=170 { pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,E" is regmask=171 { pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,E" is regmask=172 { pull16(E); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,E" is regmask=173 { pull16(E); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,E" is regmask=174 { pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,E" is regmask=175 { pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX,E" is regmask=176 { pull16(E); pull16(IX); }
+pulmList: "CCR,IX,E" is regmask=177 { pull16(E); pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX,E" is regmask=178 { pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX,E" is regmask=179 { pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX,E" is regmask=180 { pull16(E); pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX,E" is regmask=181 { pull16(E); pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX,E" is regmask=182 { pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX,E" is regmask=183 { pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX,E" is regmask=184 { pull16(E); pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX,E" is regmask=185 { pull16(E); pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX,E" is regmask=186 { pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX,E" is regmask=187 { pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX,E" is regmask=188 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX,E" is regmask=189 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX,E" is regmask=190 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX,E" is regmask=191 { pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "D" is regmask=192 { pull16(D); }
+pulmList: "CCR,D" is regmask=193 { pull16(D); pull16(CCR); unpackCCR(); }
+pulmList: "K,D" is regmask=194 { pull16(D); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,D" is regmask=195 { pull16(D); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,D" is regmask=196 { pull16(D); pull16(IZ); }
+pulmList: "CCR,IZ,D" is regmask=197 { pull16(D); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,D" is regmask=198 { pull16(D); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,D" is regmask=199 { pull16(D); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,D" is regmask=200 { pull16(D); pull16(IY); }
+pulmList: "CCR,IY,D" is regmask=201 { pull16(D); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,D" is regmask=202 { pull16(D); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,D" is regmask=203 { pull16(D); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,D" is regmask=204 { pull16(D); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,D" is regmask=205 { pull16(D); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,D" is regmask=206 { pull16(D); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,D" is regmask=207 { pull16(D); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX,D" is regmask=208 { pull16(D); pull16(IX); }
+pulmList: "CCR,IX,D" is regmask=209 { pull16(D); pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX,D" is regmask=210 { pull16(D); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX,D" is regmask=211 { pull16(D); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX,D" is regmask=212 { pull16(D); pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX,D" is regmask=213 { pull16(D); pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX,D" is regmask=214 { pull16(D); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX,D" is regmask=215 { pull16(D); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX,D" is regmask=216 { pull16(D); pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX,D" is regmask=217 { pull16(D); pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX,D" is regmask=218 { pull16(D); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX,D" is regmask=219 { pull16(D); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX,D" is regmask=220 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX,D" is regmask=221 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX,D" is regmask=222 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX,D" is regmask=223 { pull16(D); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "E,D" is regmask=224 { pull16(D); pull16(E); }
+pulmList: "CCR,E,D" is regmask=225 { pull16(D); pull16(E); pull16(CCR); unpackCCR(); }
+pulmList: "K,E,D" is regmask=226 { pull16(D); pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,E,D" is regmask=227 { pull16(D); pull16(E); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,E,D" is regmask=228 { pull16(D); pull16(E); pull16(IZ); }
+pulmList: "CCR,IZ,E,D" is regmask=229 { pull16(D); pull16(E); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,E,D" is regmask=230 { pull16(D); pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,E,D" is regmask=231 { pull16(D); pull16(E); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,E,D" is regmask=232 { pull16(D); pull16(E); pull16(IY); }
+pulmList: "CCR,IY,E,D" is regmask=233 { pull16(D); pull16(E); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,E,D" is regmask=234 { pull16(D); pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,E,D" is regmask=235 { pull16(D); pull16(E); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,E,D" is regmask=236 { pull16(D); pull16(E); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,E,D" is regmask=237 { pull16(D); pull16(E); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,E,D" is regmask=238 { pull16(D); pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,E,D" is regmask=239 { pull16(D); pull16(E); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IX,E,D" is regmask=240 { pull16(D); pull16(E); pull16(IX); }
+pulmList: "CCR,IX,E,D" is regmask=241 { pull16(D); pull16(E); pull16(IX); pull16(CCR); unpackCCR(); }
+pulmList: "K,IX,E,D" is regmask=242 { pull16(D); pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IX,E,D" is regmask=243 { pull16(D); pull16(E); pull16(IX); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IX,E,D" is regmask=244 { pull16(D); pull16(E); pull16(IX); pull16(IZ); }
+pulmList: "CCR,IZ,IX,E,D" is regmask=245 { pull16(D); pull16(E); pull16(IX); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IX,E,D" is regmask=246 { pull16(D); pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IX,E,D" is regmask=247 { pull16(D); pull16(E); pull16(IX); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IY,IX,E,D" is regmask=248 { pull16(D); pull16(E); pull16(IX); pull16(IY); }
+pulmList: "CCR,IY,IX,E,D" is regmask=249 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(CCR); unpackCCR(); }
+pulmList: "K,IY,IX,E,D" is regmask=250 { pull16(D); pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IY,IX,E,D" is regmask=251 { pull16(D); pull16(E); pull16(IX); pull16(IY); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }
+pulmList: "IZ,IY,IX,E,D" is regmask=252 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); }
+pulmList: "CCR,IZ,IY,IX,E,D" is regmask=253 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); pull16(CCR); unpackCCR(); }
+pulmList: "K,IZ,IY,IX,E,D" is regmask=254 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; }
+pulmList: "CCR,K,IZ,IY,IX,E,D" is regmask=255 { pull16(D); pull16(E); pull16(IX); pull16(IY); pull16(IZ); local un:2; pull16(un); EK=un[12,4]; XK=un[8,4]; YK=un[4,4]; ZK=un[0,4]; pull16(CCR); unpackCCR(); }

@@ -64,7 +64,8 @@
 
     <!-- ================================================================
          ADC - Analog-to-Digital Converter  ($YFF700 - $YFF73F)
-         Source: MC68HC16ZUM Table D-1, EQUATES.ASM
+         Source: MC68HC16ZUM Table D-24, EQUATES.ASM
+         64 bytes
          ================================================================ -->
     <symbol name="ADCMCR"   address="ram:0x0FF700"/>  <!-- ADC Module Configuration Register -->
     <symbol name="ADCTEST"  address="ram:0x0FF702"/>  <!-- ADC Test Register -->
@@ -99,7 +100,8 @@
 
     <!-- ================================================================
          MRM - Masked ROM Module  ($YFF820 - $YFF83F)
-         Source: MC68HC16ZUM EQUATES.ASM
+         Source: MC68HC16ZUM Table D-21, EQUATES.ASM
+         32 bytes (Z2/Z3 only)
          ================================================================ -->
     <symbol name="MRMCR"      address="ram:0x0FF820"/>  <!-- MRM Module Configuration Register -->
     <symbol name="ROMBAH"     address="ram:0x0FF824"/>  <!-- ROM Array Base Address High -->
@@ -112,12 +114,14 @@
     <symbol name="ROMBS3"     address="ram:0x0FF836"/>  <!-- ROM Bootstrap Word 3 -->
 
     <!-- ================================================================
-         GPT - General-Purpose Timer  ($YFF900 - $YFF92F)
+         GPT - General-Purpose Timer  ($YFF900 - $YFF93F)
          Source: MC68HC16ZUM Table D-42, EQUATES.ASM
+         64 bytes
          ================================================================ -->
     <symbol name="GPTMCR"   address="ram:0x0FF900"/>  <!-- GPT Module Configuration Register -->
     <symbol name="GPTMTR"   address="ram:0x0FF902"/>  <!-- GPT Module Test Register (reserved) -->
     <symbol name="ICR"      address="ram:0x0FF904"/>  <!-- GPT Interrupt Configuration Register -->
+    <symbol name="ICPAR"    address="ram:0x0FF905"/>  <!-- GPT Input Capture Pulse Accumulator Register -->
     <symbol name="DDRGP"    address="ram:0x0FF906"/>  <!-- Port GP Data Direction Register -->
     <symbol name="PORTGP"   address="ram:0x0FF907"/>  <!-- Port GP Data Register -->
     <symbol name="OC1M"     address="ram:0x0FF908"/>  <!-- Output Compare 1 Action Mask Register -->
@@ -151,6 +155,7 @@
     <!-- ================================================================
          SIM - System Integration Module  ($YFFA00 - $YFFA7F)
          Source: MC68HC16ZUM Table D-2, EQUATES.ASM
+         128 bytes
          ================================================================ -->
     <symbol name="SIMCR"    address="ram:0x0FFA00"/>  <!-- SIM Module Configuration Register -->
     <symbol name="SIMTR"    address="ram:0x0FFA02"/>  <!-- SIM Test Register -->
@@ -205,7 +210,8 @@
 
     <!-- ================================================================
          SRAM - Standby RAM Module  ($YFFB00 - $YFFB07)
-         Source: MC68HC16ZUM EQUATES.ASM
+         Source: MC68HC16ZUM Table D-19, EQUATES.ASM
+         8 bytes
          ================================================================ -->
     <symbol name="RAMMCR"   address="ram:0x0FFB00"/>  <!-- RAM Module Configuration Register -->
     <symbol name="RAMTST"   address="ram:0x0FFB02"/>  <!-- RAM Test Register -->
@@ -216,7 +222,8 @@
          QSM - Queued Serial Module  ($YFFC00 - $YFFDFF)
          Includes SCI (Serial Communications Interface) and
          SPI (Serial Peripheral Interface)
-         Source: MC68HC16ZUM Table D-5, EQUATES.ASM
+         Source: MC68HC16ZUM Table D-31, EQUATES.ASM
+         512 bytes (includes data RAM)
          ================================================================ -->
     <symbol name="QSMCR"    address="ram:0x0FFC00"/>  <!-- QSM Module Configuration Register -->
     <symbol name="QTEST"    address="ram:0x0FFC02"/>  <!-- QSM Test Register -->
@@ -243,6 +250,16 @@
     <symbol name="CR_BASE"  address="ram:0x0FFD40"/>  <!-- Command RAM base -->
 
   </default_symbols>
+
+  <!-- ================================================================
+       Memory Blocks
+       Sized from MC68HC16ZUM Figure 3-9 (Z2/Z3 Address Map).
+       SRAM location determined by JTEC+ startup code (FUN_020000):
+         RAMBAH=0x00FF, RAMBAL=0x8000 → maps to 0x0F8000.
+       Bank 0 (0x000000-0x00FFFF) is external ROM containing vectors,
+       interrupt thunk stubs, dispatch tables, and calibration data —
+       loaded from the firmware binary, no memory block needed.
+       ================================================================ -->
   <default_memory_blocks>
     <!-- CS0: External peripheral at bank 4, 2KB, 8-bit port, R/W
          CSBAR0=0x0400 CSOR0=0x7C70 -->
@@ -251,10 +268,16 @@
          4KB for Z3 variant. Stack lives here (SK:SP = 0x0F:0x8FFC).
          IZ base points here (ZK:IZ = 0x0F:0x8000). -->
     <memory_block name="INT_SRAM" start_address="ram:0x0F8000" length="0x1000" initialized="false" mode="rw"/>
-    <!-- I/O register blocks: ADC, MRM, GPT, SIM, SRAM ctrl, QSM
-         0x0FF700 to 0x0FFFFF -->
-    <memory_block name="IO_REGS" start_address="ram:0x0FF700" length="0x900" initialized="false" mode="rwv"/>
+    <!-- I/O register blocks: per-peripheral for better Ghidra visibility.
+         Sizes from MC68HC16ZUM Figure 3-9 (Z2/Z3 address map). -->
+    <memory_block name="ADC_REGS"  start_address="ram:0x0FF700" length="0x40"  initialized="false" mode="rwv"/>
+    <memory_block name="MRM_REGS"  start_address="ram:0x0FF820" length="0x20"  initialized="false" mode="rwv"/>
+    <memory_block name="GPT_REGS"  start_address="ram:0x0FF900" length="0x40"  initialized="false" mode="rwv"/>
+    <memory_block name="SIM_REGS"  start_address="ram:0x0FFA00" length="0x80"  initialized="false" mode="rwv"/>
+    <memory_block name="SRAM_REGS" start_address="ram:0x0FFB00" length="0x08"  initialized="false" mode="rwv"/>
+    <memory_block name="QSM_REGS"  start_address="ram:0x0FFC00" length="0x200" initialized="false" mode="rwv"/>
   </default_memory_blocks>
+
   <register_data>
     <register name="A"    group="GP"/>
     <register name="B"    group="GP"/>

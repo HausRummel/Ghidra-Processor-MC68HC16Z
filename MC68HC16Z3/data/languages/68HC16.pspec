@@ -255,9 +255,9 @@
        Memory Blocks
        Sized from MC68HC16ZUM Figure 3-9 (Z2/Z3 Address Map).
        SRAM location determined by JTEC+ startup code (FUN_020000):
-         RAMBAH=0x00FF, RAMBAL=0x8000 → maps to 0x0F8000.
+         RAMBAH=0x00FF, RAMBAL=0x8000 -> maps to 0x0F8000.
        Bank 0 (0x000000-0x00FFFF) is external ROM containing vectors,
-       interrupt thunk stubs, dispatch tables, and calibration data —
+       interrupt thunk stubs, dispatch tables, and calibration data,
        loaded from the firmware binary, no memory block needed.
        ================================================================ -->
   <default_memory_blocks>

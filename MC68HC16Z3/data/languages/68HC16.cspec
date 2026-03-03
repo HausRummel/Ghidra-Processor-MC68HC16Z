@@ -20,7 +20,7 @@
        Data Organization
        CPU16: 16-bit data bus, big-endian, 20-bit addresses (3 bytes)
        Typical C compiler mapping for this era:
-         <!-- char=1, short=2, int=2, long=4, pointer=3 (20-bit addr space) -->
+          char=1, short=2, int=2, long=4, pointer=3 (20-bit addr space) 
        ================================================================ -->
   <data_organization>
     <absolute_max_alignment value="0"/>
@@ -143,12 +143,12 @@
        Alternate Calling Convention: Register-Heavy Functions
        
        Many JTEC+ firmware functions pass parameters in registers that
-       the default convention doesn't model — particularly pointer-in-IX
+       the default convention does not model, particularly pointer-in-IX
        patterns. Examples include table interpolation routines that take
        a table pointer in IX and an input value in D.
        
-       Assign to specific functions via right-click → Edit Function
-       Signature → select "__reg_call" from the calling convention
+       Assign to specific functions via right-click -> Edit Function
+       Signature -> select "__reg_call" from the calling convention
        dropdown.
        ================================================================ -->
   <prototype name="__reg_call" extrapop="0" stackshift="4">

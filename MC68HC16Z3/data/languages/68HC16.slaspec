@@ -158,7 +158,7 @@ macro packCCR() {
     CCR = (zext(S_flag:1)  << 15) | (zext(MV_flag:1) << 14) | (zext(H_flag:1)  << 13) |
           (zext(EV_flag:1) << 12) | (zext(N_flag:1)  << 11) | (zext(Z_flag:1)  << 10) |
           (zext(V_flag:1)  <<  9) | (zext(C_flag:1)  <<  8) |
-          (zext(IP_bits) <<  4) | (zext(SM_flag:1) <<  4) | zext(PK:1);
+          (zext(IP_bits) <<  5) | (zext(SM_flag:1) <<  4) | zext(PK:1);
 }
 
 # Unpack CCR into individual flags

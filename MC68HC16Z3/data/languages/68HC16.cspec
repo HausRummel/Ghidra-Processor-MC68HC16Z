@@ -20,7 +20,7 @@
        Data Organization
        CPU16: 16-bit data bus, big-endian, 20-bit addresses (3 bytes)
        Typical C compiler mapping for this era:
-         char=1, short=2, int=2, long=4, pointer=3 (20-bit addr space)
+         <!-- char=1, short=2, int=2, long=4, pointer=3 (20-bit addr space) -->
        ================================================================ -->
   <data_organization>
     <absolute_max_alignment value="0"/>
@@ -106,7 +106,7 @@
         </pentry>
         <!-- 32-bit return in E:D (E=high word, D=low word)
              Used by EMUL/EMULS results and some utility functions -->
-        <pentry minsize="3" maxsize="4">
+        <pentry minsize="2" maxsize="2">
           <register name="E"/>
         </pentry>
       </output>
@@ -170,7 +170,7 @@
       <pentry minsize="1" maxsize="2">
         <register name="D"/>
       </pentry>
-      <pentry minsize="3" maxsize="4">
+      <pentry minsize="2" maxsize="2">
         <register name="E"/>
       </pentry>
     </output>

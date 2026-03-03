@@ -232,6 +232,8 @@ macro pull16(val) {
     SP = SP + 2;
 }
 
+define pcodeop HaltUntilInterrupt;
+
 # =============================================================================
 # Addressing Mode Sub-Constructors
 # =============================================================================
@@ -1352,8 +1354,8 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # ============================================================================
 :PSHA   is op8=0x37; op8b=0x08  { SP = SP - 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); *:1 (saddr+1) = A; }
 :PSHB   is op8=0x37; op8b=0x18  { SP = SP - 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); *:1 (saddr+1) = B; }
-:PULA   is op8=0x37; op8b=0x09  { SP = SP + 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); A = *:1 saddr; SP = SP - 1; }
-:PULB   is op8=0x37; op8b=0x19  { SP = SP + 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); B = *:1 saddr; SP = SP - 1; }
+:PULA   is op8=0x37; op8b=0x09  { local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); A = *:1 (saddr+1); SP = SP + 2; }
+:PULB   is op8=0x37; op8b=0x19  { local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); B = *:1 (saddr+1); SP = SP + 2; }
 
 
 # ============================================================================

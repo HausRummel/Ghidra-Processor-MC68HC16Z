@@ -66,14 +66,19 @@
          - 8-bit args in A, then B
          - 16-bit args in D, then E
          - Additional args spill to the stack
-         - 8-bit return in B (low byte of D)
-         - 16-bit return in D
+         - 8-bit/16-bit return in D
          - 32-bit return in E:D (E=high word, D=low word)
          - IX, IY, IZ, SP and all extension fields are callee-saved
          - A, B, D, E, CCR flags are caller-saved (trashed by calls)
+       
+       stackshift=4: JSR/BSR push a 4-byte frame (PC word + CCR word)
+       onto the stack before the called function begins executing.
+       This tells the decompiler that SP is 4 bytes lower at function
+       entry than at the call site, which is critical for correct
+       local variable offset calculation.
        ================================================================ -->
   <default_proto>
-    <prototype name="__stdcall" extrapop="0" stackshift="0">
+    <prototype name="__stdcall" extrapop="0" stackshift="4">
       <input>
         <!-- 8-bit parameters: first in A, then B -->
         <pentry minsize="1" maxsize="1">
@@ -95,9 +100,14 @@
         </pentry>
       </input>
       <output>
-        <!-- Return value: 8-bit in B (low byte of D), 16-bit in D -->
+        <!-- Return value: 8-bit/16-bit in D -->
         <pentry minsize="1" maxsize="2">
           <register name="D"/>
+        </pentry>
+        <!-- 32-bit return in E:D (E=high word, D=low word)
+             Used by EMUL/EMULS results and some utility functions -->
+        <pentry minsize="3" maxsize="4">
+          <register name="E"/>
         </pentry>
       </output>
 
@@ -128,6 +138,63 @@
       </killedbycall>
     </prototype>
   </default_proto>
+
+  <!-- ================================================================
+       Alternate Calling Convention: Register-Heavy Functions
+       
+       Many JTEC+ firmware functions pass parameters in registers that
+       the default convention doesn't model — particularly pointer-in-IX
+       patterns. Examples include table interpolation routines that take
+       a table pointer in IX and an input value in D.
+       
+       Assign to specific functions via right-click → Edit Function
+       Signature → select "__reg_call" from the calling convention
+       dropdown.
+       ================================================================ -->
+  <prototype name="__reg_call" extrapop="0" stackshift="4">
+    <input>
+      <!-- Pointer/index parameter in IX (e.g., table base address) -->
+      <pentry minsize="2" maxsize="2">
+        <register name="IX"/>
+      </pentry>
+      <!-- Primary data parameter in D -->
+      <pentry minsize="1" maxsize="2">
+        <register name="D"/>
+      </pentry>
+      <!-- Secondary data parameter in E -->
+      <pentry minsize="2" maxsize="2">
+        <register name="E"/>
+      </pentry>
+    </input>
+    <output>
+      <pentry minsize="1" maxsize="2">
+        <register name="D"/>
+      </pentry>
+      <pentry minsize="3" maxsize="4">
+        <register name="E"/>
+      </pentry>
+    </output>
+
+    <unaffected>
+      <register name="SP"/>
+      <register name="IY"/>
+      <register name="IZ"/>
+      <register name="SK"/>
+      <register name="XK"/>
+      <register name="YK"/>
+      <register name="ZK"/>
+      <register name="PK"/>
+      <register name="EK"/>
+    </unaffected>
+
+    <killedbycall>
+      <register name="A"/>
+      <register name="B"/>
+      <register name="D"/>
+      <register name="E"/>
+      <register name="IX"/>
+      <register name="CCR"/>
+    </killedbycall>
+  </prototype>
+
 </compiler_spec>
-
-

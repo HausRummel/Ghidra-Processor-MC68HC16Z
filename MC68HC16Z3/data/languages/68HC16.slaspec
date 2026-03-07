@@ -60,6 +60,20 @@ define register offset=0x80 size=3 [ EADDR ];    # effective address scratchpad
 define register offset=0x84 size=1 [ SM_flag ];  # saturation mode
 define register offset=0x85 size=1 [ IP_bits ];  # interrupt priority [2:0]
 
+
+# ================= Disassembly Context Register ====================================
+# Used to resolve banked addresses at disassembly time.
+# ctxEK: tracks the EK (data bank) extension field so that EXT16
+#         addressing mode can compute full 20-bit addresses statically.
+#         Default value set in pspec <context_data>.
+#         noflow: prevents accidental propagation across branches;
+# ================== the pspec default applies everywhere instead. ==================
+define register offset=0x90 size=4 [ contextreg ];
+
+define context contextreg
+    ctxEK = (0,3) noflow
+;
+
 # =============================================================================
 # Token Definitions (instruction byte stream)
 # =============================================================================
@@ -255,7 +269,17 @@ IND16Z: simm16^",Z"  is simm16  { local ea:3 = (zext(ZK:1) << 16) | zext(IZ + si
 # = Extended (EXT) =
 # EK concatenated with 16-bit address
 
-EXT16: addr16  is addr16  { local hi:3 = zext(EK:1) << 16; local lo:3 = zext(addr16:2); local ea:3 = hi | lo; export ea; }
+# EXT16: Extended addressing with static bank resolution via ctxEK.
+# The disassembly action computes the full 20-bit address at parse time,
+# enabling Ghidra to create xrefs and clickable address links.
+# Instructions dereference at their own size: *:1 EXT16 or *:2 EXT16.
+EXT16: reloc  is addr16 & ctxEK  [ reloc = (ctxEK << 16) | addr16; ]  
+{ 
+    local hi:3 = zext(EK:1) << 16; 
+    local lo:3 = zext(addr16:2); 
+    local ea:3 = hi | lo; 
+    export ea; 
+}
 
 # = Accumulator E Offset (E,X / E,Y / E,Z) =
 # Sign-extended E added to index register
@@ -1613,10 +1637,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     push16(PC:2);
     packCCR();
     push16(CCR);
-    # Wait for interrupt
+    HaltUntilInterrupt();
 }
 
 :LPSTOP  is op8=0x27; op8b=0xF1 {
+    HaltUntilInterrupt();
     # Low power stop - halt clocks until interrupt
 }
 

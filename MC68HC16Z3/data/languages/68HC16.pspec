@@ -2,6 +2,25 @@
 
 <processor_spec>
   <programcounter register="PC"/>
+  <!-- ================================================================
+       Context Data: Default Extension Register Values
+       
+       Derived from reset vector at address 0x0000:
+         Word 0x0FF1  EK=0x0, ZK=0xF, SK=0xF, PK=0x1
+       
+       EK is never modified at runtime in the target firmware
+       (no LDEK, TDP, or TEDPK instructions present; only PSHM/PULM K
+       for save/restore). The static default is therefore valid for all
+       code in the binary.
+       
+       If future firmware variants write EK dynamically, this must be
+       replaced with globalset() propagation in the slaspec.
+       ================================================================ -->
+  <context_data>
+    <context_set space="ram">
+        <set name="ctxEK" val="0"/>
+    </context_set>
+</context_data>
   <volatile outputop="write_volatile" inputop="read_volatile">
     <range space="ram" first="0x0FF000" last="0x0FFFFF"/>
   </volatile>
@@ -25,6 +44,7 @@
                           builds the function body, stack frame, and call
                           graph automatically without manual F-key creation.
          Handler addresses confirmed from JTEC+ firmware vector table scan. -->
+    <symbol name="RESET_ENTRY"        address="ram:0x010000" entry="true" type="code"/>     
     <symbol name="STARTUP"            address="ram:0x020000" entry="true" type="code"/>
     <symbol name="IRQ_DEFAULT_STUB"   address="ram:0x000882" entry="true" type="code"/>
     <symbol name="IRQ_BKPT"           address="ram:0x000886" entry="true" type="code"/>

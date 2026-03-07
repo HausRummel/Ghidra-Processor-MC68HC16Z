@@ -1229,8 +1229,16 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :BGND   is op8=0x37; op8b=0xA6  { }
 
 # = ANDP / ORP (CCR manipulation) =
-:ANDP "#"^imm16  is op8=0x37; op8b=0x3A; imm16  { CCR = CCR & imm16; unpackCCR(); }
-:ORP  "#"^imm16  is op8=0x37; op8b=0x3B; imm16  { CCR = CCR | imm16; unpackCCR(); }
+:ANDP "#"^imm16  is op8=0x37; op8b=0x3A; imm16  {
+    local pk_save:2 = CCR & 0x000F;
+    CCR = (CCR & imm16 & 0xFFF0) | pk_save;
+    unpackCCR();
+}
+:ORP  "#"^imm16  is op8=0x37; op8b=0x3B; imm16  {
+    local pk_save:2 = CCR & 0x000F;
+    CCR = ((CCR | imm16) & 0xFFF0) | pk_save;
+    unpackCCR();
+}
 
 
 # ============================================================================

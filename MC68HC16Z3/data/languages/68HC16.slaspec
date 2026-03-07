@@ -1131,8 +1131,8 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :MUL    is op8=0x37; op8b=0x24  { D = zext(A:1) * zext(B:1); C_flag = D[7,1]; }
 
 # = EMUL / EMULS: Unsigned/Signed 16x16 => 32 multiply =
-:EMUL   is op8=0x37; op8b=0x25  { local res:4 = zext(D:2) * zext(IX:2); E = res[16,16]; D = res[0,16]; C_flag = D[15,1]; setNZ16(D); }
-:EMULS  is op8=0x37; op8b=0x26  { local res:4 = sext(D:2) * sext(IX:2); E = res[16,16]; D = res[0,16]; setNZ16(D); }
+:EMUL   is op8=0x37; op8b=0x25  { local res:4 = zext(E:2) * zext(D:2); E = res[16,16]; D = res[0,16]; C_flag = D[15,1]; setNZ16(D); }
+:EMULS  is op8=0x37; op8b=0x26  { local res:4 = sext(E:2) * sext(D:2); E = res[16,16]; D = res[0,16]; setNZ16(D); }
 
 # = EDIV / EDIVS =
 :EDIV   is op8=0x37; op8b=0x28  {

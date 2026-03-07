@@ -1015,12 +1015,44 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # = TDE/TED/TDP/TPD etc. =
 :TDE   is op8=0x27; op8b=0x7B  { E = D; }
 :TED   is op8=0x27; op8b=0xFB  { D = E; }
-:TXS   is op8=0x37; op8b=0x4E  { SP = IX; }
-:TYS   is op8=0x37; op8b=0x5E  { SP = IY; }
-:TZS   is op8=0x37; op8b=0x6E  { SP = IZ; }
-:TSX   is op8=0x27; op8b=0x4F  { IX = SP; }
-:TSY   is op8=0x27; op8b=0x5F  { IY = SP; }
-:TSZ   is op8=0x27; op8b=0x6F  { IZ = SP; }
+# = Transfer Index to SP (with -2) =
+:TXS   is op8=0x37; op8b=0x4E  {
+    local tmp:3 = (zext(XK:1) << 16) | zext(IX:2);
+    tmp = tmp - 2;
+    SK = tmp[16,4];
+    SP = tmp:2;
+}
+:TYS   is op8=0x37; op8b=0x5E  {
+    local tmp:3 = (zext(YK:1) << 16) | zext(IY:2);
+    tmp = tmp - 2;
+    SK = tmp[16,4];
+    SP = tmp:2;
+}
+:TZS   is op8=0x37; op8b=0x6E  {
+    local tmp:3 = (zext(ZK:1) << 16) | zext(IZ:2);
+    tmp = tmp - 2;
+    SK = tmp[16,4];
+    SP = tmp:2;
+}
+# = Transfer SP to Index (with +2) =
+:TSX   is op8=0x27; op8b=0x4F  {
+    local tmp:3 = (zext(SK:1) << 16) | zext(SP:2);
+    tmp = tmp + 2;
+    XK = tmp[16,4];
+    IX = tmp:2;
+}
+:TSY   is op8=0x27; op8b=0x5F  {
+    local tmp:3 = (zext(SK:1) << 16) | zext(SP:2);
+    tmp = tmp + 2;
+    YK = tmp[16,4];
+    IY = tmp:2;
+}
+:TSZ   is op8=0x27; op8b=0x6F  {
+    local tmp:3 = (zext(SK:1) << 16) | zext(SP:2);
+    tmp = tmp + 2;
+    ZK = tmp[16,4];
+    IZ = tmp:2;
+}
 
 # = Inter-index-register transfers =
 :TXY   is op8=0x27; op8b=0x5C  { YK = XK; IY = IX; }

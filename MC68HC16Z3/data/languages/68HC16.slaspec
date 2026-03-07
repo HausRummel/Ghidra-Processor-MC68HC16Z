@@ -172,7 +172,7 @@ macro packCCR() {
     CCR = (zext(S_flag:1)  << 15) | (zext(MV_flag:1) << 14) | (zext(H_flag:1)  << 13) |
           (zext(EV_flag:1) << 12) | (zext(N_flag:1)  << 11) | (zext(Z_flag:1)  << 10) |
           (zext(V_flag:1)  <<  9) | (zext(C_flag:1)  <<  8) |
-          (zext(IP_bits) <<  5) | (zext(SM_flag:1) <<  4) | zext(PK:1);
+          (zext(IP_bits & 0x07) << 5) | (zext(SM_flag:1) << 4) | zext(PK & 0x0F);
 }
 
 # Unpack CCR into individual flags
@@ -689,6 +689,12 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :ADCD IND16Z    is op8=0x37; op8b=0xE3; IND16Z  { local val:2 = *:2 IND16Z; local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
 :ADCD EXT16     is op8=0x37; op8b=0xF3; EXT16   { local val:2 = *:2 EXT16;  local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
 
+# = ADCD E,offset =
+:ADCD EOFFX     is op8=0x27; op8b=0x83; EOFFX   { local val:2 = *:2 EOFFX;  local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
+:ADCD EOFFY     is op8=0x27; op8b=0x93; EOFFY   { local val:2 = *:2 EOFFY;  local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
+:ADCD EOFFZ     is op8=0x27; op8b=0xA3; EOFFZ   { local val:2 = *:2 EOFFZ;  local c:2 = zext(C_flag:1); addFlags16(D, val+c); D = D + val + c; setNZ16(D); }
+
+
 # = LDD: (M:M+1) => D =
 :LDD IND8X     is op8=0x85; IND8X     { D = *:2 IND8X; setNZ16(D); V_flag = 0; }
 :LDD IND8Y     is op8=0x95; IND8Y     { D = *:2 IND8Y; setNZ16(D); V_flag = 0; }
@@ -712,6 +718,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :ANDD IND16Z    is op8=0x37; op8b=0xE6; IND16Z  { D = D & (*:2 IND16Z); setNZ16(D); V_flag = 0; }
 :ANDD EXT16     is op8=0x37; op8b=0xF6; EXT16   { D = D & (*:2 EXT16);  setNZ16(D); V_flag = 0; }
 
+# = ANDD E,offset =
+:ANDD EOFFX     is op8=0x27; op8b=0x86; EOFFX   { D = D & (*:2 EOFFX);  setNZ16(D); V_flag = 0; }
+:ANDD EOFFY     is op8=0x27; op8b=0x96; EOFFY   { D = D & (*:2 EOFFY);  setNZ16(D); V_flag = 0; }
+:ANDD EOFFZ     is op8=0x27; op8b=0xA6; EOFFZ   { D = D & (*:2 EOFFZ);  setNZ16(D); V_flag = 0; }
+
 # = ORD =
 :ORD IND8X     is op8=0x87; IND8X     { D = D | (*:2 IND8X); setNZ16(D); V_flag = 0; }
 :ORD IND8Y     is op8=0x97; IND8Y     { D = D | (*:2 IND8Y); setNZ16(D); V_flag = 0; }
@@ -721,6 +732,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :ORD IND16Y    is op8=0x37; op8b=0xD7; IND16Y  { D = D | (*:2 IND16Y); setNZ16(D); V_flag = 0; }
 :ORD IND16Z    is op8=0x37; op8b=0xE7; IND16Z  { D = D | (*:2 IND16Z); setNZ16(D); V_flag = 0; }
 :ORD EXT16     is op8=0x37; op8b=0xF7; EXT16   { D = D | (*:2 EXT16);  setNZ16(D); V_flag = 0; }
+
+# = ORD E,offset =
+:ORD EOFFX      is op8=0x27; op8b=0x87; EOFFX   { D = D | (*:2 EOFFX);  setNZ16(D); V_flag = 0; }
+:ORD EOFFY      is op8=0x27; op8b=0x97; EOFFY   { D = D | (*:2 EOFFY);  setNZ16(D); V_flag = 0; }
+:ORD EOFFZ      is op8=0x27; op8b=0xA7; EOFFZ   { D = D | (*:2 EOFFZ);  setNZ16(D); V_flag = 0; }
 
 # = CPD: (D) - (M:M+1) compare =
 :CPD IND8X     is op8=0x88; IND8X     { local val:2 = *:2 IND8X; local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
@@ -732,6 +748,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :CPD IND16Z    is op8=0x37; op8b=0xE8; IND16Z  { local val:2 = *:2 IND16Z; local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
 :CPD EXT16     is op8=0x37; op8b=0xF8; EXT16   { local val:2 = *:2 EXT16;  local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
 
+# = CPD E,offset =
+:CPD EOFFX      is op8=0x27; op8b=0x88; EOFFX   { local val:2 = *:2 EOFFX;  local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
+:CPD EOFFY      is op8=0x27; op8b=0x98; EOFFY   { local val:2 = *:2 EOFFY;  local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
+:CPD EOFFZ      is op8=0x27; op8b=0xA8; EOFFZ   { local val:2 = *:2 EOFFZ;  local tmp:2 = D - val; subFlags16(D, val); setNZ16(tmp); }
+
 # = EORD =
 :EORD IND8X     is op8=0x84; IND8X     { D = D ^ (*:2 IND8X); setNZ16(D); V_flag = 0; }
 :EORD IND8Y     is op8=0x94; IND8Y     { D = D ^ (*:2 IND8Y); setNZ16(D); V_flag = 0; }
@@ -741,6 +762,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :EORD IND16Y    is op8=0x37; op8b=0xD4; IND16Y  { D = D ^ (*:2 IND16Y); setNZ16(D); V_flag = 0; }
 :EORD IND16Z    is op8=0x37; op8b=0xE4; IND16Z  { D = D ^ (*:2 IND16Z); setNZ16(D); V_flag = 0; }
 :EORD EXT16     is op8=0x37; op8b=0xF4; EXT16   { D = D ^ (*:2 EXT16);  setNZ16(D); V_flag = 0; }
+
+# = EORD E,offset =
+:EORD EOFFX     is op8=0x27; op8b=0x84; EOFFX   { D = D ^ (*:2 EOFFX);  setNZ16(D); V_flag = 0; }
+:EORD EOFFY     is op8=0x27; op8b=0x94; EOFFY   { D = D ^ (*:2 EOFFY);  setNZ16(D); V_flag = 0; }
+:EORD EOFFZ     is op8=0x27; op8b=0xA4; EOFFZ   { D = D ^ (*:2 EOFFZ);  setNZ16(D); V_flag = 0; }
 
 # = STD =
 :STD IND8X     is op8=0x8A; IND8X     { *:2 IND8X = D; setNZ16(D); V_flag = 0; }

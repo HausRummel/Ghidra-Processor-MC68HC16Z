@@ -96,7 +96,7 @@
         </pentry>
         <!-- Remaining parameters spill to the stack -->
         <pentry minsize="1" maxsize="500" align="2">
-          <addr offset="2" space="stack"/>
+          <addr offset="4" space="stack"/>
         </pentry>
       </input>
       <output>

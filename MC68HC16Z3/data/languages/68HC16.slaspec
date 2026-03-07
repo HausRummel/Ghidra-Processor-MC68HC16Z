@@ -284,9 +284,9 @@ EXT16: reloc  is addr16 & ctxEK  [ reloc = (ctxEK << 16) | addr16; ]
 # = Accumulator E Offset (E,X / E,Y / E,Z) =
 # Sign-extended E added to index register
 
-EOFFX: E,IX  is E & IX  { local ea:3 = (zext(XK:1) << 16) | zext(IX + sext(E:2)); export ea; }
-EOFFY: E,IY  is E & IY  { local ea:3 = (zext(YK:1) << 16) | zext(IY + sext(E:2)); export ea; }
-EOFFZ: E,IZ  is E & IZ  { local ea:3 = (zext(ZK:1) << 16) | zext(IZ + sext(E:2)); export ea; }
+EOFFX: E,IX  is E & IX  { local ea:3 = (zext(XK:1) << 16) | zext(IX + E); export ea; }
+EOFFY: E,IY  is E & IY  { local ea:3 = (zext(YK:1) << 16) | zext(IY + E); export ea; }
+EOFFZ: E,IZ  is E & IZ  { local ea:3 = (zext(ZK:1) << 16) | zext(IZ + E); export ea; }
 
 # = Relative Addressing =
 # CPU16 pipeline: branch offsets are ALWAYS relative to inst_start + 6 (3-word prefetch)

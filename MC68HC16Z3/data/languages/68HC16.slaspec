@@ -167,27 +167,17 @@ define token ext20_tok (24)
 # P-Code Macros for common operations
 # =============================================================================
 
+define pcodeop packCCR_op;
+define pcodeop unpackCCR_op;
+
 # Pack individual flags into the CCR register
 macro packCCR() {
-    CCR = (zext(S_flag:1)  << 15) | (zext(MV_flag:1) << 14) | (zext(H_flag:1)  << 13) |
-          (zext(EV_flag:1) << 12) | (zext(N_flag:1)  << 11) | (zext(Z_flag:1)  << 10) |
-          (zext(V_flag:1)  <<  9) | (zext(C_flag:1)  <<  8) |
-          (zext(IP_bits & 0x07) << 5) | (zext(SM_flag:1) << 4) | zext(PK & 0x0F);
+    CCR = packCCR_op();
 }
 
 # Unpack CCR into individual flags
 macro unpackCCR() {
-    S_flag  = CCR[15,1];
-    MV_flag = CCR[14,1];
-    H_flag  = CCR[13,1];
-    EV_flag = CCR[12,1];
-    N_flag  = CCR[11,1];
-    Z_flag  = CCR[10,1];
-    V_flag  = CCR[9,1];
-    C_flag  = CCR[8,1];
-    IP_bits = CCR[5,3];
-    SM_flag = CCR[4,1];
-    PK      = CCR[0,4];
+    unpackCCR_op(CCR);
 }
 
 # 8-bit addition flag computation (H, V, C)

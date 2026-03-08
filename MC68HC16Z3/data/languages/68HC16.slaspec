@@ -886,10 +886,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = BSR (Branch to Subroutine) =
 :BSR  REL8ADDR   is op8=0x36; REL8ADDR {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
+    SP = SP - 4;
     call REL8ADDR;
 }
 
@@ -917,10 +914,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = LBSR (Long Branch to Subroutine) =
 :LBSR  REL16ADDR   is op8=0x27; op8b=0xF9; REL16ADDR {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
+    SP = SP - 4;
     call REL16ADDR;
 }
 
@@ -937,44 +931,28 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = JSR (Jump to Subroutine - Extended 20 and Indexed 20) =
 :JSR EXT20ADDR       is op8=0xFA; EXT20ADDR {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
+    SP = SP - 4;
     call EXT20ADDR;
 }
 :JSR IND20X          is op8=0x89; IND20X {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
+    SP = SP - 4;
     call [IND20X];
 }
 :JSR IND20Y          is op8=0x99; IND20Y {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
+    SP = SP - 4;
     call [IND20Y];
 }
 :JSR IND20Z          is op8=0xA9; IND20Z {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
+    SP = SP - 4;
     call [IND20Z];
 }
 
 # = RTS (Return from Subroutine) =
 :RTS   is op8=0x27; op8b=0xF7 {
-    local saved_ccr:2;
-    pull16(saved_ccr);
-    syncPullPK(saved_ccr);
-    local retaddr:2;
-    pull16(retaddr);
-    local fulladdr:3 = (zext(PK:1) << 16) | zext(retaddr);
-    return [fulladdr];
+    SP = SP + 4;
+    return [PC];
 }
+
 
 # = RTI (Return from Interrupt) =
 :RTI   is op8=0x27; op8b=0x77 {
@@ -988,10 +966,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = SWI (Software Interrupt) =
 :SWI   is op8=0x37; op8b=0x20 {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
+    SP = SP - 4;
     local vec:3 = 0x000C;
     local target:2 = *:2 vec;
     call [target];
@@ -1705,10 +1680,6 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # SECTION: WAI / LPSTOP
 # ============================================================================
 :WAI    is op8=0x27; op8b=0xF3 {
-    push16(PC:2);
-    local ccr_out:2;
-    syncPushCCR(ccr_out);
-    push16(ccr_out);
     HaltUntilInterrupt();
 }
 

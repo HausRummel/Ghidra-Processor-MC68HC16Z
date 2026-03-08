@@ -186,7 +186,7 @@ macro syncPushCCR(out) {
 # For RTI: also write the pulled value into CCR (restores all flags).
 # For RTS: only extract PK; flags are not restored.
 macro syncPullPK(val) {
-    PK = val & 0x0F;
+    PK = val:1 & 0x0F;
 }
 
 # 8-bit addition flag computation (H, V, C)

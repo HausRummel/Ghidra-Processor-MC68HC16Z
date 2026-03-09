@@ -164,6 +164,7 @@ define token ext20_tok (24)
     ext20_bank  = (16,19)     # upper 4 bits of the 20-bit address
     ext20_addr  = (0,15)      # lower 16 bits
     ext20_pad   = (20,23)     # should be zero
+    ext20_val   = (0,19)      # <--- ADD THIS: The contiguous 20-bit offset TEST_TEST
 ;
 
 # =============================================================================
@@ -318,23 +319,22 @@ EXT20ADDR: reloc  is ext20_pad=0 & ext20_bank & ext20_addr [ reloc = (ext20_bank
 # positive bank constant (+0x10000, +0x20000, +0x30000) to the loaded pointer.
 #
 # Display: "bank:addr,X" mirrors EXT20ADDR notation for consistency and makes
-# the bank contribution immediately visible to the analyst.
-IND20X: ext20_bank^":"^ext20_addr^",X"  is ext20_pad=0 & ext20_bank & ext20_addr {
-    local offset:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
+# the bank contribution immediately visible to the analyst.  TEST_TEST
+IND20X: ext20_bank^":"^ext20_addr^",X"  is ext20_pad=0 & ext20_bank & ext20_addr & ext20_val {
     local base:3 = (zext(XK:1) << 16) | zext(IX:2);
-    local ea:3 = base + offset;
+    local ea:3 = base + ext20_val;
     export ea;
 }
-IND20Y: ext20_bank^":"^ext20_addr^",Y"  is ext20_pad=0 & ext20_bank & ext20_addr {
-    local offset:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
+
+IND20Y: ext20_bank^":"^ext20_addr^",Y"  is ext20_pad=0 & ext20_bank & ext20_addr & ext20_val {
     local base:3 = (zext(YK:1) << 16) | zext(IY:2);
-    local ea:3 = base + offset;
+    local ea:3 = base + ext20_val;
     export ea;
 }
-IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr {
-    local offset:3 = (zext(ext20_bank:1) << 16) | zext(ext20_addr:2);
+
+IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr & ext20_val {
     local base:3 = (zext(ZK:1) << 16) | zext(IZ:2);
-    local ea:3 = base + offset;
+    local ea:3 = base + ext20_val;
     export ea;
 }
 
@@ -954,6 +954,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 
+
 # = RTI (Return from Interrupt) =
 :RTI   is op8=0x27; op8b=0x77 {
     pull16(CCR);
@@ -986,7 +987,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :TAB   is op8=0x37; op8b=0x17  { B = A; setNZ8(B); V_flag = 0; }
 :TBA   is op8=0x37; op8b=0x07  { A = B; setNZ8(A); V_flag = 0; }
 :XGAB  is op8=0x37; op8b=0x1A  { local tmp:1 = A; A = B; B = tmp; }
-:XGDE  is op8=0x27; op8b=0x7A  { local tmp:2 = D; D = E; E = tmp; setNZ16(D); }
+:XGDE  is op8=0x27; op8b=0x7A  { local tmp:2 = D; D = E; E = tmp; }
 :XGDX  is op8=0x37; op8b=0xCC  { local tmp:2 = D; D = IX; IX = tmp; }
 :XGDY  is op8=0x37; op8b=0xDC  { local tmp:2 = D; D = IY; IY = tmp; }
 :XGDZ  is op8=0x37; op8b=0xEC  { local tmp:2 = D; D = IZ; IZ = tmp; }

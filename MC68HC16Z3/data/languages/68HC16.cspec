@@ -140,7 +140,7 @@
   </default_proto>
 
   <!-- ================================================================
-       Alternate Calling Convention: Register-Heavy Functions
+       Alternate Calling Conventions: Register-Heavy Functions
        
        Many JTEC+ firmware functions pass parameters in registers that
        the default convention does not model, particularly pointer-in-IX
@@ -197,4 +197,50 @@
     </killedbycall>
   </prototype>
 
+      <!-- ================================================================
+       Alternate Calling Convention: __IX_Ptr_Call
+       IX is used as an input pointer in some functions.              
+       ================================================================ -->
+<prototype name="__IX_Ptr_call" extrapop="0" stackshift="4">
+  <input>
+  <pentry minsize="2" maxsize="2">
+    <register name="IX"/>
+  </pentry>
+  <!-- Combined 16-bit D register (A:B) -->
+  <pentry minsize="2" maxsize="2">
+    <register name="D"/>
+  </pentry>
+</input>
+
+<output>
+  <pentry minsize="1" maxsize="2">
+    <register name="D"/>
+  </pentry>
+  <pentry minsize="2" maxsize="2">
+    <register name="E"/>
+  </pentry>
+</output>
+
+  <unaffected>
+    <register name="SP"/>
+    <register name="IY"/>
+    <register name="IZ"/>
+    <register name="SK"/>
+    <register name="XK"/>
+    <register name="YK"/>
+    <register name="ZK"/>
+    <register name="PK"/>
+    <register name="EK"/>
+  </unaffected>
+
+  <killedbycall>
+    <register name="A"/>
+    <register name="B"/>
+    <register name="D"/>
+    <register name="E"/>
+    <register name="IX"/>
+    <register name="CCR"/>
+  </killedbycall>
+</prototype>
+   
 </compiler_spec>

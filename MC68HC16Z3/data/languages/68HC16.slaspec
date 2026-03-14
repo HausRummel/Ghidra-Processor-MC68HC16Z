@@ -234,16 +234,16 @@ macro makeAddr20(ext4, reg16, out_addr) {
 }
 
 # Push a 16-bit word onto the stack
-macro push16(val) {
+macro push16(__val__) {
     SP = SP - 2;
-    local saddr:3 = (zext(SK:1) << 16) | zext(SP:2);
-    *:2 saddr = val;
+    local __saddr__:3 = zext(SP);
+    *:2 __saddr__ = __val__;
 }
 
 # Pull a 16-bit word from the stack
-macro pull16(val) {
-    local saddr:3 = (zext(SK:1) << 16) | zext(SP:2);
-    val = *:2 saddr;
+macro pull16(__val__) {
+    local __saddr__:3 = zext(SP);
+    __val__ = *:2 __saddr__;
     SP = SP + 2;
 }
 
@@ -1424,10 +1424,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # ============================================================================
 # SECTION: PSHA/PSHB/PULA/PULB  (Stack byte operations)
 # ============================================================================
-:PSHA   is op8=0x37; op8b=0x08  { SP = SP - 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); *:1 (saddr+1) = A; }
-:PSHB   is op8=0x37; op8b=0x18  { SP = SP - 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); *:1 (saddr+1) = B; }
-:PULA   is op8=0x37; op8b=0x09  { local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); A = *:1 (saddr+1); SP = SP + 2; }
-:PULB   is op8=0x37; op8b=0x19  { local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); B = *:1 (saddr+1); SP = SP + 2; }
+#:PSHA   is op8=0x37; op8b=0x08  { SP = SP - 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); *:1 (saddr+1) = A; }
+:PSHA   is op8=0x37; op8b=0x08  { SP = SP - 2; local saddr:3 = zext(SP); *:1 (saddr+1) = A; }
+:PSHB   is op8=0x37; op8b=0x18  { SP = SP - 2; local saddr:3 = zext(SP); *:1 (saddr+1) = B; }
+:PULA   is op8=0x37; op8b=0x09  { local saddr:3 = zext(SP); A = *:1 (saddr+1); SP = SP + 2; }
+:PULB   is op8=0x37; op8b=0x19  { local saddr:3 = zext(SP); B = *:1 (saddr+1); SP = SP + 2; }
 
 
 # ============================================================================

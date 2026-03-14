@@ -34,7 +34,7 @@ define register offset=0x00 size=1 [ A B ];
 define register offset=0x02 size=2 [ E ];
 
 # = Index Registers and Stack Pointer (16-bit) =
-define register offset=0x10 size=2 [ IX IY IZ SP ];
+define register offset=0x10 size=2 [ IX IY IZ ];
 
 # = Program Counter (full 24-bit for Ghidra's address space) =
 define register offset=0x20 size=3 [ PC ];
@@ -55,7 +55,7 @@ define bitrange
     IP_bits=CCR[5,3]  SM_flag=CCR[4,1];
 
 # = Address Extension Fields (4-bit each, stored as 1-byte) =
-define register offset=0x40 size=1 [ PK EK XK YK ZK SK ];
+define register offset=0x40 size=1 [ PK EK XK YK ZK ];
 
 
 # = MAC Registers =
@@ -63,6 +63,15 @@ define register offset=0x60 size=2 [ HR IR ];
 define register offset=0x64 size=4 [ AM ];       # using 32-bit for AM[31:0]
 define register offset=0x68 size=1 [ AM_EXT ];   # AM[35:32] extension bits
 define register offset=0x6A size=1 [ XMSK YMSK ];
+
+# = Stack Pointer (3-byte composite for RAM address space compatibility) =
+# SSP is the full 20-bit stack address. SK is the high byte (bank),
+# SP is the lower 2 bytes. The cspec declares SSP as the stackpointer
+# so Ghidra's stack analyzer sees a 3-byte pointer matching the 3-byte
+# RAM space, eliminating ZEXT23 decompiler noise.
+define register offset=0xA0 size=3 [ SSP ];
+define register offset=0xA0 size=1 [ SK ];
+define register offset=0xA1 size=2 [ SP ];
 
 # = Temporary/internal registers =
 define register offset=0x80 size=3 [ EADDR ];    # effective address scratchpad
@@ -234,17 +243,15 @@ macro makeAddr20(ext4, reg16, out_addr) {
 }
 
 # Push a 16-bit word onto the stack
-macro push16(__val__) {
-    SP = SP - 2;
-    local __saddr__:3 = zext(SP);
-    *:2 __saddr__ = __val__;
+macro push16(val) {
+    SSP = SSP - 2;
+    *:2 SSP = val;
 }
 
 # Pull a 16-bit word from the stack
-macro pull16(__val__) {
-    local __saddr__:3 = zext(SP);
-    __val__ = *:2 __saddr__;
-    SP = SP + 2;
+macro pull16(val) {
+    val = *:2 SSP;
+    SSP = SSP + 2;
 }
 
 define pcodeop HaltUntilInterrupt;
@@ -887,7 +894,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = BSR (Branch to Subroutine) =
 :BSR  REL8ADDR   is op8=0x36; REL8ADDR {
-    SP = SP - 4;
+    SSP = SSP - 4;
     call REL8ADDR;
 }
 
@@ -915,7 +922,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = LBSR (Long Branch to Subroutine) =
 :LBSR  REL16ADDR   is op8=0x27; op8b=0xF9; REL16ADDR {
-    SP = SP - 4;
+    SSP = SSP - 4;
     call REL16ADDR;
 }
 
@@ -932,25 +939,25 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = JSR (Jump to Subroutine - Extended 20 and Indexed 20) =
 :JSR EXT20ADDR       is op8=0xFA; EXT20ADDR {
-    SP = SP - 4;
+    SSP = SSP - 4;
     call EXT20ADDR;
 }
 :JSR IND20X          is op8=0x89; IND20X {
-    SP = SP - 4;
+    SSP = SSP - 4;
     call [IND20X];
 }
 :JSR IND20Y          is op8=0x99; IND20Y {
-    SP = SP - 4;
+    SSP = SSP - 4;
     call [IND20Y];
 }
 :JSR IND20Z          is op8=0xA9; IND20Z {
-    SP = SP - 4;
+    SSP = SSP - 4;
     call [IND20Z];
 }
 
 # = RTS (Return from Subroutine) =
 :RTS   is op8=0x27; op8b=0xF7 {
-    SP = SP + 4;
+    SSP = SSP + 4;
     return [PC];
 }
 
@@ -968,7 +975,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = SWI (Software Interrupt) =
 :SWI   is op8=0x37; op8b=0x20 {
-    SP = SP - 4;
+    SSP = SSP - 4;
     local vec:3 = 0x000C;
     local target:2 = *:2 vec;
     call [target];
@@ -999,6 +1006,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # = TDE/TED/TDP/TPD etc. =
 :TDE   is op8=0x27; op8b=0x7B  { E = D; }
 :TED   is op8=0x27; op8b=0xFB  { D = E; }
+
 # = Transfer Index to SP (with -2) =
 :TXS   is op8=0x37; op8b=0x4E  {
     local tmp:3 = (zext(XK:1) << 16) | zext(IX:2);
@@ -1020,8 +1028,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 # = Transfer SP to Index (with +2) =
 :TSX   is op8=0x27; op8b=0x4F  {
-    local tmp:3 = (zext(SK:1) << 16) | zext(SP:2);
-    tmp = tmp + 2;
+    local tmp:3 = SSP + 2;
     XK = tmp[16,4];
     IX = tmp:2;
 }
@@ -1032,8 +1039,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
     IY = tmp:2;
 }
 :TSZ   is op8=0x27; op8b=0x6F  {
-    local tmp:3 = (zext(SK:1) << 16) | zext(SP:2);
-    tmp = tmp + 2;
+    local tmp:3 = SSP + 2;
     ZK = tmp[16,4];
     IZ = tmp:2;
 }
@@ -1088,11 +1094,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :AIX "#"^simm8   is op8=0x3C; simm8    { IX = IX + sext(simm8:1); Z_flag = (IX == 0); }
 :AIY "#"^simm8   is op8=0x3D; simm8    { IY = IY + sext(simm8:1); Z_flag = (IY == 0); }
 :AIZ "#"^simm8   is op8=0x3E; simm8    { IZ = IZ + sext(simm8:1); Z_flag = (IZ == 0); }
-:AIS "#"^simm8   is op8=0x3F; simm8    { SP = SP + sext(simm8:1); }
+:AIS "#"^simm8   is op8=0x3F; simm8    { SSP = SSP + sext(simm8:1); }
 :AIX "#"^simm16  is op8=0x37; op8b=0x3C; simm16  { IX = IX + simm16; Z_flag = (IX == 0); }
 :AIY "#"^simm16  is op8=0x37; op8b=0x3D; simm16  { IY = IY + simm16; Z_flag = (IY == 0); }
 :AIZ "#"^simm16  is op8=0x37; op8b=0x3E; simm16  { IZ = IZ + simm16; Z_flag = (IZ == 0); }
-:AIS "#"^simm16  is op8=0x37; op8b=0x3F; simm16  { SP = SP + simm16; }
+:AIS "#"^simm16  is op8=0x37; op8b=0x3F; simm16  { SSP = SSP + simm16; }
 
 # = Register Clear, Complement, Negate (Inherent) =
 :CLRA   is op8=0x37; op8b=0x05  { A = 0; N_flag = 0; Z_flag = 1; V_flag = 0; C_flag = 0; }
@@ -1424,12 +1430,11 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # ============================================================================
 # SECTION: PSHA/PSHB/PULA/PULB  (Stack byte operations)
 # ============================================================================
-#:PSHA   is op8=0x37; op8b=0x08  { SP = SP - 2; local saddr:3 = (zext(SK:1) << 16) | zext(SP:2); *:1 (saddr+1) = A; }
-:PSHA   is op8=0x37; op8b=0x08  { SP = SP - 2; local saddr:3 = zext(SP); *:1 (saddr+1) = A; }
-:PSHB   is op8=0x37; op8b=0x18  { SP = SP - 2; local saddr:3 = zext(SP); *:1 (saddr+1) = B; }
-:PULA   is op8=0x37; op8b=0x09  { local saddr:3 = zext(SP); A = *:1 (saddr+1); SP = SP + 2; }
-:PULB   is op8=0x37; op8b=0x19  { local saddr:3 = zext(SP); B = *:1 (saddr+1); SP = SP + 2; }
 
+:PSHA   is op8=0x37; op8b=0x08  { SSP = SSP - 2; *:1 (SSP+1) = A; }
+:PSHB   is op8=0x37; op8b=0x18  { SSP = SSP - 2; *:1 (SSP+1) = B; }
+:PULA   is op8=0x37; op8b=0x09  { A = *:1 (SSP+1); SSP = SSP + 2; }
+:PULB   is op8=0x37; op8b=0x19  { B = *:1 (SSP+1); SSP = SSP + 2; }
 
 # ============================================================================
 # SECTION: PSHM / PULM (Push/Pull Multiple Registers)

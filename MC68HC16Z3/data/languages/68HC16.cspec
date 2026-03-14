@@ -50,7 +50,7 @@
   <!-- Stack: SP register, grows downward (high-to-low), lives in RAM.
        The CPU16 uses SK:SP for 20-bit stack addressing, but Ghidra
        tracks the 16-bit SP and the extension separately. -->
-  <stackpointer register="SP" space="ram" growth="negative"/>
+  <stackpointer register="SSP" space="ram" growth="negative"/>
 
   <!-- Return address: pushed onto stack by BSR/JSR, pulled by RTS.
        The CPU16 stores PK:PC on the stack. Ghidra models this via PC. -->
@@ -100,7 +100,7 @@
     </pentry>
   </output>
   <unaffected>
-    <register name="SP"/>
+    <register name="SSP"/>
     <register name="IX"/>
     <register name="IZ"/>
     <register name="SK"/>
@@ -154,7 +154,7 @@
     </pentry>
   </output>
   <unaffected>
-    <register name="SP"/>
+    <register name="SSP"/>
     <register name="IX"/>
     <register name="IZ"/>
     <register name="SK"/>
@@ -196,7 +196,7 @@
     </pentry>
   </output>
   <unaffected>
-    <register name="SP"/>
+    <register name="SSP"/>
     <register name="IX"/>
     <register name="IZ"/>
     <register name="SK"/>

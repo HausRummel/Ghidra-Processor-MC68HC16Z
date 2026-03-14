@@ -312,6 +312,7 @@
     <register name="IX"   group="Index"/>
     <register name="IY"   group="Index"/>
     <register name="IZ"   group="Index"/>
+    <register name="SSP"  group="Stack"/>
     <register name="SP"   group="Stack"/>
     <register name="PC"   group="PC"/>
     <register name="CCR"  group="Flags"/>

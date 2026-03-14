@@ -50,7 +50,7 @@
   <!-- Stack: SP register, grows downward (high-to-low), lives in RAM.
        The CPU16 uses SK:SP for 20-bit stack addressing, but Ghidra
        tracks the 16-bit SP and the extension separately. -->
-  <stackpointer register="SP" space="ram" growth="negative"/>
+  <stackpointer register="SSP" space="ram" growth="negative"/>
 
   <!-- Return address: pushed onto stack by BSR/JSR, pulled by RTS.
        The CPU16 stores PK:PC on the stack. Ghidra models this via PC. -->
@@ -70,7 +70,9 @@
          - 32-bit return in E:D (E=high word, D=low word)
          - IX, IY, IZ, SP and all extension fields are callee-saved
          - A, B, D, E, CCR flags are caller-saved (trashed by calls)
-       
+       But based on the Cosmic compiler manual
+         -IY should be caller-saved(killedbycall)
+         -IX is the frame pointer-Always callee-saved(unaffected)
        stackshift=4: JSR/BSR push a 4-byte frame (PC word + CCR word)
        onto the stack before the called function begins executing.
        This tells the decompiler that SP is 4 bytes lower at function
@@ -79,68 +81,48 @@
        ================================================================ -->
   <default_proto>
     <prototype name="__stdcall" extrapop="0" stackshift="4">
-      <input>
-        <!-- 8-bit parameters: first in A, then B -->
-        <pentry minsize="1" maxsize="1">
-          <register name="A"/>
-        </pentry>
-        <pentry minsize="1" maxsize="1">
-          <register name="B"/>
-        </pentry>
-        <!-- 16-bit parameters: first in D, then E -->
-        <pentry minsize="2" maxsize="2">
-          <register name="D"/>
-        </pentry>
-        <pentry minsize="2" maxsize="2">
-          <register name="E"/>
-        </pentry>
-        <!-- Remaining parameters spill to the stack -->
-        <pentry minsize="1" maxsize="500" align="2">
-          <addr offset="4" space="stack"/>
-        </pentry>
-      </input>
-      <output>
-        <!-- Return value: 8-bit/16-bit in D -->
-        <pentry minsize="1" maxsize="2">
-          <register name="D"/>
-        </pentry>
-        <!-- 32-bit return in E:D (E=high word, D=low word)
-             Used by EMUL/EMULS results and some utility functions -->
-        <pentry minsize="2" maxsize="2">
-          <register name="E"/>
-        </pentry>
-      </output>
-
-      <!-- Callee-saved: these registers must be preserved across calls.
-           Includes index registers, stack pointer, and all bank extension
-           fields (since bank context must remain valid across calls). -->
-      <unaffected>
-        <register name="SP"/>
-        <register name="IX"/>
-        <register name="IY"/>
-        <register name="IZ"/>
-        <register name="SK"/>
-        <register name="XK"/>
-        <register name="YK"/>
-        <register name="ZK"/>
-        <register name="PK"/>
-        <register name="EK"/>
-      </unaffected>
-
-      <!-- Caller-saved: these registers may be trashed by any function call.
-           The caller must save them if it needs their values afterward. -->
-      <killedbycall>
-        <register name="A"/>
-        <register name="B"/>
-        <register name="D"/>
-        <register name="E"/>
-        <register name="CCR"/>
-      </killedbycall>
-    </prototype>
+  <input>
+    <!-- First arg: D register (byte gets widened to short by default) -->
+    <pentry minsize="1" maxsize="2">
+      <register name="D"/>
+    </pentry>
+    <!-- Remaining args: stack, right-to-left -->
+    <pentry minsize="1" maxsize="500" align="2">
+      <addr offset="4" space="stack"/>
+    </pentry>
+  </input>
+  <output>
+    <pentry minsize="1" maxsize="2">
+      <register name="D"/>
+    </pentry>
+    <pentry minsize="2" maxsize="2">
+      <register name="E"/>
+    </pentry>
+  </output>
+  <unaffected>
+    <register name="SSP"/>
+    <register name="IX"/>
+    <register name="IZ"/>
+    <register name="SK"/>
+    <register name="XK"/>
+    <register name="YK"/>
+    <register name="ZK"/>
+    <register name="PK"/>
+    <register name="EK"/>
+  </unaffected>
+  <killedbycall>
+    <register name="A"/>
+    <register name="B"/>
+    <register name="D"/>
+    <register name="E"/>
+    <register name="IY"/>
+    <register name="CCR"/>
+  </killedbycall>
+</prototype>
   </default_proto>
 
   <!-- ================================================================
-       Alternate Calling Convention: Register-Heavy Functions
+       Alternate Calling Conventions: Register-Heavy Functions
        
        Many JTEC+ firmware functions pass parameters in registers that
        the default convention does not model, particularly pointer-in-IX
@@ -148,53 +130,90 @@
        a table pointer in IX and an input value in D.
        
        Assign to specific functions via right-click -> Edit Function
-       Signature -> select "__reg_call" from the calling convention
+       Signature -> select "__table_1d" from the calling convention
        dropdown.
        ================================================================ -->
-  <prototype name="__reg_call" extrapop="0" stackshift="4">
-    <input>
-      <!-- Pointer/index parameter in IX (e.g., table base address) -->
-      <pentry minsize="2" maxsize="2">
-        <register name="IX"/>
-      </pentry>
-      <!-- Primary data parameter in D -->
-      <pentry minsize="1" maxsize="2">
-        <register name="D"/>
-      </pentry>
-      <!-- Secondary data parameter in E -->
-      <pentry minsize="2" maxsize="2">
-        <register name="E"/>
-      </pentry>
-    </input>
-    <output>
-      <pentry minsize="1" maxsize="2">
-        <register name="D"/>
-      </pentry>
-      <pentry minsize="2" maxsize="2">
-        <register name="E"/>
-      </pentry>
-    </output>
 
-    <unaffected>
-      <register name="SP"/>
-      <register name="IY"/>
-      <register name="IZ"/>
-      <register name="SK"/>
-      <register name="XK"/>
-      <register name="YK"/>
-      <register name="ZK"/>
-      <register name="PK"/>
-      <register name="EK"/>
-    </unaffected>
 
-    <killedbycall>
-      <register name="A"/>
-      <register name="B"/>
-      <register name="D"/>
-      <register name="E"/>
+<!-- 1D table lookup: IX=table pointer, A=lookup param -->
+<prototype name="__table_1d" extrapop="0" stackshift="4">
+  <input>
+    <pentry minsize="2" maxsize="2">
       <register name="IX"/>
-      <register name="CCR"/>
-    </killedbycall>
-  </prototype>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="A"/>
+    </pentry>
+  </input>
+  <output>
+    <pentry minsize="1" maxsize="1">
+      <register name="B"/>
+    </pentry>
+    <pentry minsize="2" maxsize="2">
+      <register name="D"/>
+    </pentry>
+  </output>
+  <unaffected>
+    <register name="SSP"/>
+    <register name="IX"/>
+    <register name="IZ"/>
+    <register name="SK"/>
+    <register name="XK"/>
+    <register name="YK"/>
+    <register name="ZK"/>
+    <register name="PK"/>
+    <register name="EK"/>
+  </unaffected>
+  <killedbycall>
+    <register name="A"/>
+    <register name="B"/>
+    <register name="D"/>
+    <register name="E"/>
+    <register name="IY"/>
+    <register name="CCR"/>
+  </killedbycall>
+</prototype>
 
+<!-- 2D table lookup: IX=table pointer, A=row param, B=column param -->
+<prototype name="__table_2d" extrapop="0" stackshift="4">
+  <input>
+    <pentry minsize="2" maxsize="2">
+      <register name="IX"/>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="A"/>
+    </pentry>
+    <pentry minsize="1" maxsize="1">
+      <register name="B"/>
+    </pentry>
+  </input>
+  <output>
+    <pentry minsize="1" maxsize="1">
+      <register name="A"/>
+    </pentry>
+    <pentry minsize="2" maxsize="2">
+      <register name="E"/>
+    </pentry>
+  </output>
+  <unaffected>
+    <register name="SSP"/>
+    <register name="IX"/>
+    <register name="IZ"/>
+    <register name="SK"/>
+    <register name="XK"/>
+    <register name="YK"/>
+    <register name="ZK"/>
+    <register name="PK"/>
+    <register name="EK"/>
+  </unaffected>
+  <killedbycall>
+    <register name="A"/>
+    <register name="B"/>
+    <register name="D"/>
+    <register name="E"/>
+    <register name="IY"/>
+    <register name="CCR"/>
+  </killedbycall>
+</prototype>
+   
 </compiler_spec>

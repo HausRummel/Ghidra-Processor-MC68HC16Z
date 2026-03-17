@@ -148,7 +148,7 @@ define token imm16_tok2 (16)
 ;
 
 # 8-bit token for PSHM/PULM register mask
-# Bit 0=D, 1=E, 2=IX, 3=IY, 4=IZ, 5=K, 6=CCR, 7=PC
+# Bit 0=D, 1=E, 2=IX, 3=IY, 4=IZ, 5=K, 6=CCR, 7=reserved
 define token regmask_tok (8)
     regmask  = (0,7)
     rm_d     = (0,0)
@@ -314,13 +314,13 @@ EXT20ADDR: reloc  is ext20_pad=0 & ext20_bank & ext20_addr [ reloc = (ext20_bank
 # ext20_pad must be 0 to disambiguate from BRSET/BRCLR sharing the same opcodes.
 #
 # The 3-byte operand encodes a 20-bit UNSIGNED offset split as:
-#   ext20_bank (bits 19-16) : the bank contribution (0–15)
+#   ext20_bank (bits 19-16) : the bank contribution (0-15)
 #   ext20_addr (bits 15-0)  : the low 16-bit contribution
 #
 # EA = (XK:IX) + (ext20_bank << 16) | ext20_addr
 #
 # IMPORTANT: The offset is UNSIGNED here (zext, not sext).  With ext20_pad=0
-# we can only decode non-negative offsets (0x00000–0x0FFFF).  Negative 20-bit
+# we can only decode non-negative offsets (0x00000-0x0FFFF).  Negative 20-bit
 # offsets would require bits 23-20 to be set, violating ext20_pad=0, so they
 # are handled by separate encodings (if present).  In practice, Chrysler JTEC+
 # firmware (and most 68HC16 banked code) uses this mode exclusively to add a
@@ -365,8 +365,8 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 #          174x=IND16,X  175x=IND16,Y  176x=IND16,Z  177x=EXT
 #          274x=E,X  275x=E,Y  276x=E,Z
 # Lower nibble determines operation:
-#   0=SUBA 1=ADDA 2=SBCA 3=ADCA 4=UNUSED 5=LDAA 6=ANDA 7=ORAA
-#   8=CMPA 9=BITA A=STAA B=UNUSED C=UNUSED D=UNUSED E=UNUSED F=UNUSED
+#   0=SUBA 1=ADDA 2=SBCA 3=ADCA 4=EORA 5=LDAA 6=ANDA 7=ORAA
+#   8=CMPA 9=BITA A=STAA
 # ============================================================================
 
 # = SUBA: (A) - (M) => A =
@@ -1699,7 +1699,6 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # ============================================================================
 # SECTION: B-ACCUMULATOR E,X / E,Y / E,Z MODES (page 3: 27Cx/27Dx/27Ex)
-# These were missing from the original B-accumulator section
 # ============================================================================
 
 # = SBCB E,offset =

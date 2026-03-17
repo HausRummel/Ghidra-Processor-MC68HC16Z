@@ -174,7 +174,7 @@ define token ext20_tok (24)
     ext20_bank  = (16,19)     # upper 4 bits of the 20-bit address
     ext20_addr  = (0,15)      # lower 16 bits
     ext20_pad   = (20,23)     # should be zero
-    ext20_val   = (0,19)      # <--- ADD THIS: The contiguous 20-bit offset TEST_TEST
+    ext20_val   = (0,19) signed
 ;
 
 # =============================================================================
@@ -327,7 +327,7 @@ EXT20ADDR: reloc  is ext20_pad=0 & ext20_bank & ext20_addr [ reloc = (ext20_bank
 # positive bank constant (+0x10000, +0x20000, +0x30000) to the loaded pointer.
 #
 # Display: "bank:addr,X" mirrors EXT20ADDR notation for consistency and makes
-# the bank contribution immediately visible to the analyst.  TEST_TEST
+# the bank contribution immediately visible to the analyst.  
 IND20X: ext20_bank^":"^ext20_addr^",X"  is ext20_pad=0 & ext20_bank & ext20_addr & ext20_val {
     local base:3 = (zext(XK:1) << 16) | zext(IX:2);
     local ea:3 = base + ext20_val;

@@ -61,32 +61,55 @@
   </returnaddress>
 
   <!-- ================================================================
-       Default Calling Convention
+       Default Calling Convention: __cosmic
        
-       There was no formal ABI standard for the MC68HC16. This models
-       common practice from Motorola/Freescale tool chains:
-         - 8-bit args in A, then B
-         - 16-bit args in D, then E
-         - Additional args spill to the stack
-         - 8-bit/16-bit return in D
-         - 32-bit return in E:D (E=high word, D=low word)
-         - IX, IY, IZ, SP and all extension fields are callee-saved
-         - A, B, D, E, CCR flags are caller-saved (trashed by calls)
-       But based on the Cosmic compiler manual
-         -IY should be caller-saved(killedbycall)
-         -IX is the frame pointer-Always callee-saved(unaffected)
-       stackshift=4: JSR/BSR push a 4-byte frame (PC word + CCR word)
-       onto the stack before the called function begins executing.
-       This tells the decompiler that SP is 4 bytes lower at function
-       entry than at the call site, which is critical for correct
-       local variable offset calculation.
+       Based on the Cosmic CX6816 User's Guide (Version 4.1), Chapter 3:
+       "Interfacing C to Assembly Language" (p.47-50).
+       
+       Parameter passing (p.48):
+         - First arg in D if size <= int (2 bytes), or in D,E pair
+           if long/float (4 bytes). D holds low word, E holds high.
+         - If widening disabled and first arg is char, it goes in B.
+         - Remaining args pushed on stack, right to left.
+         - Struct/double return address pushed on stack by caller.
+       
+       Return values (p.49):
+         - char/short/int/pointer: D register
+         - long/float: E:D pair (E=high word, D=low word)
+       
+       Register preservation (p.49, Small Memory Model):
+         - Trashed (caller-saved): D, E, IY, IZ, CCR
+         - Preserved (callee-saved): IX (frame pointer),
+           all extension registers (EK, XK, YK, ZK, SK, PK)
+       
+       FIRMWARE DEVIATION: The Cosmic manual lists IZ as trashed
+       (caller-saved). However, this firmware uses IZ=0x8000 as a
+       dedicated global data pointer; it is set once at startup and
+       never modified by any function. Declaring IZ as killedbycall
+       would cause the decompiler to lose track of Z-indexed global
+       accesses after every function call. We keep IZ as unaffected
+       to match the actual firmware behavior. The global register
+       assumption (ZK=0x0F, IZ=0x8000) reinforces this.
+       
+       Stack frame (p.49-50):
+         - IX is the frame pointer
+         - Prologue: pshm x; ais #-<size>; tsx
+           or: pshm d,x; ais #-<size>; tsx (when first arg in D)
+         - stackshift=4: JSR/BSR push PK:PC + CCR = 4 bytes
        ================================================================ -->
   <default_proto>
-    <prototype name="__stdcall" extrapop="0" stackshift="4">
+    <prototype name="__cosmic" extrapop="0" stackshift="4">
   <input>
-    <!-- First arg: D register (byte gets widened to short by default) -->
+    <!-- First arg: D register for char/short/int/pointer (1-2 bytes) -->
     <pentry minsize="1" maxsize="2">
       <register name="D"/>
+    </pentry>
+    <!-- First arg: E:D join for long/float (3-4 bytes)
+         E=high word (piece1), D=low word (piece2)
+         Per Cosmic manual: "d,e register pair if its type is long
+         or unwidened float" and "The d register holds the low order word" -->
+    <pentry minsize="3" maxsize="4">
+      <addr space="join" piece1="E" piece2="D"/>
     </pentry>
     <!-- Remaining args: stack, right-to-left -->
     <pentry minsize="1" maxsize="500" align="2">
@@ -94,11 +117,14 @@
     </pentry>
   </input>
   <output>
+    <!-- Return: D for char/short/int/pointer (1-2 bytes) -->
     <pentry minsize="1" maxsize="2">
       <register name="D"/>
     </pentry>
-    <pentry minsize="2" maxsize="2">
-      <register name="E"/>
+    <!-- Return: E:D join for long/float (3-4 bytes)
+         E=high word, D=low word -->
+    <pentry minsize="3" maxsize="4">
+      <addr space="join" piece1="E" piece2="D"/>
     </pentry>
   </output>
   <unaffected>
@@ -133,7 +159,7 @@
        a table pointer in IX and an input value in D.
        
        Assign to specific functions via right-click -> Edit Function
-       Signature -> select "__table_1d" from the calling convention
+       Signature -> select the convention from the calling convention
        dropdown.
        ================================================================ -->
 

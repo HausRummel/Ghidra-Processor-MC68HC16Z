@@ -1,4 +1,4 @@
-##Ghidra 68HC16z3 processor module for chrysler PCMs
+#Ghidra 68HC16z3 processor module for chrysler PCMs
 
 Download the MC68HC16Z3 folder and place it in \GhidraInstallDir\Ghidra\Processors
 

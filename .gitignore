@@ -1,0 +1,33 @@
+# ── Ghidra project / analysis artifacts ──────────────────────────────
+*.rep/
+*.gpr
+*.lock
+*.lock~
+ghidra_*/                 # unpacked Ghidra installs (e.g. for the test harness)
+.ghidra/
+.ghidra.*
+
+# ── Test harness scratch ─────────────────────────────────────────────
+tests/generated/
+
+# ── Java / build ─────────────────────────────────────────────────────
+*.class
+bin/
+build/
+dist/
+*.jar                     # keep none committed; the module ships source + .sla only
+
+# ── IDE / editor ─────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+
+# ── OS cruft ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# NOTE: 68HC16.sla IS intentionally committed (it is a generated artifact,
+# compiled from 68HC16.slaspec) so the module works as a drop-in without a
+# local SLEIGH compile. Ghidra auto-recompiles it if it is missing or stale.

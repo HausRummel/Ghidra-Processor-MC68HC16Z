@@ -1,0 +1,13 @@
+# Arithmetic + immediate/CCR ops, incl. signed immediates (sign rendering).
+# Format:  HEXBYTES | EXPECTED_DISASM | comment
+@base 0x010000
+
+4104 | ADDA 0x4,X | ADDA IND8,X        (slaspec:386)
+7105 | ADDA #0x5 | ADDA #imm8          (slaspec:389)
+FC05 | ADDD #0x5 | ADDD #imm8 (sext)   (slaspec:666)
+37B10100 | ADDD #0x100 | ADDD #imm16         (slaspec:667)
+3CFE | AIX #-0x2 | AIX  #simm8 (-2)    (slaspec:1094, signed)
+3FFC | AIS #-0x4 | AIS  #simm8 (-4)    (slaspec:1097, signed)
+373C1234 | AIX #0x1234 | AIX  #simm16        (slaspec:1098)
+373A0F00 | ANDP #0xf00 | ANDP #imm16         (slaspec:1255)
+373BF000 | ORP #0xf000 | ORP  #imm16         (slaspec:1259)

@@ -1227,7 +1227,8 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = DAA =
 :DAA   is op8=0x37; op8b=0x21  {
-    # Decimal Adjust Accumulator A (placeholder - complex BCD logic)
+    # Decimal Adjust Accumulator A: correct A to packed BCD after an add,
+    # using H and C to add 0x06 to the low nibble and/or 0x60 to the high.
     local tmp:2 = zext(A:1);
     if ((A & 0x0F) > 9 || H_flag != 0) goto <lower>;
     goto <chkupper>;

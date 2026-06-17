@@ -28,4 +28,7 @@
 3704 | ASLA | ASLA  (slaspec:1131)
 370D | ASRA | ASRA  (slaspec:1136)
 370F | LSRA | LSRA  (slaspec:1138)
-3721 | DAA | DAA   (slaspec:1229)
+3721 | DAA | DAA   (DAA; now derives BCD correction from original nibbles)
+37A6 | BGND | BGND  (now emits background_debug())
+27F3 | WAI | WAI    (now emits wait_for_interrupt())
+27F1 | LPSTOP | LPSTOP  (now emits low_power_stop())

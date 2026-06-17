@@ -74,9 +74,10 @@ the decompiler, not a guarantee. Reassign a per-function convention (right-click
 Signature*) where a routine clearly deviates. Two register-heavy table-lookup conventions
 (`__table_1d`, `__table_2d`) are also provided.
 
-**Known follow-ups** (intentionally not yet done): a couple of control instructions are modeled
-minimally (`BGND` has an empty body; `WAI`/`LPSTOP` share one pseudo-op); immediate operands use
-SLEIGH's default display radix rather than a pinned hex format.
+**Modeling notes**: the control instructions `BGND`, `WAI`, and `LPSTOP` lift to distinct opaque
+pseudo-ops (`background_debug()`, `wait_for_interrupt()`, `low_power_stop()`) — accurate for
+disassembly and control flow, though fine-grained side effects (e.g. WAI's context stacking) are
+intentionally not modeled. Immediate/offset operands are pinned to hexadecimal display.
 
 ---
 

@@ -111,40 +111,40 @@ define token opbyte2 (8)
 
 # 8-bit immediate / offset / relative
 define token imm8_tok (8)
-    imm8     = (0,7)
-    simm8    = (0,7) signed
+    imm8     = (0,7) hex
+    simm8    = (0,7) signed hex
     rel8     = (0,7) signed
-    mask8    = (0,7)
+    mask8    = (0,7) hex
 ;
 
 # Second 8-bit token (e.g., for BRCLR/BRSET mask + offset patterns)
 define token imm8_tok2 (8)
-    imm8_2    = (0,7)
-    simm8_2   = (0,7) signed
+    imm8_2    = (0,7) hex
+    simm8_2   = (0,7) signed hex
     rel8_2    = (0,7) signed
-    mask8_2   = (0,7)
+    mask8_2   = (0,7) hex
 ;
 
 # Third 8-bit token (for BRCLR/BRSET IND8: mask + offset + rel8)
 define token imm8_tok3 (8)
-    imm8_3    = (0,7)
+    imm8_3    = (0,7) hex
     rel8_3    = (0,7) signed
 ;
 
 # 16-bit immediate / offset / address
 define token imm16_tok (16)
-    imm16    = (0,15)
-    simm16   = (0,15) signed
+    imm16    = (0,15) hex
+    simm16   = (0,15) signed hex
     rel16    = (0,15) signed
-    addr16   = (0,15)
+    addr16   = (0,15) hex
 ;
 
 # Second 16-bit token (for instructions with two 16-bit operands)
 define token imm16_tok2 (16)
-    imm16_2  = (0,15)
-    simm16_2 = (0,15) signed
+    imm16_2  = (0,15) hex
+    simm16_2 = (0,15) signed hex
     rel16_2  = (0,15) signed
-    addr16_2 = (0,15)
+    addr16_2 = (0,15) hex
 ;
 
 # 8-bit token for PSHM/PULM register mask
@@ -163,7 +163,7 @@ define token regmask_tok (8)
 
 # 8-bit token for MAC xo:yo offsets
 define token macoff_tok (8)
-    macoffs  = (0,7)
+    macoffs  = (0,7) hex
     mac_xo   = (4,7) signed
     mac_yo   = (0,3) signed
 ;
@@ -171,8 +171,8 @@ define token macoff_tok (8)
 # 24-bit token for EXT20 / IND20 (zero-extended 20-bit in 3 bytes)
 define token ext20_tok (24)
     ext20_full  = (0,23)
-    ext20_bank  = (16,19)     # upper 4 bits of the 20-bit address
-    ext20_addr  = (0,15)      # lower 16 bits
+    ext20_bank  = (16,19) hex # upper 4 bits of the 20-bit address
+    ext20_addr  = (0,15) hex  # lower 16 bits
     ext20_pad   = (20,23)     # should be zero
     ext20_val   = (0,19) signed
 ;
@@ -254,7 +254,9 @@ macro pull16(val) {
     SSP = SSP + 2;
 }
 
-define pcodeop HaltUntilInterrupt;
+define pcodeop wait_for_interrupt;   # WAI    - stack context, halt until interrupt
+define pcodeop low_power_stop;       # LPSTOP - stop clocks until reset/interrupt
+define pcodeop background_debug;     # BGND   - enter Background Debug Mode / breakpoint
 
 # =============================================================================
 # Addressing Mode Sub-Constructors
@@ -1227,20 +1229,30 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 
 # = DAA =
 :DAA   is op8=0x37; op8b=0x21  {
-    # Decimal Adjust Accumulator A (placeholder - complex BCD logic)
-    local tmp:2 = zext(A:1);
-    if ((A & 0x0F) > 9 || H_flag != 0) goto <lower>;
-    goto <chkupper>;
-    <lower>
-    tmp = tmp + 6;
-    <chkupper>
-    if (((tmp >> 4) & 0x0F) > 9 || C_flag != 0) goto <upper>;
-    goto <done>;
-    <upper>
-    tmp = tmp + 0x60;
-    C_flag = 1;
-    <done>
-    A = tmp:1;
+    # Decimal Adjust Accumulator A: correct A to packed BCD after an add.
+    # Both corrections are decided from the ORIGINAL nibbles and the C/H
+    # flags (the standard 68HC11/CPU16 table) so a low-nibble +6 carry into
+    # the high nibble is never lost when it overflows the byte
+    # (e.g. 0x95+0x65=0xFA must adjust to 0x60 with C=1).
+    local lo:1   = A & 0x0F;
+    local hi:1   = A >> 4;
+    local corr:1 = 0;
+    local newC:1 = C_flag;
+    # low nibble: half-carry set, or low digit > 9
+    if (H_flag == 0 && lo <= 9) goto <chkhi>;
+    corr = 0x06;
+  <chkhi>
+    # high nibble: carry set, or high digit > 9, or (high == 9 and low > 9)
+    if (C_flag != 0) goto <hicorr>;
+    if (hi > 9) goto <hicorr>;
+    if (hi == 9 && lo > 9) goto <hicorr>;
+    goto <apply>;
+  <hicorr>
+    corr = corr + 0x60;
+    newC = 1;
+  <apply>
+    A = A + corr;
+    C_flag = newC;
     setNZ8(A);
 }
 
@@ -1248,7 +1260,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 :NOP    is op8=0x27; op8b=0x4C  { }
 
 # = BGND =
-:BGND   is op8=0x37; op8b=0xA6  { }
+:BGND   is op8=0x37; op8b=0xA6  { background_debug(); }
 
 # = ANDP / ORP (CCR manipulation) =
 :ANDP "#"^imm16  is op8=0x37; op8b=0x3A; imm16  {
@@ -1688,12 +1700,12 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # SECTION: WAI / LPSTOP
 # ============================================================================
 :WAI    is op8=0x27; op8b=0xF3 {
-    HaltUntilInterrupt();
+    wait_for_interrupt();
 }
 
 :LPSTOP  is op8=0x27; op8b=0xF1 {
-    HaltUntilInterrupt();
-    # Low power stop - halt clocks until interrupt
+    # Low power stop - stop clocks until reset/interrupt
+    low_power_stop();
 }
 
 

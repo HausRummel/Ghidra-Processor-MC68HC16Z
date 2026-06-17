@@ -1,0 +1,19 @@
+# Load/store across addressing modes: IND8 X/Y/Z, IMM8/IMM16, EXT16.
+# Exercises banked Z-indexing (ctxZK) and the EXT16 context bank (ctxEK).
+# Format:  HEXBYTES | EXPECTED_DISASM | comment
+@base 0x010000
+
+4504 | LDAA 0x4,X | LDAA IND8,X   (slaspec:425)
+5508 | LDAA 0x8,Y | LDAA IND8,Y   (slaspec:426)
+6502 | LDAA 0x2,Z | LDAA IND8,Z   (slaspec:427, uses ctxZK)
+7510 | LDAA #0x10 | LDAA #imm8     (slaspec:428)
+17751234 | LDAA 0x1234 | LDAA EXT16     (slaspec:432, uses ctxEK)
+F520 | LDAB #0x20 | LDAB #imm8     (slaspec:569)
+C504 | LDAB 0x4,X | LDAB IND8,X   (slaspec:566)
+8506 | LDD 0x6,X | LDD  IND8,X   (slaspec:706)
+A500 | LDD 0x0,Z | LDD  IND8,Z   (slaspec:708, uses ctxZK)
+37B51234 | LDD #0x1234 | LDD  #imm16    (slaspec:709)
+8A04 | STD 0x4,X | STD  IND8,X   (slaspec:779)
+37FA8000 | STD 0x8000 | STD  EXT16     (slaspec:785)
+4A0A | STAA 0xa,X | STAA IND8,X   (slaspec:503)
+37BC1234 | LDX #0x1234 | LDX  #imm16    (slaspec:799)

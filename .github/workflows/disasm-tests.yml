@@ -1,0 +1,67 @@
+name: disasm-tests
+
+# Two jobs:
+#   * harness-selfcheck — always runs, no Ghidra: lints/parses the corpus.
+#   * disasm-golden     — manual (workflow_dispatch): downloads a pinned Ghidra,
+#                         installs the module, and runs the real disassembly check.
+# The heavy job is gated because the Ghidra download is ~550 MB.
+
+on:
+  push:
+    paths:
+      - "MC68HC16Z3/data/languages/**"
+      - "tests/**"
+      - ".github/workflows/disasm-tests.yml"
+  pull_request:
+    paths:
+      - "MC68HC16Z3/data/languages/**"
+      - "tests/**"
+  workflow_dispatch: {}
+
+jobs:
+  harness-selfcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Lint corpus (no Ghidra)
+        run: python3 tests/run_disasm_tests.py --lint
+
+  disasm-golden:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      GHIDRA_VERSION: "12.1.2"
+      GHIDRA_DATE: "20260605"   # build date in the release asset name
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache Ghidra
+        id: cache-ghidra
+        uses: actions/cache@v4
+        with:
+          path: ghidra_install
+          key: ghidra-${{ env.GHIDRA_VERSION }}-${{ env.GHIDRA_DATE }}
+      - name: Download + unzip pinned Ghidra
+        if: steps.cache-ghidra.outputs.cache-hit != 'true'
+        run: |
+          set -e
+          url="https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${GHIDRA_VERSION}_build/ghidra_${GHIDRA_VERSION}_PUBLIC_${GHIDRA_DATE}.zip"
+          curl -L -o ghidra.zip "$url"
+          mkdir -p ghidra_install
+          unzip -q ghidra.zip -d ghidra_install
+      - name: Install module + run disassembly regression
+        run: |
+          set -e
+          GHIDRA_DIR="$(ls -d "$GITHUB_WORKSPACE"/ghidra_install/ghidra_*_PUBLIC | head -1)"
+          cp -r MC68HC16Z3 "$GHIDRA_DIR/Ghidra/Processors/MC68HC16Z3"
+          export GHIDRA_INSTALL_DIR="$GHIDRA_DIR"
+          python3 tests/run_disasm_tests.py --no-allow-skip

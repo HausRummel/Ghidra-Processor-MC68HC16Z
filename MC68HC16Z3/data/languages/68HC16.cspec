@@ -19,7 +19,7 @@
   <!-- ================================================================
        Data Organization
        CPU16: 16-bit data bus, big-endian, 20-bit addresses (3 bytes)
-       Typical C compiler mapping for this era:
+       Natural data sizes for this architecture (era assemblers/compilers):
           char=1, short=2, int=2, long=4, pointer=3 (20-bit addr space) 
        ================================================================ -->
   <data_organization>
@@ -61,53 +61,51 @@
   </returnaddress>
 
   <!-- ================================================================
-       Default Calling Convention: __cosmic
+       Default Calling Convention: __pcm_default
+
+       PROVENANCE: the JTEC+ PCM firmware is hand-written assembly; no C
+       compiler (Cosmic CX6816 or otherwise) was ever used. Hand-written
+       assembly enforces no single calling convention, so this default is
+       an EMPIRICAL best-effort model of the register usage actually
+       observed in the firmware; a reasonable starting point for the
+       decompiler, not a formal ABI. Reassign a per-function convention
+       wherever a routine clearly deviates.
        
-       Based on the Cosmic CX6816 User's Guide (Version 4.1), Chapter 3:
-       "Interfacing C to Assembly Language" (p.47-50).
+       Observed parameter passing:
+         - First integer/pointer arg tends to arrive in D (1-2 bytes),
+           or in the E:D pair for 32-bit values (E=high word, D=low).
+         - Further args, when stack-passed, are pushed right to left.
        
-       Parameter passing (p.48):
-         - First arg in D if size <= int (2 bytes), or in D,E pair
-           if long/float (4 bytes). D holds low word, E holds high.
-         - If widening disabled and first arg is char, it goes in B.
-         - Remaining args pushed on stack, right to left.
-         - Struct/double return address pushed on stack by caller.
-       
-       Return values (p.49):
+       Observed return values:
          - char/short/int/pointer: D register
-         - long/float: E:D pair (E=high word, D=low word)
+         - long/float-width: E:D pair (E=high word, D=low word)
+
+       Register preservation (as observed):
+         - Treated as clobbered by a call: D, E, IY, CCR
+         - Treated as preserved across a call: IX (frame pointer), SP/SK,
+           and all address-extension registers (EK, XK, YK, ZK, PK)
        
-       Register preservation (p.49, Small Memory Model):
-         - Trashed (caller-saved): D, E, IY, IZ, CCR
-         - Preserved (callee-saved): IX (frame pointer),
-           all extension registers (EK, XK, YK, ZK, SK, PK)
+       IZ IS DELIBERATELY PRESERVED: this firmware dedicates IZ=0x8000 as
+       a global data pointer, set once at startup and never modified by a
+       routine. Marking IZ killedbycall would make the decompiler lose
+       every Z-indexed global access across a call, so IZ is kept
+       unaffected to match real firmware behavior (paired with ZK=0x0F).
        
-       FIRMWARE DEVIATION: The Cosmic manual lists IZ as trashed
-       (caller-saved). However, this firmware uses IZ=0x8000 as a
-       dedicated global data pointer; it is set once at startup and
-       never modified by any function. Declaring IZ as killedbycall
-       would cause the decompiler to lose track of Z-indexed global
-       accesses after every function call. We keep IZ as unaffected
-       to match the actual firmware behavior. The global register
-       assumption (ZK=0x0F, IZ=0x8000) reinforces this.
-       
-       Stack frame (p.49-50):
-         - IX is the frame pointer
-         - Prologue: pshm x; ais #-<size>; tsx
-           or: pshm d,x; ais #-<size>; tsx (when first arg in D)
-         - stackshift=4: JSR/BSR push PK:PC + CCR = 4 bytes
+       Stack frame (as observed):
+         - IX commonly serves as the frame pointer.
+         - Prologue pattern: pshm <regs>; ais #-<size>; tsx
+         - stackshift=4: JSR/BSR push PK:PC + CCR = 4 bytes.
        ================================================================ -->
   <default_proto>
-    <prototype name="__cosmic" extrapop="0" stackshift="4">
+    <prototype name="__pcm_default" extrapop="0" stackshift="4">
   <input>
     <!-- First arg: D register for char/short/int/pointer (1-2 bytes) -->
     <pentry minsize="1" maxsize="2">
       <register name="D"/>
     </pentry>
-    <!-- First arg: E:D join for long/float (3-4 bytes)
-         E=high word (piece1), D=low word (piece2)
-         Per Cosmic manual: "d,e register pair if its type is long
-         or unwidened float" and "The d register holds the low order word" -->
+    <!-- First arg: E:D join for long/float-width values (3-4 bytes)
+         E=high word (piece1), D=low word (piece2), as observed in firmware -->
+
     <pentry minsize="3" maxsize="4">
       <addr space="join" piece1="E" piece2="D"/>
     </pentry>

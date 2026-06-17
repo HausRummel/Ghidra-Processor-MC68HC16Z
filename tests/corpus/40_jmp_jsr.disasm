@@ -1,0 +1,9 @@
+# JMP/JSR with 20-bit extended (EXT20) and 20-bit indexed (IND20) operands.
+# EXT20 operand is a 3-byte big-endian value: [pad:4=0][bank:4][addr:16].
+# Format:  HEXBYTES | EXPECTED_DISASM | comment
+@base 0x010000
+
+7A012345 | JMP 0x012345 | JMP EXT20 bank1:0x2345 -> 0x12345  (slaspec:935)
+FA020000 | JSR 0x020000 | JSR EXT20 bank2:0x0000 -> 0x20000  (slaspec:941)
+4B002345 | JMP 0x0:0x2345,X | JMP IND20,X  0:2345,X             (slaspec:936)
+99010000 | JSR 0x1:0x0,Y | JSR IND20,Y  1:0000,Y             (slaspec:949)

@@ -1,0 +1,13 @@
+# Multi-register stack ops (PSHM/PULM mask decoding) and MAC/DSP instructions.
+# Note PSHM and PULM decode the same mask byte to DIFFERENT register lists
+# (push vs pull order); see 68HC16_PSHM_PULM.sinc.
+# Format:  HEXBYTES | EXPECTED_DISASM | comment
+@base 0x010000
+
+340D | PSHM D,IX,IY | PSHM mask 0x0D = D,IX,IY        (PSHM_PULM.sinc:17)
+350D | PULM CCR,IZ,IY | PULM mask 0x0D = CCR,IZ,IY      (PSHM_PULM.sinc:275)
+27B8 | PSHMAC | PSHMAC                          (slaspec:2415)
+27B9 | PULMAC | PULMAC                          (slaspec:2432)
+7B11 | MAC 0x11 | MAC  xo=1,yo=1                  (slaspec:2253)
+FB11 | RMAC 0x11 | RMAC xo=1,yo=1                  (slaspec:2291)
+372F | TDMSK | TDMSK                           (slaspec:2327)

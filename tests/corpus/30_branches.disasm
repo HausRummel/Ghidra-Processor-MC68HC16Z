@@ -1,0 +1,12 @@
+# Branches — verify the CPU16 pipeline-relative target math: inst_start + 6 + rel.
+# Targets are slot-dependent (slot i sits at base + i*10); ratify each against
+# that formula. Includes a backward branch to exercise signed rel8.
+# Format:  HEXBYTES | EXPECTED_DISASM | comment
+@base 0x010000
+
+B07E | BRA 0x010084 | BRA  rel8 fwd  -> 0x010000+6+0x7E = 0x010084  (slaspec:878)
+B410 | BCC 0x010020 | BCC  rel8      -> 0x01000A+6+0x10 = 0x010020   (slaspec:882)
+B620 | BNE 0x01003a | BNE  rel8      -> 0x010014+6+0x20 = 0x01003A   (slaspec:884)
+B7F8 | BEQ 0x01001c | BEQ  rel8 back -> 0x01001E+6-8    = 0x01001C   (slaspec:885)
+3600 | BSR 0x01002e | BSR  rel8      -> 0x010028+6+0     = 0x01002E   (slaspec:896)
+37800100 | LBRA 0x010138 | LBRA rel16     -> 0x010032+6+0x100 = 0x010138  (slaspec:902)

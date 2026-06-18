@@ -283,12 +283,14 @@ IND16Z: simm16^",Z"  is simm16 & ctxZK  { local bank:1 = ctxZK; local ea:3 = (ze
 # The disassembly action computes the full 20-bit address at parse time,
 # enabling Ghidra to create xrefs and clickable address links.
 # Instructions dereference at their own size: *:1 EXT16 or *:2 EXT16.
-EXT16: reloc  is addr16 & ctxEK  [ reloc = (ctxEK << 16) | addr16; ]  
-{ 
-    local hi:3 = zext(EK:1) << 16; 
-    local lo:3 = zext(addr16:2); 
-    local ea:3 = hi | lo; 
-    export ea; 
+EXT16: reloc  is addr16 & ctxEK  [ reloc = (ctxEK << 16) | addr16; ]
+{
+    # Resolve the data bank from ctxEK (a parse-time constant) rather than the
+    # EK register, so the effective address is concrete for xrefs and the
+    # decompiler -- consistent with the ,Z modes' use of ctxZK.
+    local bank:1 = ctxEK;
+    local ea:3 = (zext(bank) << 16) | zext(addr16:2);
+    export ea;
 }
 
 # = Accumulator E Offset (E,X / E,Y / E,Z) =
@@ -1622,9 +1624,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # ============================================================================
 
 # MOVB IXP to EXT: (XK:IX) => M(EXT); IX = IX + sext(ff)
-:MOVB imm8^",X,"^addr16  is op8=0x30; imm8; addr16 {
+:MOVB imm8^",X,"^addr16  is op8=0x30; imm8; addr16 & ctxEK {
     local src:3 = (zext(XK:1) << 16) | zext(IX:2);
-    local dst:3 = (zext(EK:1) << 16) | zext(addr16:2);
+    local bank:1 = ctxEK;
+    local dst:3 = (zext(bank) << 16) | zext(addr16:2);
     local val:1 = *:1 src;
     *:1 dst = val;
     IX = IX + sext(imm8:1);
@@ -1632,9 +1635,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # MOVB EXT to IXP: (M(EXT)) => (XK:IX); IX = IX + sext(ff)
-:MOVB addr16^","^imm8^",X"  is op8=0x32; imm8; addr16 {
+:MOVB addr16^","^imm8^",X"  is op8=0x32; imm8; addr16 & ctxEK {
     local dst:3 = (zext(XK:1) << 16) | zext(IX:2);
-    local src:3 = (zext(EK:1) << 16) | zext(addr16:2);
+    local bank:1 = ctxEK;
+    local src:3 = (zext(bank) << 16) | zext(addr16:2);
     local val:1 = *:1 src;
     *:1 dst = val;
     IX = IX + sext(imm8:1);
@@ -1642,9 +1646,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # MOVW IXP to EXT
-:MOVW imm8^",X,"^addr16  is op8=0x31; imm8; addr16 {
+:MOVW imm8^",X,"^addr16  is op8=0x31; imm8; addr16 & ctxEK {
     local src:3 = (zext(XK:1) << 16) | zext(IX:2);
-    local dst:3 = (zext(EK:1) << 16) | zext(addr16:2);
+    local bank:1 = ctxEK;
+    local dst:3 = (zext(bank) << 16) | zext(addr16:2);
     local val:2 = *:2 src;
     *:2 dst = val;
     IX = IX + sext(imm8:1);
@@ -1652,9 +1657,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # MOVW EXT to IXP
-:MOVW addr16^","^imm8^",X"  is op8=0x33; imm8; addr16 {
+:MOVW addr16^","^imm8^",X"  is op8=0x33; imm8; addr16 & ctxEK {
     local dst:3 = (zext(XK:1) << 16) | zext(IX:2);
-    local src:3 = (zext(EK:1) << 16) | zext(addr16:2);
+    local bank:1 = ctxEK;
+    local src:3 = (zext(bank) << 16) | zext(addr16:2);
     local val:2 = *:2 src;
     *:2 dst = val;
     IX = IX + sext(imm8:1);
@@ -1662,18 +1668,20 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # MOVB EXT to EXT: 37 FE hh ll hh ll
-:MOVB addr16^","^addr16_2  is op8=0x37; op8b=0xFE; addr16; addr16_2 {
-    local src:3 = (zext(EK:1) << 16) | zext(addr16:2);
-    local dst:3 = (zext(EK:1) << 16) | zext(addr16_2:2);
+:MOVB addr16^","^addr16_2  is op8=0x37; op8b=0xFE; addr16 & ctxEK; addr16_2 {
+    local bank:1 = ctxEK;
+    local src:3 = (zext(bank) << 16) | zext(addr16:2);
+    local dst:3 = (zext(bank) << 16) | zext(addr16_2:2);
     local val:1 = *:1 src;
     *:1 dst = val;
     setNZ8(val); V_flag = 0;
 }
 
 # MOVW EXT to EXT: 37 FF hh ll hh ll
-:MOVW addr16^","^addr16_2  is op8=0x37; op8b=0xFF; addr16; addr16_2 {
-    local src:3 = (zext(EK:1) << 16) | zext(addr16:2);
-    local dst:3 = (zext(EK:1) << 16) | zext(addr16_2:2);
+:MOVW addr16^","^addr16_2  is op8=0x37; op8b=0xFF; addr16 & ctxEK; addr16_2 {
+    local bank:1 = ctxEK;
+    local src:3 = (zext(bank) << 16) | zext(addr16:2);
+    local dst:3 = (zext(bank) << 16) | zext(addr16_2:2);
     local val:2 = *:2 src;
     *:2 dst = val;
     setNZ16(val); V_flag = 0;
@@ -1835,9 +1843,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # BCLR EXT: 38 mm hh ll
-:BCLR addr16^",#"^mask8  is op8=0x38; mask8; addr16 {
+:BCLR addr16^",#"^mask8  is op8=0x38; mask8; addr16 & ctxEK {
+    local bank:1 = ctxEK;
     local a:2 = addr16;
-    local ea:3 = (zext(EK:1) << 16) | zext(a);
+    local ea:3 = (zext(bank) << 16) | zext(a);
     local val:1 = *:1 ea;
     local m:1 = mask8;
     val = val & (~m);
@@ -1921,9 +1930,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # BSET EXT: 39 mm hh ll
-:BSET addr16^",#"^mask8  is op8=0x39; mask8; addr16 {
+:BSET addr16^",#"^mask8  is op8=0x39; mask8; addr16 & ctxEK {
+    local bank:1 = ctxEK;
     local a:2 = addr16;
-    local ea:3 = (zext(EK:1) << 16) | zext(a);
+    local ea:3 = (zext(bank) << 16) | zext(a);
     local val:1 = *:1 ea;
     local m:1 = mask8;
     val = val | m;
@@ -1969,8 +1979,9 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # BCLRW EXT: 27 38 hh ll mmmm
-:BCLRW addr16^",#"^imm16_2  is op8=0x27; op8b=0x38; addr16; imm16_2 {
-    local ea:3 = (zext(EK:1) << 16) | zext(addr16:2);
+:BCLRW addr16^",#"^imm16_2  is op8=0x27; op8b=0x38; addr16 & ctxEK; imm16_2 {
+    local bank:1 = ctxEK;
+    local ea:3 = (zext(bank) << 16) | zext(addr16:2);
     local val:2 = *:2 ea;
     val = val & (~imm16_2);
     *:2 ea = val;
@@ -2013,8 +2024,9 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # BSETW EXT: 27 39 hh ll mmmm
-:BSETW addr16^",#"^imm16_2  is op8=0x27; op8b=0x39; addr16; imm16_2 {
-    local ea:3 = (zext(EK:1) << 16) | zext(addr16:2);
+:BSETW addr16^",#"^imm16_2  is op8=0x27; op8b=0x39; addr16 & ctxEK; imm16_2 {
+    local bank:1 = ctxEK;
+    local ea:3 = (zext(bank) << 16) | zext(addr16:2);
     local val:2 = *:2 ea;
     val = val | imm16_2;
     *:2 ea = val;
@@ -2087,9 +2099,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # BRCLR EXT: 3A mm hh ll rrrr
-:BRCLR addr16^",#"^mask8, BRREL16  is op8=0x3A; mask8; addr16; BRREL16 {
+:BRCLR addr16^",#"^mask8, BRREL16  is op8=0x3A; mask8; addr16 & ctxEK; BRREL16 {
+    local bank:1 = ctxEK;
     local a:2 = addr16;
-    local ea:3 = (zext(EK:1) << 16) | zext(a);
+    local ea:3 = (zext(bank) << 16) | zext(a);
     local val:1 = *:1 ea;
     local m:1 = mask8;
     if ((val & m) == 0) goto BRREL16;
@@ -2159,9 +2172,10 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 }
 
 # BRSET EXT: 3B mm hh ll rrrr
-:BRSET addr16^",#"^mask8, BRREL16  is op8=0x3B; mask8; addr16; BRREL16 {
+:BRSET addr16^",#"^mask8, BRREL16  is op8=0x3B; mask8; addr16 & ctxEK; BRREL16 {
+    local bank:1 = ctxEK;
     local a:2 = addr16;
-    local ea:3 = (zext(EK:1) << 16) | zext(a);
+    local ea:3 = (zext(bank) << 16) | zext(a);
     local val:1 = *:1 ea;
     local m:1 = mask8;
     if ((val & m) == m) goto BRREL16;

@@ -1,13 +1,16 @@
 # Multi-register stack ops (PSHM/PULM mask decoding) and MAC/DSP instructions.
 # Note PSHM and PULM decode the same mask byte to DIFFERENT register lists
 # (push vs pull order); see 68HC16_PSHM_PULM.sinc.
+# MAC/RMAC display the two signed 4-bit pointer offsets as xo,yo.
 # Format:  HEXBYTES | EXPECTED_DISASM | comment
 @base 0x010000
 
-340D | PSHM D,IX,IY | PSHM mask 0x0D = D,IX,IY        (PSHM_PULM.sinc:17)
-350D | PULM CCR,IZ,IY | PULM mask 0x0D = CCR,IZ,IY      (PSHM_PULM.sinc:275)
-27B8 | PSHMAC | PSHMAC                          (slaspec:2415)
-27B9 | PULMAC | PULMAC                          (slaspec:2432)
-7B11 | MAC 0x11 | MAC  xo=1,yo=1                  (slaspec:2253)
-FB11 | RMAC 0x11 | RMAC xo=1,yo=1                  (slaspec:2291)
-372F | TDMSK | TDMSK                           (slaspec:2327)
+340D | PSHM D,IX,IY | PSHM mask 0x0D = D,IX,IY      (PSHM_PULM.sinc:17)
+350D | PULM CCR,IZ,IY | PULM mask 0x0D = CCR,IZ,IY   (PSHM_PULM.sinc:275)
+27B8 | PSHMAC | PSHMAC
+27B9 | PULMAC | PULMAC
+7B11 | MAC 0x1,0x1 | MAC  xo=+1, yo=+1
+7B8F | MAC -0x8,-0x1 | MAC  xo=-8, yo=-1 (signed 4-bit offsets)
+7B3D | MAC 0x3,-0x3 | MAC  xo=+3, yo=-3 (mixed signs)
+FB11 | RMAC 0x1,0x1 | RMAC xo=+1, yo=+1
+372F | TDMSK | TDMSK

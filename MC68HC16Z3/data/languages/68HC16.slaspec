@@ -164,8 +164,8 @@ define token regmask_tok (8)
 # 8-bit token for MAC xo:yo offsets
 define token macoff_tok (8)
     macoffs  = (0,7) hex
-    mac_xo   = (4,7) signed
-    mac_yo   = (0,3) signed
+    mac_xo   = (4,7) signed hex
+    mac_yo   = (0,3) signed hex
 ;
 
 # 24-bit token for EXT20 / IND20 (zero-extended 20-bit in 3 bytes)
@@ -2005,7 +2005,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # BSETW IND16,Z: 27 29 gggg mmmm
 :BSETW simm16^",Z,#"^imm16_2  is op8=0x27; op8b=0x29; simm16; imm16_2 & ctxZK{
     local bank:1 = ctxZK;
-    local ea:3 = (zext(ZK:1) << 16) | zext(IZ + simm16);
+    local ea:3 = (zext(bank) << 16) | zext(IZ + simm16);
     local val:2 = *:2 ea;
     val = val | imm16_2;
     *:2 ea = val;
@@ -2261,7 +2261,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # Flags: MV=delta EV=delta V=delta
 # ============================================================================
 
-:MAC macoffs  is op8=0x7B; macoffs & mac_xo & mac_yo {
+:MAC mac_xo^","^mac_yo  is op8=0x7B; mac_xo & mac_yo {
     # Fractional multiply: HR * IR => 32-bit product, shifted left 1
     local prod:4 = sext(HR:2) * sext(IR:2);
     prod = prod << 1;
@@ -2299,7 +2299,7 @@ IND20Z: ext20_bank^":"^ext20_addr^",Z"  is ext20_pad=0 & ext20_bank & ext20_addr
 # Opcode: FB xoyo
 # ============================================================================
 
-:RMAC macoffs  is op8=0xFB; macoffs & mac_xo & mac_yo {
+:RMAC mac_xo^","^mac_yo  is op8=0xFB; mac_xo & mac_yo {
     # RMAC loops internally until E becomes negative
     # We model a single-pass semantic with a loop pcodeop hint
     local count:2 = E;

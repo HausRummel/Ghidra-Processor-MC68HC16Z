@@ -1,0 +1,9 @@
+# Word bit-set (BSETW) across IND16,X / IND16,Z / EXT addressing.
+# Covers the ,Z constructor whose effective-address bank is resolved from
+# ctxZK context (consistent with the other ,Z modes).
+# Format:  HEXBYTES | EXPECTED_DISASM | comment
+@base 0x010000
+
+270900040080 | BSETW 0x4,X,#0x80 | BSETW IND16,X  (op 27 09)  (slaspec ~1985)
+272900100001 | BSETW 0x10,Z,#0x1 | BSETW IND16,Z  (op 27 29)  (slaspec:2006, uses ctxZK)
+273980000001 | BSETW 0x8000,#0x1 | BSETW EXT      (op 27 39)  (slaspec:2016)

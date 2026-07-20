@@ -68,6 +68,9 @@ bug forever. Workflow:
 - **Radix.** The `.slaspec` doesn't pin an immediate display radix; the installed Ghidra renders hex
   here (e.g. `LDAA #0x10`). The runner normalizes whitespace but compares the rendered text as-is,
   so a future change to the display radix would (correctly) require re-ratifying the goldens.
-- **Context dependence.** `,Z` and `EXT16` operands resolve using the `.pspec` context defaults
-  (`ctxEK=0`, `ctxZK=15`); changing those legitimately changes the goldens.
+- **Context dependence.** The harness runs the `68HC16:BE:24:default` (generic) language, whose
+  bank context defaults are `ctxEK=0`, `ctxZK=0`. Those defaults set the *bank* of the effective
+  address in the p-code for `,Z` and `EXT16` operands, but the disassembly **text** the harness
+  compares shows only the offset (e.g. `LDAA 0x2,Z`), so it is unaffected by the bank value. The
+  JTEC preset (`68HC16:BE:24:JTEC`) uses `ctxZK=15` instead; it decodes to the same text.
 - `tests/generated/` is scratch (blobs, headless projects) and is git-ignored.

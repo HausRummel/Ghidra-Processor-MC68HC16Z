@@ -9,6 +9,10 @@
  *
  * Register naming follows Motorola EQUATES.ASM conventions.
  * Bit definitions use register_FIELD_MASK / register_FIELD_SHIFT format.
+ *
+ * The register/bit definitions are chip-generic (MC68HC16Z2/Z3). The
+ * "Typical JTEC+ init" comments are illustrative example values observed
+ * in that firmware; they are not required and will differ on other targets.
  */
 
 #ifndef MC68HC16Z3_REGS_H

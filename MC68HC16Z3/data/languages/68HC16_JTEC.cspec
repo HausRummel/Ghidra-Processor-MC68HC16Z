@@ -2,21 +2,15 @@
 
 <!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/compiler_spec.rxg -->
 
-<!-- Generic MC68HC16 (CPU16) compiler spec (language 68HC16:BE:24:default).
+<!-- JTEC+ PCM/TCM compiler spec (language 68HC16:BE:24:JTEC).
 
-     The MC68HC16 has no single ABI (era firmware is typically hand-written
-     assembly), so the default __asmcall convention below is a conservative,
-     best-effort model: first arg in D / E:D, return in D / E:D, IX as a
-     common frame pointer, and the architecturally-sticky bank registers
-     (EK/XK/YK/ZK/PK) plus SP/SK preserved across calls. Reassign a
-     per-function convention wherever a routine clearly deviates.
+     Same as the generic 68HC16.cspec EXCEPT the default convention is
+     __pcm_default, which additionally treats IZ as callee-saved (the JTEC+
+     firmware dedicates IZ=0x8000 as a global data pointer). For any
+     non-JTEC binary use 68HC16:BE:24:default, whose __asmcall default does
+     NOT assume a global pointer in IZ.
 
-     Unlike the JTEC+ preset (68HC16_JTEC.cspec / __pcm_default), this
-     default does NOT assume IZ holds a preserved global data pointer; IZ
-     is treated as clobbered by a call. If your firmware does dedicate an
-     index register to a global base, switch to __pcm_default or define your
-     own convention.
-
+     MC68HC16 (CPU16) Compiler Spec for Ghidra
      This file defines:
        - C data type sizes and alignment for the CPU16 architecture
        - Stack pointer and return address conventions
@@ -75,46 +69,50 @@
   </returnaddress>
 
   <!-- ================================================================
-       Default Calling Convention: __asmcall (generic HC16)
+       Default Calling Convention: __pcm_default
 
-       A conservative, best-effort model for hand-written CPU16 assembly,
-       which has no formal ABI. A reasonable starting point for the
-       decompiler, not a guarantee. Reassign a per-function convention
+       PROVENANCE: the JTEC+ PCM firmware is hand-written assembly; no C
+       compiler (Cosmic CX6816 or otherwise) was ever used. Hand-written
+       assembly enforces no single calling convention, so this default is
+       an EMPIRICAL best-effort model of the register usage actually
+       observed in the firmware; a reasonable starting point for the
+       decompiler, not a formal ABI. Reassign a per-function convention
        wherever a routine clearly deviates.
-
-       Parameter passing:
-         - First integer/pointer arg in D (1-2 bytes), or the E:D pair for
-           32-bit values (E=high word, D=low word).
+       
+       Observed parameter passing:
+         - First integer/pointer arg tends to arrive in D (1-2 bytes),
+           or in the E:D pair for 32-bit values (E=high word, D=low).
          - Further args, when stack-passed, are pushed right to left.
-
-       Return values:
+       
+       Observed return values:
          - char/short/int/pointer: D register
          - long/float-width: E:D pair (E=high word, D=low word)
 
-       Register preservation:
-         - Clobbered by a call: A, B, D, E, IY, IZ, CCR
-         - Preserved across a call: IX (common frame pointer), SP/SK, and
-           the architecturally-sticky bank registers (EK, XK, YK, ZK, PK).
-
-       NOTE: IZ is treated as clobbered here. If your firmware dedicates an
-       index register to a global data pointer (as JTEC+ does with IZ),
-       switch to the __pcm_default convention (or the JTEC language), which
-       keeps IZ callee-saved so Z-indexed global accesses survive a call.
-
-       Stack frame:
+       Register preservation (as observed):
+         - Treated as clobbered by a call: D, E, IY, CCR
+         - Treated as preserved across a call: IX (frame pointer), SP/SK,
+           and all address-extension registers (EK, XK, YK, ZK, PK)
+       
+       IZ IS DELIBERATELY PRESERVED: this firmware dedicates IZ=0x8000 as
+       a global data pointer, set once at startup and never modified by a
+       routine. Marking IZ killedbycall would make the decompiler lose
+       every Z-indexed global access across a call, so IZ is kept
+       unaffected to match real firmware behavior (paired with ZK=0x0F).
+       
+       Stack frame (as observed):
          - IX commonly serves as the frame pointer.
-         - Typical prologue: pshm <regs>; ais #-<size>; tsx
+         - Prologue pattern: pshm <regs>; ais #-<size>; tsx
          - stackshift=4: JSR/BSR push PK:PC + CCR = 4 bytes.
        ================================================================ -->
   <default_proto>
-    <prototype name="__asmcall" extrapop="0" stackshift="4">
+    <prototype name="__pcm_default" extrapop="0" stackshift="4">
   <input>
     <!-- First arg: D register for char/short/int/pointer (1-2 bytes) -->
     <pentry minsize="1" maxsize="2">
       <register name="D"/>
     </pentry>
     <!-- First arg: E:D join for long/float-width values (3-4 bytes)
-         E=high word (piece1), D=low word (piece2) -->
+         E=high word (piece1), D=low word (piece2), as observed in firmware -->
 
     <pentry minsize="3" maxsize="4">
       <addr space="join" piece1="E" piece2="D"/>
@@ -140,6 +138,7 @@
     <register name="SP"/>
     <register name="SK"/>
     <register name="IX"/>
+    <register name="IZ"/>
     <register name="XK"/>
     <register name="YK"/>
     <register name="ZK"/>
@@ -152,69 +151,23 @@
     <register name="D"/>
     <register name="E"/>
     <register name="IY"/>
-    <register name="IZ"/>
     <register name="CCR"/>
   </killedbycall>
 </prototype>
   </default_proto>
 
   <!-- ================================================================
-       Alternate Calling Conventions
-
-       __pcm_default : the JTEC+ empirical convention, identical to
-         __asmcall except IZ is callee-saved (global data pointer). Kept
-         here as an option for firmware that dedicates IZ to a global base.
-       __table_1d / __table_2d : register-heavy table-interpolation
-         routines that take a table pointer in IX plus lookup value(s) in
-         A/B. Reusable for any ROM'd lookup-table firmware.
-
+       Alternate Calling Conventions: Register-Heavy Functions
+       
+       Many JTEC+ firmware functions pass parameters in registers that
+       the default convention does not model, particularly pointer-in-IX
+       patterns. Examples include table interpolation routines that take
+       a table pointer in IX and an input value in D.
+       
        Assign to specific functions via right-click -> Edit Function
        Signature -> select the convention from the calling convention
        dropdown.
        ================================================================ -->
-
-<!-- IZ-preserving variant (dedicated global data pointer in IZ) -->
-<prototype name="__pcm_default" extrapop="0" stackshift="4">
-  <input>
-    <pentry minsize="1" maxsize="2">
-      <register name="D"/>
-    </pentry>
-    <pentry minsize="3" maxsize="4">
-      <addr space="join" piece1="E" piece2="D"/>
-    </pentry>
-    <pentry minsize="1" maxsize="500" align="2">
-      <addr offset="4" space="stack"/>
-    </pentry>
-  </input>
-  <output>
-    <pentry minsize="1" maxsize="2">
-      <register name="D"/>
-    </pentry>
-    <pentry minsize="3" maxsize="4">
-      <addr space="join" piece1="E" piece2="D"/>
-    </pentry>
-  </output>
-  <unaffected>
-    <register name="SSP"/>
-    <register name="SP"/>
-    <register name="SK"/>
-    <register name="IX"/>
-    <register name="IZ"/>
-    <register name="XK"/>
-    <register name="YK"/>
-    <register name="ZK"/>
-    <register name="PK"/>
-    <register name="EK"/>
-  </unaffected>
-  <killedbycall>
-    <register name="A"/>
-    <register name="B"/>
-    <register name="D"/>
-    <register name="E"/>
-    <register name="IY"/>
-    <register name="CCR"/>
-  </killedbycall>
-</prototype>
 
 
 <!-- 1D table lookup: IX=table pointer, A=lookup param -->

@@ -1,41 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ================================================================
-     Generic MC68HC16Z2/Z3 processor spec (language 68HC16:BE:24:default)
+     JTEC+ PCM/TCM preset processor spec (language 68HC16:BE:24:JTEC)
 
-     This is the chip-generic profile: the CPU16 exception-vector layout
-     plus the MC68HC16Z2/Z3 on-chip peripheral map (ADC/MRM/GPT/SIM/SRAM/
-     QSM), taken straight from the MC68HC16ZUM manual. It carries NO
-     firmware-specific assumptions: no seeded entry points, no external
-     memory blocks, and neutral (reset) bank defaults. Use it as a clean
-     starting point for any HC16Z binary, then add your own entry points,
-     memory map, and bank context.
+     This is the Chrysler JTEC+ firmware profile. It is the generic
+     MC68HC16Z2/Z3 spec (68HC16.pspec) PLUS the firmware-specific layer:
+       - ctxZK=15 bank default (JTEC startup sets ZK=0x0F as its global
+         data pointer bank; a bare chip resets ZK to 0)
+       - RESET_ENTRY / STARTUP / IRQ_* entry points (from the JTEC vector
+         table scan) that seed disassembly
+       - EXT_PERIPH / INT_SRAM memory blocks (from JTEC chip-select and
+         RAMBAH/RAMBAL configuration)
 
-     For the Chrysler JTEC+ PCM/TCM firmware, import with the
-     68HC16:BE:24:JTEC language instead (68HC16_JTEC.pspec), which layers
-     the firmware-specific entry points, memory blocks, and bank defaults
-     on top of this same peripheral map.
+     The Tier-2 peripheral map (ADC/MRM/GPT/SIM/SRAM/QSM symbols, volatile
+     ranges, register blocks) below is shared VERBATIM with 68HC16.pspec.
+     Ghidra pspecs have no include mechanism, so keep the two in sync when
+     editing that shared block.
+
+     For any non-JTEC MC68HC16Z binary, import with 68HC16:BE:24:default
+     instead, which omits the firmware-specific layer above.
      ================================================================ -->
 <processor_spec>
   <programcounter register="PC"/>
   <!-- ================================================================
        Context Data: Default Extension Register Values
-
-       Neutral CPU16 reset defaults: the hardware clears the EK and ZK
-       extension fields to 0 at reset (only PK/SK/SP/PC come from the
-       reset vector words). ctxEK / ctxZK statically resolve EXT16 and
-       ,Z addressing at disassembly time.
-
-       If your firmware sets a fixed data-bank register at startup (as the
-       JTEC+ firmware does, ZK=0x0F), change ctxZK here to match, or set it
-       per-range from the Ghidra listing (Set Register Values). If a target
-       writes EK/ZK dynamically, static resolution no longer holds and the
-       slaspec would need globalset() propagation instead.
+       
+       Derived from reset vector at address 0x0000:
+         Word 0x0FF1  EK=0x0, ZK=0xF, SK=0xF, PK=0x1
+       
+       EK is never modified at runtime in the target firmware
+       (no LDEK, TDP, or TEDPK instructions present; only PSHM/PULM K
+       for save/restore). The static default is therefore valid for all
+       code in the binary.
+       
+       If future firmware variants write EK dynamically, this must be
+       replaced with globalset() propagation in the slaspec.
        ================================================================ -->
   <context_data>
     <context_set space="ram">
         <set name="ctxEK" val="0"/>
-        <set name="ctxZK" val="0"/>
+        <set name="ctxZK" val="15"/> 
     </context_set>
 </context_data>
 	<volatile outputop="write_volatile" inputop="read_volatile">
@@ -60,11 +64,28 @@
     <symbol name="VEC_RESET_ZK_SK_PK" address="ram:0x0000"/>
     <symbol name="VEC_RESET_PC"       address="ram:0x0002"/>
 
-    <!-- NOTE: no handler entry points are seeded here. Exception-handler
-         addresses live in this binary's own vector table (0x0008-0x01FE);
-         they are firmware-specific, so on import Ghidra should follow the
-         reset vector / your own analysis rather than guessing. The JTEC+
-         preset (68HC16_JTEC.pspec) seeds its scanned handler addresses. -->
+    <!-- Actual handler entry points derived from vector table values.
+         entry="true"  : seeds disassembly from this address on import.
+         type="function": promotes the label to a full function so Ghidra
+                          builds the function body, stack frame, and call
+                          graph automatically without manual F-key creation.
+         Handler addresses confirmed from JTEC+ firmware vector table scan. -->
+    <symbol name="RESET_ENTRY"        address="ram:0x010000" entry="true" type="code"/>     
+    <symbol name="STARTUP"            address="ram:0x020000" entry="true" type="code"/>
+    <symbol name="IRQ_DEFAULT_STUB"   address="ram:0x000882" entry="true" type="code"/>
+    <symbol name="IRQ_BKPT"           address="ram:0x000886" entry="true" type="code"/>
+    <symbol name="IRQ_BERR"           address="ram:0x00088a" entry="true" type="code"/>
+    <symbol name="IRQ_SWI"            address="ram:0x00088e" entry="true" type="code"/>
+    <symbol name="IRQ_ILLEGAL"        address="ram:0x000892" entry="true" type="code"/>
+    <symbol name="IRQ_DIV_ZERO"       address="ram:0x000896" entry="true" type="code"/>
+    <symbol name="IRQ_UNINIT"         address="ram:0x00089a" entry="true" type="code"/>
+    <symbol name="IRQ_LVL1"           address="ram:0x00089e" entry="true" type="code"/>
+    <symbol name="IRQ_LVL2"           address="ram:0x0008a2" entry="true" type="code"/>
+    <symbol name="IRQ_LVL3"           address="ram:0x0008a6" entry="true" type="code"/>
+    <symbol name="IRQ_LVL4"           address="ram:0x0008aa" entry="true" type="code"/>
+    <symbol name="IRQ_LVL6"           address="ram:0x0008ae" entry="true" type="code"/>
+    <symbol name="IRQ_LVL7"           address="ram:0x0008b2" entry="true" type="code"/>
+    <symbol name="IRQ_SPURIOUS"       address="ram:0x0008b6" entry="true" type="code"/>
     <symbol name="VEC_RESET_SP"       address="ram:0x0004"/>
     <symbol name="VEC_RESET_IZ"       address="ram:0x0006"/>
     <symbol name="VEC_BKPT"           address="ram:0x0008"/>
@@ -277,21 +298,22 @@
   </default_symbols>
 
   <!-- ================================================================
-       Memory Blocks (chip-generic)
-
-       Only the on-chip I/O register blocks are declared here. Their
-       location (bank 0xF, 0x0FFxxx) is the MC68HC16Z2/Z3 reset default
-       from MC68HC16ZUM Figure 3-9.
-
-       NOT declared (firmware/board-specific; add per target):
-         - Internal SRAM: its base is programmed at runtime via
-           RAMBAH/RAMBAL, so there is no universal address.
-         - External memory / peripherals: mapped by the chip-select
-           registers (CSBARx/CSORx) your firmware configures.
-       The JTEC+ preset (68HC16_JTEC.pspec) declares both, at the
-       addresses that firmware's startup code programs.
+       Memory Blocks
+       Sized from MC68HC16ZUM Figure 3-9 (Z2/Z3 Address Map).
+       SRAM location determined by JTEC+ startup code (FUN_020000):
+         RAMBAH=0x00FF, RAMBAL=0x8000 -> maps to 0x0F8000.
+       Bank 0 (0x000000-0x00FFFF) is external ROM containing vectors,
+       interrupt thunk stubs, dispatch tables, and calibration data,
+       loaded from the firmware binary, no memory block needed.
        ================================================================ -->
   <default_memory_blocks>
+    <!-- CS0: External peripheral at bank 4, 2KB, 8-bit port, R/W
+         CSBAR0=0x0400 CSOR0=0x7C70 -->
+    <memory_block name="EXT_PERIPH" start_address="ram:0x040000" length="0x800" initialized="false" mode="rw"/>
+    <!-- Internal SRAM: base at 0x0F8000 (RAMBAH=0x00FF, RAMBAL=0x8000)
+         4KB for Z3 variant. Stack lives here (SK:SP = 0x0F:0x8FFC).
+         IZ base points here (ZK:IZ = 0x0F:0x8000). -->
+    <memory_block name="INT_SRAM" start_address="ram:0x0F8000" length="0x1000" initialized="false" mode="rw"/>
     <!-- I/O register blocks: per-peripheral for better Ghidra visibility.
          Sizes from MC68HC16ZUM Figure 3-9 (Z2/Z3 address map). -->
     <memory_block name="ADC_REGS"  start_address="ram:0x0FF700" length="0x40"  initialized="false" mode="rwv"/>

@@ -1,10 +1,14 @@
 // DisassembleBanks.java
-// Ghidra script for JTEC+ 68HC16 firmware
-// Scans banks 1, 2, and 3 to find the end of real code (where 0xFF padding begins)
-// then disassembles everything from the bank start up to that point.
+// Ghidra script for banked 68HC16 firmware.
+// Scans a set of code banks to find the end of real code (where a run of
+// 0xFF padding begins) then disassembles from each bank start up to that point.
+//
+// The bank ranges and the FF-run threshold are prompted for at run time and
+// default to the common 0x10000/0x20000/0x30000 layout; override them for your
+// own dump. In headless mode without script properties, the defaults are used.
 //
 // Run via: Script Manager > DisassembleBanks.java
-// @author David (JTEC RE project)
+// @author David
 // @category Analysis
 // @keybinding
 // @menupath
@@ -18,19 +22,19 @@ import ghidra.program.model.address.AddressSpace;
 import ghidra.program.model.mem.Memory;
 import ghidra.program.model.mem.MemoryAccessException;
 import ghidra.app.cmd.disassemble.DisassembleCommand;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DisassembleBanks extends GhidraScript {
 
-    // Each pair is: { bank_start, bank_end }
-    // bank_end is the maximum possible end of the bank
-    private static final long[][] BANKS = {
-        { 0x10000L, 0x1FFFFL },
-        { 0x20000L, 0x2FFFFL },
-        { 0x30000L, 0x3FFFFL }
-    };
+    // Default bank layout (start-end pairs), used when the prompt is accepted
+    // as-is or when running headless without script properties. Each pair is
+    // { bank_start, bank_end }, bank_end being the maximum possible end.
+    private static final String DEFAULT_BANKS =
+        "0x10000-0x1FFFF, 0x20000-0x2FFFF, 0x30000-0x3FFFF";
 
     // How many consecutive 0xFF bytes signals the end of real code
-    private static final int FF_RUN_THRESHOLD = 16;
+    private static final int DEFAULT_FF_RUN_THRESHOLD = 16;
 
     @Override
     public void run() throws Exception {
@@ -38,9 +42,12 @@ public class DisassembleBanks extends GhidraScript {
         AddressSpace addrSpace = addrFactory.getDefaultAddressSpace();
         Memory mem = currentProgram.getMemory();
 
+        long[][] banks = promptForBanks();
+        int ffThreshold = promptForFFThreshold();
+
         int totalDisassembled = 0;
 
-        for (long[] bank : BANKS) {
+        for (long[] bank : banks) {
             long bankStart = bank[0];
             long bankEnd = bank[1];
 
@@ -51,7 +58,7 @@ public class DisassembleBanks extends GhidraScript {
             println(String.format("Scanning bank: 0x%05X - 0x%05X", bankStart, bankEnd));
 
             // Find where the FF padding starts
-            Address ffBoundary = findFFStart(mem, startAddr, endAddr);
+            Address ffBoundary = findFFStart(mem, startAddr, endAddr, ffThreshold);
 
             if (ffBoundary.equals(startAddr)) {
                 println("  WARNING: FF bytes found immediately at bank start, skipping.");
@@ -90,11 +97,61 @@ public class DisassembleBanks extends GhidraScript {
     }
 
     /**
+     * Prompt for the bank ranges as a comma-separated list of "start-end"
+     * pairs (hex or decimal). Falls back to DEFAULT_BANKS if the prompt is
+     * cancelled or unavailable (e.g. headless with no script properties).
+     */
+    private long[][] promptForBanks() {
+        String spec = DEFAULT_BANKS;
+        try {
+            spec = askString("DisassembleBanks",
+                "Bank ranges (comma-separated start-end pairs)", DEFAULT_BANKS);
+        } catch (Exception e) {
+            println("  Using default bank ranges: " + DEFAULT_BANKS);
+        }
+        return parseBanks(spec);
+    }
+
+    /** Parse "0x10000-0x1FFFF, 0x20000-0x2FFFF" into { {start,end}, ... }. */
+    private long[][] parseBanks(String spec) {
+        List<long[]> banks = new ArrayList<>();
+        for (String part : spec.split(",")) {
+            part = part.trim();
+            if (part.isEmpty()) {
+                continue;
+            }
+            String[] ends = part.split("-");
+            if (ends.length != 2) {
+                println("  Skipping malformed bank range: " + part);
+                continue;
+            }
+            long start = Long.decode(ends[0].trim());
+            long end = Long.decode(ends[1].trim());
+            banks.add(new long[] { start, end });
+        }
+        return banks.toArray(new long[0][]);
+    }
+
+    /**
+     * Prompt for the consecutive-0xFF run length that marks the end of code.
+     * Falls back to DEFAULT_FF_RUN_THRESHOLD if unavailable.
+     */
+    private int promptForFFThreshold() {
+        try {
+            return askInt("DisassembleBanks",
+                "Consecutive 0xFF bytes that mark end of code");
+        } catch (Exception e) {
+            println("  Using default FF-run threshold: " + DEFAULT_FF_RUN_THRESHOLD);
+            return DEFAULT_FF_RUN_THRESHOLD;
+        }
+    }
+
+    /**
      * Scans forward from startAddr.
-     * Returns the address where a run of FF_RUN_THRESHOLD consecutive 0xFF bytes begins.
+     * Returns the address where a run of ffThreshold consecutive 0xFF bytes begins.
      * If no padding is found, returns endAddr.
      */
-    private Address findFFStart(Memory mem, Address startAddr, Address endAddr) {
+    private Address findFFStart(Memory mem, Address startAddr, Address endAddr, int ffThreshold) {
         Address addr = startAddr;
         Address ffRunStart = null;
         int ffCount = 0;
@@ -113,7 +170,7 @@ public class DisassembleBanks extends GhidraScript {
                     ffRunStart = addr; // remember where this run started
                 }
                 ffCount++;
-                if (ffCount >= FF_RUN_THRESHOLD) {
+                if (ffCount >= ffThreshold) {
                     return ffRunStart; // found the padding boundary
                 }
             } else {

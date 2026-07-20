@@ -12,7 +12,10 @@
 //
 // Safe to run multiple times -- existing equates are reused, not duplicated.
 //
-// Source: MC68HC16Z3 User's Manual register definitions + JTEC+ firmware patterns
+// The register set and bit masks are chip-generic (MC68HC16Z2/Z3 User's
+// Manual), so this works on any HC16Z binary, not just JTEC+ firmware.
+//
+// Source: MC68HC16Z3 User's Manual register definitions
 //
 // @author  Claude (Anthropic) + David
 // @category MC68HC16

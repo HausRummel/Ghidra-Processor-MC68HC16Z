@@ -7,16 +7,17 @@ PSHM/PULM register set. The module was originally built to reverse-engineer the 
 JTEC+ PCM/TCM** firmware (MC68HC16Z2/Z3), and that profile is preserved — but the default is
 now a clean, chip-generic profile you can use on **any** MC68HC16Z binary.
 
-The instruction set is generic CPU16; the difference between the two profiles is entirely in
-the bundled processor/compiler spec (memory map, symbols, entry points, bank defaults,
-calling convention):
+The instruction set is generic CPU16; the difference between the profiles is entirely in the
+bundled processor/compiler spec (memory map, symbols, entry points, bank defaults, calling
+convention). They layer from bare core to firmware preset:
 
 | Language id | Profile | Use for |
 |---|---|---|
-| `68HC16:BE:24:default` | **Generic MC68HC16Z2/Z3** — chip peripheral map, neutral bank defaults, no seeded entry points | any HC16Z binary |
-| `68HC16:BE:24:JTEC` | **Chrysler JTEC+ PCM/TCM preset** — adds firmware entry points, memory blocks, `ZK=0x0F` default, and the IZ-preserving calling convention | JTEC+ PCM/TCM firmware |
+| `68HC16:BE:24:cpu16` | **Bare CPU16 core** — exception-vector names + register model only, no peripheral map | a non-Z2/Z3 MC68HC16, or a clean slate |
+| `68HC16:BE:24:default` | **Generic MC68HC16Z2/Z3** — the core PLUS this chip's on-chip peripheral map, neutral bank defaults, no seeded entry points | any HC16Z binary |
+| `68HC16:BE:24:JTEC` | **Chrysler JTEC+ PCM/TCM preset** — the Z2/Z3 map PLUS firmware entry points, memory blocks, `ZK=0x0F` default, and the IZ-preserving calling convention | JTEC+ PCM/TCM firmware |
 
-Both are big-endian, 24-bit (1 MB address space), and share the same compiled `68HC16.sla`.
+All three are big-endian, 24-bit (1 MB address space), and share the same compiled `68HC16.sla`.
 
 - **Target parts:** MC68HC16Z2 / MC68HC16Z3 (the `.pspec` ships the Z2/Z3 peripheral map)
 - **Status:** in active use on real firmware; see *Profiles & limitations* below.
@@ -31,10 +32,10 @@ This module installs as a **drop-in processor**, no build step required (a preco
 1. Copy the `MC68HC16Z3/` folder into your Ghidra installation under
    `<GhidraInstallDir>/Ghidra/Processors/`.
 2. Restart Ghidra.
-3. Import your binary. When prompted for the language, choose **68HC16** — pick the
-   `68HC16:BE:24:default` variant for a generic HC16Z binary, or `68HC16:BE:24:JTEC` for
-   Chrysler JTEC+ firmware. Set the base address appropriately for your dump, and proceed
-   with disassembly.
+3. Import your binary. When prompted for the language, choose **68HC16** and pick the variant:
+   `68HC16:BE:24:default` for a generic HC16Z binary, `68HC16:BE:24:JTEC` for Chrysler JTEC+
+   firmware, or `68HC16:BE:24:cpu16` for a non-Z2/Z3 part or a clean slate. Set the base address
+   appropriately for your dump, and proceed with disassembly.
 
 If you edit `68HC16.slaspec`, Ghidra recompiles `68HC16.sla` automatically on next load (or run
 `<GhidraInstallDir>/support/sleigh 68HC16.slaspec` yourself).
@@ -66,24 +67,27 @@ spec it was created with — its analysis is unaffected. To adopt the JTEC prese
 ## Profiles & limitations
 
 The **instruction set, registers, and addressing modes are generic CPU16** and apply to any
-MC68HC16 (shared `.slaspec`/`.sla`). The two profiles differ only in the environment they set up:
+MC68HC16 (shared `.slaspec`/`.sla`). The three profiles differ only in the environment they set up,
+layering from bare core outward:
 
-| Concern | `default` (generic) | `JTEC` preset | Files |
-|---|---|---|---|
-| Peripheral (MMIO) symbol map | ✅ Z2/Z3 map (from the manual) | ✅ same map | `.pspec` `default_symbols` |
-| I/O register memory blocks | ✅ on-chip blocks only | ✅ + `EXT_PERIPH`, `INT_SRAM` | `.pspec` `default_memory_blocks` |
-| Bank context defaults | `ctxEK=0`, `ctxZK=0` (reset) | `ctxEK=0`, `ctxZK=15` (JTEC startup) | `.pspec` `<context_data>` |
-| Seeded entry points | none | `RESET_ENTRY`/`STARTUP`/`IRQ_*` | `.pspec` `default_symbols` |
-| Default calling convention | `__asmcall` (IZ clobbered) | `__pcm_default` (IZ preserved) | `.cspec` `<default_proto>` |
+| Concern | `cpu16` (bare core) | `default` (Z2/Z3) | `JTEC` preset | Files |
+|---|---|---|---|---|
+| Exception-vector names | ✅ CPU16 table | ✅ + Z2/Z3 `VEC_PICR` | ✅ same | `.pspec` `default_symbols` |
+| Peripheral (MMIO) symbol map | ✖ none | ✅ Z2/Z3 map (from the manual) | ✅ same map | `.pspec` `default_symbols` |
+| I/O register memory blocks | ✖ none | ✅ on-chip blocks | ✅ + `EXT_PERIPH`, `INT_SRAM` | `.pspec` `default_memory_blocks` |
+| Bank context defaults | `ctxEK=0`, `ctxZK=0` | `ctxEK=0`, `ctxZK=0` (reset) | `ctxEK=0`, `ctxZK=15` (JTEC startup) | `.pspec` `<context_data>` |
+| Seeded entry points | none | none | `RESET_ENTRY`/`STARTUP`/`IRQ_*` | `.pspec` `default_symbols` |
+| Default calling convention | `__asmcall` (IZ clobbered) | `__asmcall` (IZ clobbered) | `__pcm_default` (IZ preserved) | `.cspec` `<default_proto>` |
 
-So the **generic profile carries no firmware assumptions** — no spurious entry points, no external
-memory blocks, neutral bank defaults. For a non-JTEC HC16Z binary, import with
-`68HC16:BE:24:default`, then add your own entry points, memory map, and (if your firmware fixes a
-data bank at startup) bank context via *Set Register Values*.
+So both `cpu16` and `default` **carry no firmware assumptions** — no spurious entry points, no
+external memory blocks, neutral bank defaults. Use `cpu16` for a part whose peripheral layout is
+*not* the Z2/Z3 (or when you want to define the map yourself); use `default` for any HC16Z binary.
+Either way, add your own entry points, memory map, and (if your firmware fixes a data bank at
+startup) bank context via *Set Register Values*.
 
-**Peripheral map caveat.** The MMIO symbol map and register blocks are chip-generic to the
-MC68HC16Z2/Z3 (SIM/QSM/GPT/ADC/MRM/SRAM), taken from the MC68HC16ZUM manual — verify against your
-exact part.
+**Peripheral map caveat.** In the `default`/`JTEC` profiles the MMIO symbol map and register blocks
+are chip-generic to the MC68HC16Z2/Z3 (SIM/QSM/GPT/ADC/MRM/SRAM), taken from the MC68HC16ZUM
+manual — verify against your exact part. The `cpu16` profile omits them entirely.
 
 **Calling convention.** MC68HC16 firmware of this era is typically **hand-written assembly** with no
 formal ABI, so both conventions are *empirical* best-effort models — reasonable starting points for
@@ -106,7 +110,8 @@ intentionally not modeled. Immediate/offset operands are pinned to hexadecimal d
 ```
 MC68HC16Z3/
   data/languages/      SLEIGH spec: .slaspec, .sinc, .ldefs, compiled .sla
-                       68HC16.pspec / 68HC16.cspec        (generic profile)
+                       68HC16_cpu16.pspec                    (bare CPU16 core)
+                       68HC16.pspec / 68HC16.cspec           (generic Z2/Z3)
                        68HC16_JTEC.pspec / 68HC16_JTEC.cspec (JTEC+ preset)
   data/GhidraScripts/  helper scripts (see below)
   data/Manual/         CPU16RM.pdf and MC68HC16ZUM.pdf reference manuals

@@ -2,22 +2,38 @@
 
 <!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/language_definitions.rxg -->
 
-<!-- Two variants share the same CPU16 instruction set (68HC16.sla); they
-     differ only in the processor/compiler spec they ship with:
+<!-- Three variants share the same CPU16 instruction set (68HC16.sla); they
+     differ only in the processor/compiler spec they ship with, layered from
+     bare core to firmware preset:
 
-       68HC16:BE:24:default  generic MC68HC16Z2/Z3 (chip peripheral map,
-                             neutral bank defaults, no seeded entry points).
-                             Use for any HC16Z binary.
+       68HC16:BE:24:cpu16    bare CPU16 core only: exception-vector names,
+                             neutral bank defaults, no peripheral map. Use
+                             for a non-Z2/Z3 MC68HC16 or a clean slate.
 
-       68HC16:BE:24:JTEC     Chrysler JTEC+ PCM/TCM preset (adds firmware
-                             entry points, memory blocks, ZK=0x0F default,
-                             and the IZ-preserving __pcm_default convention).
+       68HC16:BE:24:default  generic MC68HC16Z2/Z3: the cpu16 core PLUS this
+                             chip's on-chip peripheral map (SIM/QSM/GPT/ADC/
+                             MRM/SRAM). Use for any HC16Z binary.
 
-     Pick the matching language on import. Existing projects imported under
-     :default keep the spec they were created with; to adopt the JTEC preset
-     on an existing project, use Set Language and choose :JTEC. -->
+       68HC16:BE:24:JTEC     Chrysler JTEC+ PCM/TCM preset: the Z2/Z3 map
+                             PLUS firmware entry points, memory blocks,
+                             ZK=0x0F default, and the IZ-preserving
+                             __pcm_default convention.
+
+     Pick the matching language on import. Existing projects keep the spec
+     they were created with; use Set Language to move between variants. -->
 
 <language_definitions>
+  <language processor="68HC16"
+           endian="big"
+           size="24"
+           variant="cpu16"
+           version="1.0"
+           slafile="68HC16.sla"
+           processorspec="68HC16_cpu16.pspec"
+           id="68HC16:BE:24:cpu16">
+    <description>Motorola/Freescale MC68HC16 (CPU16) - bare core, no peripheral map</description>
+    <compiler name="generic (asm)" spec="68HC16.cspec" id="default"/>
+  </language>
   <language processor="68HC16"
            endian="big"
            size="24"

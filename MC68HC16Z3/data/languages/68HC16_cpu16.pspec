@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ================================================================
+     Bare CPU16 core processor spec (language 68HC16:BE:24:cpu16)
+
+     The lowest tier: the CPU16 core only, with NO on-chip peripheral
+     map at all. It carries just the architectural essentials shared by
+     every MC68HC16 part:
+       - the CPU16 exception vector table names (0x0000-0x0030)
+       - neutral (reset) bank-extension defaults
+       - register UI grouping
+
+     Use this for an MC68HC16 that is NOT a Z2/Z3 (e.g. a part with a
+     different peripheral layout), or when you want a clean slate and will
+     define the peripheral map yourself. For an MC68HC16Z2/Z3 binary,
+     prefer 68HC16:BE:24:default, which adds that chip's peripheral map;
+     for Chrysler JTEC+ firmware, use 68HC16:BE:24:JTEC.
+
+     There is intentionally NO <volatile> block and NO
+     <default_memory_blocks> here: peripheral (MMIO) locations are
+     part-specific, and RAM/ROM layout is binary-specific.
+     ================================================================ -->
+<processor_spec>
+  <programcounter register="PC"/>
+
+  <!-- ================================================================
+       Context Data: Default Extension Register Values
+
+       Neutral CPU16 reset defaults: the hardware clears the EK and ZK
+       extension fields to 0 at reset (only PK/SK/SP/PC come from the
+       reset vector words). ctxEK / ctxZK statically resolve EXT16 and
+       ,Z addressing at disassembly time. If your firmware fixes a data
+       bank at startup, set ctxZK to match here or per-range from the
+       listing (Set Register Values).
+       ================================================================ -->
+  <context_data>
+    <context_set space="ram">
+        <set name="ctxEK" val="0"/>
+        <set name="ctxZK" val="0"/>
+    </context_set>
+  </context_data>
+
+  <default_symbols>
+    <!-- ================================================================
+         CPU16 Exception Vector Table (Bank 0, 0x0000-0x0030)
+         Architectural to every MC68HC16; see the CPU16 Reference Manual.
+         Each entry is a 16-bit word (a PC value), NOT a 20-bit pointer;
+         the reset bank context is encoded separately in
+         VEC_RESET_ZK_SK_PK. No handler addresses are seeded; they are
+         firmware-specific and live in this binary's own vector table.
+         Vectors above 0x0030 (periodic interrupt, user-defined) depend on
+         the specific peripheral set and are left to the chip/firmware.
+         ================================================================ -->
+    <symbol name="VEC_RESET_ZK_SK_PK" address="ram:0x0000"/>
+    <symbol name="VEC_RESET_PC"       address="ram:0x0002"/>
+    <symbol name="VEC_RESET_SP"       address="ram:0x0004"/>
+    <symbol name="VEC_RESET_IZ"       address="ram:0x0006"/>
+    <symbol name="VEC_BKPT"           address="ram:0x0008"/>
+    <symbol name="VEC_BERR"           address="ram:0x000A"/>
+    <symbol name="VEC_SWI"            address="ram:0x000C"/>
+    <symbol name="VEC_ILLEGAL"        address="ram:0x000E"/>
+    <symbol name="VEC_DIV_ZERO"       address="ram:0x0010"/>
+    <!-- 0x0012-0x001C: Reserved -->
+    <symbol name="VEC_UNINITIALIZED"  address="ram:0x001E"/>
+    <!-- 0x0020: Reserved -->
+    <symbol name="VEC_LVL1_AUTO"      address="ram:0x0022"/>
+    <symbol name="VEC_LVL2_AUTO"      address="ram:0x0024"/>
+    <symbol name="VEC_LVL3_AUTO"      address="ram:0x0026"/>
+    <symbol name="VEC_LVL4_AUTO"      address="ram:0x0028"/>
+    <symbol name="VEC_LVL5_AUTO"      address="ram:0x002A"/>
+    <symbol name="VEC_LVL6_AUTO"      address="ram:0x002C"/>
+    <symbol name="VEC_LVL7_AUTO"      address="ram:0x002E"/>
+    <symbol name="VEC_SPURIOUS"       address="ram:0x0030"/>
+  </default_symbols>
+
+  <register_data>
+    <register name="A"    group="GP"/>
+    <register name="B"    group="GP"/>
+    <register name="D"    group="GP"/>
+    <register name="E"    group="GP"/>
+    <register name="IX"   group="Index"/>
+    <register name="IY"   group="Index"/>
+    <register name="IZ"   group="Index"/>
+    <register name="SSP"  group="Stack"/>
+    <register name="SP"   group="Stack"/>
+    <register name="PC"   group="PC"/>
+    <register name="CCR"  group="Flags"/>
+    <register name="EK"   group="Extension"/>
+    <register name="XK"   group="Extension"/>
+    <register name="YK"   group="Extension"/>
+    <register name="ZK"   group="Extension"/>
+    <register name="SK"   group="Extension"/>
+    <register name="HR"   group="MAC"/>
+    <register name="IR"   group="MAC"/>
+    <register name="AM"   group="MAC"/>
+    <register name="AM_EXT" group="MAC"/>
+    <register name="XMSK" group="MAC"/>
+    <register name="YMSK" group="MAC"/>
+  </register_data>
+</processor_spec>

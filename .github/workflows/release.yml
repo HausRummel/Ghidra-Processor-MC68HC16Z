@@ -6,10 +6,11 @@ name: release
 #                                      (version-independent; what the README documents)
 #   MC68HC16Z3-<tag>-ghidra-<ver>.zip  Ghidra File -> Install Extensions
 #
-# Ghidra pins an extension to ONE exact Ghidra version via the `version` key in
-# extension.properties, and marks any mismatch incompatible. So the extension
-# package is built once per version listed in GHIDRA_VERSIONS; add a version
-# there when a new Ghidra ships.
+# Ghidra compares the `version` key in extension.properties with its own
+# version: Install Extensions shows a version-mismatch warning (with an
+# "Install Anyway" override) and the Extensions list flags the extension. So
+# the extension package is built once per version listed in GHIDRA_VERSIONS;
+# add a version there when a new Ghidra ships.
 #
 # The bundled reference manuals under data/Manual/ are excluded from the zips:
 # they are ~11 MB of the repo's 12 MB and are not needed for the module to work.
@@ -40,9 +41,13 @@ jobs:
 
       - name: Resolve tag
         id: tag
+        env:
+          # Passed via env, not inlined into the script, so the input is never
+          # evaluated as shell.
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            echo "tag=${INPUT_TAG}" >> "$GITHUB_OUTPUT"
           else
             echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           fi
@@ -103,12 +108,12 @@ jobs:
             echo
             echo "### Install"
             echo
-            echo "**Drop-in** (any Ghidra version, what the README documents):"
+            echo "**Drop-in** (what the README documents; no extension version check):"
             echo "unzip \`${MODULE}-${TAG}-dropin.zip\` into \`<GhidraInstallDir>/Ghidra/Processors/\` and restart Ghidra."
             echo
             echo "**Ghidra extension:** *File -> Install Extensions -> +*, pick the zip matching your"
-            echo "Ghidra version, restart. Ghidra accepts an extension only for the exact version it"
-            echo "was built for, so use the matching asset."
+            echo "Ghidra version, restart. Ghidra warns when an extension's version does not match"
+            echo "its own, so use the matching asset."
             echo
             echo "Then import your binary and choose language **68HC16**:"
             echo

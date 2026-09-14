@@ -39,9 +39,9 @@ repository checkout directly:
    firmware, or `68HC16:BE:24:cpu16` for a non-Z2/Z3 part or a clean slate. Set the base address
    appropriately for your dump, and proceed with disassembly.
 
-Releases also carry a `…-ghidra-<version>.zip` for *File → Install Extensions*. Ghidra pins an
-extension to one exact Ghidra version, so pick the asset matching your install; the drop-in zip
-has no such constraint.
+Releases also carry a `…-ghidra-<version>.zip` for *File → Install Extensions*. Ghidra checks an
+extension's version against its own and warns on a mismatch, so pick the asset matching your
+install; the drop-in zip skips that check.
 
 If you edit `68HC16.slaspec`, Ghidra recompiles `68HC16.sla` automatically on next load (or run
 `<GhidraInstallDir>/support/sleigh 68HC16.slaspec` yourself).

@@ -1,0 +1,143 @@
+name: release
+
+# Publishes a GitHub Release with ready-to-install zips.
+#
+#   MC68HC16Z3-<tag>-dropin.zip        unzip into <GhidraInstallDir>/Ghidra/Processors/
+#                                      (version-independent; what the README documents)
+#   MC68HC16Z3-<tag>-ghidra-<ver>.zip  Ghidra File -> Install Extensions
+#
+# Ghidra compares the `version` key in extension.properties with its own
+# version: Install Extensions shows a version-mismatch warning (with an
+# "Install Anyway" override) and the Extensions list flags the extension. So
+# the extension package is built once per version listed in GHIDRA_VERSIONS;
+# add a version there when a new Ghidra ships.
+#
+# The bundled reference manuals under data/Manual/ are excluded from the zips:
+# they are ~11 MB of the repo's 12 MB and are not needed for the module to work.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release, e.g. v1.1.0 (created from the selected branch if it does not exist)"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  MODULE: MC68HC16Z3
+  # Space-separated. Keep in step with the pin in disasm-tests.yml.
+  GHIDRA_VERSIONS: "12.1.2"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve tag
+        id: tag
+        env:
+          # Passed via env, not inlined into the script, so the input is never
+          # evaluated as shell.
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${INPUT_TAG}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Sanity-check the module before packaging
+        run: |
+          set -e
+          test -f "$MODULE/Module.manifest"
+          test -f "$MODULE/extension.properties"
+          test -f "$MODULE/data/languages/68HC16.sla"
+          test -f "$MODULE/data/languages/68HC16.ldefs"
+          python3 tests/run_disasm_tests.py --lint
+
+      - name: Stage module (without the bundled manuals)
+        run: |
+          set -e
+          mkdir -p stage
+          cp -r "$MODULE" "stage/$MODULE"
+          rm -rf "stage/$MODULE/data/Manual"
+
+      - name: Build drop-in zip
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -e
+          mkdir -p dist
+          (cd stage && zip -qr "../dist/${MODULE}-${TAG}-dropin.zip" "$MODULE")
+
+      - name: Build Ghidra extension zips
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -e
+          for gv in $GHIDRA_VERSIONS; do
+            rm -rf extbuild && mkdir -p extbuild
+            cp -r "stage/$MODULE" "extbuild/$MODULE"
+            # The gradle build normally substitutes @extname@; do it here, and pin
+            # `version` to the Ghidra release or Install Extensions rejects the zip.
+            sed -i "s/^name=.*/name=${MODULE}/; s/^version=.*/version=${gv}/" \
+              "extbuild/$MODULE/extension.properties"
+            (cd extbuild && zip -qr "../dist/${MODULE}-${TAG}-ghidra-${gv}.zip" "$MODULE")
+          done
+
+      - name: Checksums
+        run: |
+          set -e
+          cd dist
+          sha256sum *.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Write release notes
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -e
+          {
+            echo "Ghidra processor (SLEIGH) module for the Motorola/Freescale MC68HC16 (CPU16)."
+            echo
+            echo "### Install"
+            echo
+            echo "**Drop-in** (what the README documents; no extension version check):"
+            echo "unzip \`${MODULE}-${TAG}-dropin.zip\` into \`<GhidraInstallDir>/Ghidra/Processors/\` and restart Ghidra."
+            echo
+            echo "**Ghidra extension:** *File -> Install Extensions -> +*, pick the zip matching your"
+            echo "Ghidra version, restart. Ghidra warns when an extension's version does not match"
+            echo "its own, so use the matching asset."
+            echo
+            echo "Then import your binary and choose language **68HC16**:"
+            echo
+            echo "| Language id | Use for |"
+            echo "|---|---|"
+            echo "| \`68HC16:BE:24:cpu16\` | bare CPU16 core, no peripheral map |"
+            echo "| \`68HC16:BE:24:default\` | any MC68HC16Z2/Z3 binary |"
+            echo "| \`68HC16:BE:24:JTEC\` | Chrysler JTEC+ PCM/TCM firmware |"
+            echo
+            echo "### Notes"
+            echo
+            echo "- The reference manuals under \`MC68HC16Z3/data/Manual/\` are omitted from these"
+            echo "  zips to keep the download small; they remain in the repository."
+            echo "- \`SHA256SUMS.txt\` covers every zip in this release."
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -e
+          gh release create "$TAG" dist/* \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --notes-file release-notes.md

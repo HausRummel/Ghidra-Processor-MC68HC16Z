@@ -137,6 +137,16 @@ instruction byte sequences disassemble to the expected text, using your local Gh
 
 ---
 
+## Related projects
+
+- [**M68HC16_Assembler**](https://github.com/HausRummel/M68HC16_Assembler): a Rust
+  reimplementation of the Motorola MASM 4.6 assembler for the M68HC16 (CPU16), with a CLI
+  and GUI. The two projects share a history and cover opposite directions: this module disassembles and decompiles HC16 binaries, the assembler
+  builds them from source (`.OBJ`, `.S19`, `.LST`, raw `.bin`), with output validated against
+  the original DOS toolchain.
+
+---
+
 ## License
 
 Licensed under the **Apache License, Version 2.0** — see [`LICENSE`](LICENSE).

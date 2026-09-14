@@ -3,7 +3,7 @@ name: release
 # Publishes a GitHub Release with ready-to-install zips.
 #
 #   MC68HC16Z3-<tag>-dropin.zip        unzip into <GhidraInstallDir>/Ghidra/Processors/
-#                                      (version-independent; what the README documents)
+#                                      (no extension version check; what the README documents)
 #   MC68HC16Z3-<tag>-ghidra-<ver>.zip  Ghidra File -> Install Extensions
 #
 # Ghidra compares the `version` key in extension.properties with its own
@@ -37,7 +37,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Resolve tag
         id: tag
@@ -85,7 +85,7 @@ jobs:
             rm -rf extbuild && mkdir -p extbuild
             cp -r "stage/$MODULE" "extbuild/$MODULE"
             # The gradle build normally substitutes @extname@; do it here, and pin
-            # `version` to the Ghidra release or Install Extensions rejects the zip.
+            # `version` to the Ghidra release or Install Extensions warns on a mismatch.
             sed -i "s/^name=.*/name=${MODULE}/; s/^version=.*/version=${gv}/" \
               "extbuild/$MODULE/extension.properties"
             (cd extbuild && zip -qr "../dist/${MODULE}-${TAG}-ghidra-${gv}.zip" "$MODULE")

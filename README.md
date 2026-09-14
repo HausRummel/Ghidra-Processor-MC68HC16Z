@@ -27,7 +27,9 @@ All three are big-endian, 24-bit (1 MB address space), and share the same compil
 ## Installation
 
 This module installs as a **drop-in processor**, no build step required (a precompiled
-`68HC16.sla` is included):
+`68HC16.sla` is included). Take the `…-dropin.zip` from
+[Releases](https://github.com/HausRummel/Ghidra-Processor-MC68HC16Z/releases), or use a
+repository checkout directly:
 
 1. Copy the `MC68HC16Z3/` folder into your Ghidra installation under
    `<GhidraInstallDir>/Ghidra/Processors/`.
@@ -36,6 +38,10 @@ This module installs as a **drop-in processor**, no build step required (a preco
    `68HC16:BE:24:default` for a generic HC16Z binary, `68HC16:BE:24:JTEC` for Chrysler JTEC+
    firmware, or `68HC16:BE:24:cpu16` for a non-Z2/Z3 part or a clean slate. Set the base address
    appropriately for your dump, and proceed with disassembly.
+
+Releases also carry a `…-ghidra-<version>.zip` for *File → Install Extensions*. Ghidra pins an
+extension to one exact Ghidra version, so pick the asset matching your install; the drop-in zip
+has no such constraint.
 
 If you edit `68HC16.slaspec`, Ghidra recompiles `68HC16.sla` automatically on next load (or run
 `<GhidraInstallDir>/support/sleigh 68HC16.slaspec` yourself).
@@ -141,9 +147,9 @@ instruction byte sequences disassemble to the expected text, using your local Gh
 
 - [**M68HC16_Assembler**](https://github.com/HausRummel/M68HC16_Assembler): a Rust
   reimplementation of the Motorola MASM 4.6 assembler for the M68HC16 (CPU16), with a CLI
-  and GUI. The two projects share a history and cover opposite directions: this module disassembles and decompiles HC16 binaries, the assembler
-  builds them from source (`.OBJ`, `.S19`, `.LST`, raw `.bin`), with output validated against
-  the original DOS toolchain.
+  and GUI, producing `.OBJ`, `.S19`, `.LST` and raw `.bin` output validated against the
+  original DOS toolchain. The two projects share a history. Disassemble here, reassemble
+  there when you want to patch or rebuild what you have recovered.
 
 ---
 

@@ -13,5 +13,9 @@ Three profiles share the same instruction set, layered from bare core to firmwar
 - `68HC16:BE:24:JTEC` — Chrysler JTEC+ PCM/TCM preset (adds firmware entry points, memory blocks,
   bank defaults, and the IZ-preserving calling convention).
 
-See the [repository README](../README.md) for installation, the CPU16 banking model, the two
+See the [repository README](../README.md) for installation, the CPU16 banking model, the three
 profiles and their limitations, and licensing (Apache-2.0).
+
+To reassemble what you disassemble, see
+[M68HC16_Assembler](https://github.com/HausRummel/M68HC16_Assembler), a modern M68HC16
+cross-assembler in Rust.
